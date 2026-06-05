@@ -55,8 +55,8 @@ export default function Register() {
     await fetch('http://127.0.0.1:5000/api/user/register', {
       method: 'POST',
       body: JSON.stringify(formData),
-      headers:{
-        "Content-Type":"application/Json"
+      headers: {
+        "Content-Type": "application/Json"
       }
     })
 
@@ -64,18 +64,18 @@ export default function Register() {
     alert("¡Registro exitoso!");
 
     setFormData({
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: ""
-  });
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: ""
+    });
   };
 
   // Manejador de cambios exacto
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    
+
     // Limpiar error al empezar a escribir
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
@@ -97,7 +97,7 @@ export default function Register() {
 
         {/* Tarjeta Glassmorphism */}
         <div className="w-full bg-white/[0.001] backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_32px_0_rgba(0,0,0,0.7)] rounded-3xl p-8 sm:p-10 transition-all duration-300">
-          
+
           {/* Cabecera */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-extrabold text-white tracking-tight">
@@ -110,7 +110,7 @@ export default function Register() {
 
           {/* Formulario */}
           <form onSubmit={handleSubmit} className="space-y-5">
-            
+
             {/* Campo: Nombre completo */}
             <div>
               <label className="block text-gray-300 text-xs font-semibold uppercase tracking-wider mb-2">
@@ -123,11 +123,10 @@ export default function Register() {
                 onChange={handleChange}
                 disabled={isLoading}
                 placeholder="Nombre"
-                className={`w-full px-4 py-3 rounded-xl bg-white/[0.03] text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 transition-all duration-200 disabled:opacity-50 ${
-                  errors.username 
-                    ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/90" 
+                className={`w-full px-4 py-3 rounded-xl bg-white/[0.03] text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 transition-all duration-200 disabled:opacity-50 ${errors.username
+                    ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/90"
                     : "border border-white/[0.08] focus:ring-purple-500/30 focus:border-purple-900/50"
-                }`}
+                  }`}
               />
               {errors.username && (
                 <p className="text-red-400 text-xs mt-1.5 ml-1 font-medium">{errors.username}</p>
@@ -146,11 +145,10 @@ export default function Register() {
                 onChange={handleChange}
                 disabled={isLoading}
                 placeholder="correo@ejemplo.com"
-                className={`w-full px-4 py-3 rounded-xl bg-white/[0.03] text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 transition-all duration-200 disabled:opacity-50 ${
-                  errors.email 
-                    ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/50" 
+                className={`w-full px-4 py-3 rounded-xl bg-white/[0.03] text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 transition-all duration-200 disabled:opacity-50 ${errors.email
+                    ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/50"
                     : "border border-white/[0.08] focus:ring-purple-500/30 focus:border-purple-900/50"
-                }`}
+                  }`}
               />
               {errors.email && (
                 <p className="text-red-400 text-xs mt-1.5 ml-1 font-medium">{errors.email}</p>
@@ -170,11 +168,10 @@ export default function Register() {
                   onChange={handleChange}
                   disabled={isLoading}
                   placeholder="••••••••"
-                  className={`w-full px-4 py-3 rounded-xl bg-white/[0.03] text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 transition-all duration-200 pr-10 disabled:opacity-50 ${
-                    errors.password 
-                      ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/50" 
+                  className={`w-full px-4 py-3 rounded-xl bg-white/[0.03] text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 transition-all duration-200 pr-10 disabled:opacity-50 ${errors.password
+                      ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/50"
                       : "border border-white/[0.08] focus:ring-purple-500/30 focus:border-purple-900/50"
-                  }`}
+                    }`}
                 />
                 <button
                   type="button"
@@ -211,11 +208,10 @@ export default function Register() {
                   onChange={handleChange}
                   disabled={isLoading}
                   placeholder="••••••••"
-                  className={`w-full px-4 py-3 rounded-xl bg-white/[0.03] text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 transition-all duration-200 pr-10 disabled:opacity-50 ${
-                    errors.confirmPassword 
-                      ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/50" 
+                  className={`w-full px-4 py-3 rounded-xl bg-white/[0.03] text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 transition-all duration-200 pr-10 disabled:opacity-50 ${errors.confirmPassword
+                      ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/50"
                       : "border border-white/[0.08] focus:ring-purple-500/30 focus:border-purple-900/50"
-                  }`}
+                    }`}
                 />
                 <button
                   type="button"
@@ -241,29 +237,29 @@ export default function Register() {
 
             {/* Botón de Enviar */}
             <button
-        type="submit"
-        disabled={isLoading}
-        className="group w-full flex items-center justify-center gap-2 py-3.5 px-4 bg-white hover:bg-neutral-100 text-black font-semibold rounded-xl transition-all duration-300 shadow-lg active:scale-[0.98] disabled:opacity-75 disabled:cursor-not-allowed mt-6 border border-transparent hover:border-green-500/50 hover:shadow-[0_0_20px_rgba(34,197,94,0.5)]"
-      >
-        {isLoading ? (
-          <>
-            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Creando cuenta...
-          </>
-        ) : (
-          <>
-            <span>Registrarse</span>
-            <img 
-              src="/huella.svg" 
-              alt="Huella" 
-              className="w-5 h-5 opacity-90 transition-transform duration-200 group-hover:scale-110" 
-            />
-          </>
-        )}
-      </button>
+              type="submit"
+              disabled={isLoading}
+              className="group w-full flex items-center justify-center gap-2 py-3.5 px-4 bg-white hover:bg-neutral-100 text-black font-semibold rounded-xl transition-all duration-300 shadow-lg active:scale-[0.98] disabled:opacity-75 disabled:cursor-not-allowed mt-6 border border-transparent hover:border-green-500/50 hover:shadow-[0_0_20px_rgba(34,197,94,0.5)]"
+            >
+              {isLoading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Creando cuenta...
+                </>
+              ) : (
+                <>
+                  <span>Registrarse</span>
+                  <img
+                    src="/huella.svg"
+                    alt="Huella"
+                    className="w-5 h-5 opacity-90 transition-transform duration-200 group-hover:scale-110"
+                  />
+                </>
+              )}
+            </button>
           </form>
 
           {/* Footer del Formulario */}
