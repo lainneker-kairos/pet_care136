@@ -14,12 +14,22 @@ class User(db.Model):
     username: Mapped[str] = mapped_column( String(40), unique=True, nullable=False)
     email: Mapped[str] = mapped_column( String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(nullable=False)
-    is_active: Mapped[bool] = mapped_column(Boolean(), default=True, nullable=False)
+    role: Mapped [str] = mapped_column(String(20), nullable=False, default="owner")
+
+# --- RELACIONES ---
+# Un dueño puede tener varias mascotas
+    pets: Mapped[List["Pet"]] = relationship(back_populates="owner", cascade="all, delete-orphan")
+
+    # Un cuidador puede ofrecer varios servicios
+    services: Mapped[List["Service"]] = relationship(back_populates="petsitter", cascade="all, delete-orphan")
+
+    # Un cuidador tiene disponibilidades
+    availabilities: Mapped[List["Availability"]] = relationship(back_populates="petsitter", cascade="all, delete-orphan")
 
     def serialize(self):
         return {
             "id": self.id,
             "username": self.username,
             "email": self.email,
-            "is_active": self.is_active
+            "role": self.role,
         }

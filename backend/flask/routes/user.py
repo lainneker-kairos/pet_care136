@@ -17,6 +17,13 @@ def register_user():
     username = body.get ("username", "").strip()
     email = body.get ("email", "").strip()
     password = body.get ("password")
+    role_temp = body.get("role")
+    role = role_temp.strip() if role_temp else "user"
+
+    roles_permitidos = ["owner", "petsitter",]
+
+    if role not in roles_permitidos:
+        return jsonify({"msg": "Rol no válido"}), 400
 
     if not email or not password or not username:
         return jsonify({"msg": "Faltan campos"}), 400
@@ -25,6 +32,7 @@ def register_user():
         username = username,
         email = email,
         password = generate_password_hash(password),
+        role = role
     )
 
     db.session.add(new_user)
