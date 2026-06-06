@@ -1,31 +1,48 @@
+from __future__ import annotations
 from sqlalchemy import String, Integer, ForeignKey, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database import db
+from typing import List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .user import Owner
+    from .booking import Booking
 
 class Pet(db.Model):
     __tablename__ = "pet"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(50), nullable=False)
-    species: Mapped[str] = mapped_column(String(50), nullable=False) # Perro, Gato, etc.
-    breed: Mapped[str] = mapped_column(String(50), nullable=True) # Raza
-    age: Mapped[int] = mapped_column(Integer, nullable=True)
-    description: Mapped[str] = mapped_column(Text, nullable=True)
+    owner_id: Mapped[int] = mapped_column(ForeignKey("owner.id"), nullable=False)
     
-    # Relación con el dueño (User)
-    owner_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
-    owner: Mapped["User"] = relationship(back_populates="pets")
+    name: Mapped[str] = mapped_column(String(50), nullable=False)
+    species: Mapped[str] = mapped_column(String(50), nullable=False)
+    breed: Mapped[str] = mapped_column(String(50), nullable=True)
+    age: Mapped[int] = mapped_column(Integer, nullable=True)
+    size: Mapped[str] = mapped_column(String(20), nullable=True)
+    tags: Mapped[str] = mapped_column(String(255), nullable=True)
+    behavior: Mapped[str] = mapped_column(Text, nullable=True)
+    allergies: Mapped[str] = mapped_column(Text, nullable=True)
+    medications: Mapped[str] = mapped_column(Text, nullable=True)
+    special_notes: Mapped[str] = mapped_column(Text, nullable=True)
+    photo: Mapped[str] = mapped_column(String(255), nullable=True)
 
-    # Relación con reservas (una mascota puede estar en varias reservas a lo largo del tiempo)
-    bookings: Mapped[list["Booking"]] = relationship(back_populates="pet")
+    # Relaciones
+    owner: Mapped[Owner] = relationship(back_populates="pets")
+    bookings: Mapped[List[Booking]] = relationship(back_populates="pet")
 
     def serialize(self):
         return {
             "id": self.id,
+            "owner_id": self.owner_id,
             "name": self.name,
             "species": self.species,
             "breed": self.breed,
             "age": self.age,
-            "description": self.description,
-            "owner_id": self.owner_id
+            "size": self.size,
+            "tags": self.tags,
+            "behavior": self.behavior,
+            "allergies": self.allergies,
+            "medications": self.medications,
+            "special_notes": self.special_notes,
+            "photo": self.photo
         }
