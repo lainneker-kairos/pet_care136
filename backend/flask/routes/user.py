@@ -118,7 +118,7 @@ def login():
         profile_name = user.petsitter_profile.name
 
     # Generación de token JWT con expiración de 24 horas (idéntico a tu lógica original)
-    expiration_time = datetime.datetime.now() + datetime.timedelta(hours=24)
+    expiration_time = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
     jwt_token = jwt.encode(
         {
             "sub": user.id,  

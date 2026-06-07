@@ -1,0 +1,1032 @@
+=== ARCHIVO: ./backend/flask/app.py ===
+from flask import Flask
+from flask_cors import CORS
+from dotenv import load_dotenv
+from database import db
+import os
+from routes.user import user_bp
+from routes.pets import pets_bp  
+from routes.booking import bookings_bp
+
+# Importacion de modelos
+from models.user import User, Owner, Petsitter
+from models.pets import Pet
+from models.availability import Availability
+from models.booking import Booking
+from models.reviews import Review
+
+load_dotenv()
+
+app = Flask(__name__)
+CORS(app)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+
+db.init_app(app)
+
+app.register_blueprint(user_bp)
+app.register_blueprint(pets_bp)  
+app.register_blueprint(bookings_bp)
+
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+
+    app.run(debug=False)
+=== ARCHIVO: ./backend/flask/database.py ===
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
+=== ARCHIVO: ./backend/flask/models/availability.py ===
+from __future__ import annotations
+from sqlalchemy import String, Boolean, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from database import db
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .user import Petsitter
+
+class Availability(db.Model):
+    __tablename__ = "availability"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    petsitter_id: Mapped[int] = mapped_column(ForeignKey("petsitter.id"), nullable=False)
+    
+    date: Mapped[str] = mapped_column(String(20), nullable=False) # YYYY-MM-DD
+    is_available: Mapped[bool] = mapped_column(Boolean, default=True)
+    google_calendar_id: Mapped[str] = mapped_column(String(255), nullable=True)
+
+    # Relaciones
+    petsitter: Mapped[Petsitter] = relationship(back_populates="availabilities")
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "petsitter_id": self.petsitter_id,
+            "date": self.date,
+            "is_available": self.is_available,
+            "google_calendar_id": self.google_calendar_id
+        }
+=== ARCHIVO: ./backend/flask/models/booking.py ===
+from __future__ import annotations
+from datetime import datetime
+from sqlalchemy import String, Float, ForeignKey, Text, DateTime
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from database import db
+from typing import List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .user import Owner, Petsitter
+    from .pets import Pet
+    from .reviews import Review
+
+class Booking(db.Model):
+    __tablename__ = "booking"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    owner_id: Mapped[int] = mapped_column(ForeignKey("owner.id"), nullable=False)
+    petsitter_id: Mapped[int] = mapped_column(ForeignKey("petsitter.id"), nullable=False)
+    pet_id: Mapped[int] = mapped_column(ForeignKey("pet.id"), nullable=False)
+    
+    service_type: Mapped[str] = mapped_column(String(50), nullable=False) # paseo, hotel, guarderia, etc.
+    start_date: Mapped[str] = mapped_column(String(20), nullable=False)
+    end_date: Mapped[str] = mapped_column(String(20), nullable=False)
+    start_time: Mapped[str] = mapped_column(String(10), nullable=True)
+    end_time: Mapped[str] = mapped_column(String(10), nullable=True)
+    
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    total_price: Mapped[float] = mapped_column(Float, nullable=False)
+    comments: Mapped[str] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    # Relaciones
+    owner: Mapped[Owner] = relationship(back_populates="bookings")
+    petsitter: Mapped[Petsitter] = relationship(back_populates="bookings")
+    pet: Mapped[Pet] = relationship(back_populates="bookings")
+    reviews: Mapped[List[Review]] = relationship(back_populates="booking")
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "owner_id": self.owner_id,
+            "petsitter_id": self.petsitter_id,
+            "pet_id": self.pet_id,
+            "service_type": self.service_type,
+            "start_date": self.start_date,
+            "end_date": self.end_date,
+            "start_time": self.start_time,
+            "end_time": self.end_time,
+            "status": self.status,
+            "total_price": self.total_price,
+            "comments": self.comments,
+            "created_at": self.created_at.isoformat() if self.created_at else None
+        }
+=== ARCHIVO: ./backend/flask/models/pets.py ===
+from __future__ import annotations
+from sqlalchemy import String, Integer, ForeignKey, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from database import db
+from typing import List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .user import Owner
+    from .booking import Booking
+
+class Pet(db.Model):
+    __tablename__ = "pet"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    owner_id: Mapped[int] = mapped_column(ForeignKey("owner.id"), nullable=False)
+    
+    name: Mapped[str] = mapped_column(String(50), nullable=False)
+    species: Mapped[str] = mapped_column(String(50), nullable=False)
+    breed: Mapped[str] = mapped_column(String(50), nullable=True)
+    age: Mapped[int] = mapped_column(Integer, nullable=True)
+    size: Mapped[str] = mapped_column(String(20), nullable=True)
+    tags: Mapped[str] = mapped_column(String(255), nullable=True)
+    behavior: Mapped[str] = mapped_column(Text, nullable=True)
+    allergies: Mapped[str] = mapped_column(Text, nullable=True)
+    medications: Mapped[str] = mapped_column(Text, nullable=True)
+    special_notes: Mapped[str] = mapped_column(Text, nullable=True)
+    photo: Mapped[str] = mapped_column(String(255), nullable=True)
+
+    # Relaciones
+    owner: Mapped[Owner] = relationship(back_populates="pets")
+    bookings: Mapped[List[Booking]] = relationship(back_populates="pet")
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "owner_id": self.owner_id,
+            "name": self.name,
+            "species": self.species,
+            "breed": self.breed,
+            "age": self.age,
+            "size": self.size,
+            "tags": self.tags,
+            "behavior": self.behavior,
+            "allergies": self.allergies,
+            "medications": self.medications,
+            "special_notes": self.special_notes,
+            "photo": self.photo
+        }
+=== ARCHIVO: ./backend/flask/models/reviews.py ===
+from __future__ import annotations
+from datetime import datetime
+from sqlalchemy import String, Integer, ForeignKey, Text, DateTime
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from database import db
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .booking import Booking
+    from .user import User
+
+class Review(db.Model):
+    __tablename__ = "review"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    booking_id: Mapped[int] = mapped_column(ForeignKey("booking.id"), nullable=False)
+    reviewer_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
+    reviewed_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
+    
+    rating: Mapped[int] = mapped_column(Integer, nullable=False)
+    comment: Mapped[str] = mapped_column(Text, nullable=True)
+    review_type: Mapped[str] = mapped_column(String(50), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    # Relaciones
+    booking: Mapped[Booking] = relationship(back_populates="reviews")
+    reviewer: Mapped[User] = relationship(foreign_keys=[reviewer_id], back_populates="reviews_given")
+    reviewed: Mapped[User] = relationship(foreign_keys=[reviewed_id], back_populates="reviews_received")
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "booking_id": self.booking_id,
+            "reviewer_id": self.reviewer_id,
+            "reviewed_id": self.reviewed_id,
+            "rating": self.rating,
+            "comment": self.comment,
+            "review_type": self.review_type,
+            "created_at": self.created_at.isoformat() if self.created_at else None
+        }
+=== ARCHIVO: ./backend/flask/models/user.py ===
+from __future__ import annotations
+from datetime import datetime
+from sqlalchemy import String, Integer, Float, Boolean, ForeignKey, Text, DateTime
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from database import db
+from typing import List, TYPE_CHECKING
+
+# Usamos TYPE_CHECKING para evitar importaciones circulares
+#comentario israel 
+
+if TYPE_CHECKING:
+    from .pets import Pet
+    from .booking import Booking
+    from .reviews import Review
+    from .availability import Availability
+# ==========================================
+# TABLA BASE: USUARIOS
+# ==========================================
+class User(db.Model):
+    __tablename__ = "user"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
+    password: Mapped[str] = mapped_column(String(255), nullable=False)
+    role: Mapped[str] = mapped_column(String(20), nullable=False) # "owner" o "petsitter"
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    # Relaciones 1 a 1
+    owner_profile: Mapped[Owner] = relationship(back_populates="user", uselist=False, cascade="all, delete-orphan")
+    petsitter_profile: Mapped[Petsitter] = relationship(back_populates="user", uselist=False, cascade="all, delete-orphan")
+
+    # Relaciones 1 a N para reseñas (quien escribe y quien recibe)
+    reviews_given: Mapped[List[Review]] = relationship("Review", foreign_keys="[Review.reviewer_id]", back_populates="reviewer")
+    reviews_received: Mapped[List[Review]] = relationship("Review", foreign_keys="[Review.reviewed_id]", back_populates="reviewed")
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "email": self.email,
+            "role": self.role,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "is_active": self.is_active
+        }
+
+# ==========================================
+# PERFIL: DUEÑO
+# ==========================================
+class Owner(db.Model):
+    __tablename__ = "owner"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), unique=True, nullable=False)
+    
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    phone: Mapped[str] = mapped_column(String(20), nullable=True)
+    city: Mapped[str] = mapped_column(String(100), nullable=True)
+    neighborhood: Mapped[str] = mapped_column(String(100), nullable=True)
+    bio: Mapped[str] = mapped_column(Text, nullable=True)
+    profile_pic: Mapped[str] = mapped_column(String(255), nullable=True)
+    max_budget: Mapped[float] = mapped_column(Float, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+    # Relaciones
+    user: Mapped[User] = relationship(back_populates="owner_profile")
+    pets: Mapped[List[Pet]] = relationship(back_populates="owner", cascade="all, delete-orphan")
+    bookings: Mapped[List[Booking]] = relationship(back_populates="owner")
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "name": self.name,
+            "phone": self.phone,
+            "city": self.city,
+            "neighborhood": self.neighborhood,
+            "bio": self.bio,
+            "profile_pic": self.profile_pic,
+            "max_budget": self.max_budget,
+            "created_at": self.created_at.isoformat() if self.created_at else None
+        }
+
+# ==========================================
+# PERFIL: PETSITTER (CUIDADOR)
+# ==========================================
+class Petsitter(db.Model):
+    __tablename__ = "petsitter"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), unique=True, nullable=False)
+    
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    phone: Mapped[str] = mapped_column(String(20), nullable=True)
+    city: Mapped[str] = mapped_column(String(100), nullable=True)
+    neighborhood: Mapped[str] = mapped_column(String(100), nullable=True)
+    bio: Mapped[str] = mapped_column(Text, nullable=True)
+    profile_pic: Mapped[str] = mapped_column(String(255), nullable=True)
+    
+    # Atributos profesionales
+    experience_years: Mapped[int] = mapped_column(Integer, default=0)
+    certifications: Mapped[str] = mapped_column(Text, nullable=True)
+    
+    # Servicios ofrecidos
+    offers_walk: Mapped[bool] = mapped_column(Boolean, default=False)
+    offers_hotel: Mapped[bool] = mapped_column(Boolean, default=False)
+    offers_daycare: Mapped[bool] = mapped_column(Boolean, default=False)
+    offers_nightcare: Mapped[bool] = mapped_column(Boolean, default=False)
+    
+    available_days: Mapped[str] = mapped_column(String(100), nullable=True)
+    accepted_dog_sizes: Mapped[str] = mapped_column(String(100), nullable=True)
+    
+    price_per_hour: Mapped[float] = mapped_column(Float, nullable=True)
+    price_per_night: Mapped[float] = mapped_column(Float, nullable=True)
+    
+    rating: Mapped[float] = mapped_column(Float, default=0.0)
+    booking_count: Mapped[int] = mapped_column(Integer, default=0)
+    google_calendar_id: Mapped[str] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    # Relaciones
+    user: Mapped[User] = relationship(back_populates="petsitter_profile")
+    availabilities: Mapped[List[Availability]] = relationship(back_populates="petsitter", cascade="all, delete-orphan")
+    bookings: Mapped[List[Booking]] = relationship(back_populates="petsitter")
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "name": self.name,
+            "phone": self.phone,
+            "city": self.city,
+            "neighborhood": self.neighborhood,
+            "bio": self.bio,
+            "profile_pic": self.profile_pic,
+            "experience_years": self.experience_years,
+            "certifications": self.certifications,
+            "offers_walk": self.offers_walk,
+            "offers_hotel": self.offers_hotel,
+            "offers_daycare": self.offers_daycare,
+            "offers_nightcare": self.offers_nightcare,
+            "available_days": self.available_days,
+            "accepted_dog_sizes": self.accepted_dog_sizes,
+            "price_per_hour": self.price_per_hour,
+            "price_per_night": self.price_per_night,
+            "rating": self.rating,
+            "booking_count": self.booking_count,
+            "google_calendar_id": self.google_calendar_id,
+            "created_at": self.created_at.isoformat() if self.created_at else None
+        }
+=== ARCHIVO: ./backend/flask/routes/booking.py ===
+from flask import Blueprint, request, jsonify
+from database import db
+from models.booking import Booking
+from models.user import Owner, Petsitter
+from models.pets import Pet
+from datetime import datetime
+
+bookings_bp = Blueprint('bookings_bp', __name__, url_prefix='/api')
+
+# ==========================================
+# CREAR NUEVA RESERVA
+# ==========================================
+@bookings_bp.route('/bookings', methods=['POST'])
+def create_booking():
+    data = request.json
+    owner_id = data.get('owner_id')
+    petsitter_id = data.get('petsitter_id')
+    pet_id = data.get('pet_id')
+    service_type = data.get('service_type') # "paseo", "hotel", "guarderia", "paseo nocturno"
+    start_date = data.get('start_date')     # Formato "YYYY-MM-DD"
+    end_date = data.get('end_date')         # Formato "YYYY-MM-DD"
+    
+    # Horas opcionales (principalmente paseos)
+    start_time = data.get('start_time')
+    end_time = data.get('end_time')
+    comments = data.get('comments')
+
+    # Validaciones iniciales
+    if not all([owner_id, petsitter_id, pet_id, service_type, start_date, end_date]):
+        return jsonify({"msg": "Faltan campos requeridos para la reserva"}), 400
+
+    owner = db.session.get(Owner, owner_id)
+    petsitter = db.session.get(Petsitter, petsitter_id)
+    pet = db.session.get(Pet, pet_id)
+
+    if not owner or not petsitter or not pet:
+        return jsonify({"msg": "Dueño, cuidador o mascota no válidos"}), 404
+
+    # Verificar si la mascota pertenece al dueño solicitante
+    if pet.owner_id != owner.id:
+        return jsonify({"msg": "La mascota seleccionada no pertenece al dueño"}), 403
+
+    # Calcular precio de forma dinámica según el tipo de servicio ofrecido por el petsitter
+    # Reemplazando el comportamiento de la anterior tabla intermedia de "Service"
+    total_price = 0.0
+    
+    try:
+        # Calcular diferencia en días
+        d1 = datetime.strptime(start_date, "%Y-%m-%d")
+        d2 = datetime.strptime(end_date, "%Y-%m-%d")
+        days = (d2 - d1).days
+
+        if days < 0:
+            return jsonify({"msg": "La fecha de fin no puede ser anterior a la de inicio"}), 400
+        
+        if days <= 0:
+            days = 1 # Considerar mínimo 1 día para reservas básicas de horas o paseos individuales
+                
+        if service_type == "hotel":
+            if not petsitter.offers_hotel:
+                 return jsonify({"msg": "Este cuidador no ofrece servicio de hotel"}), 400
+            total_price = days * (petsitter.price_per_night or 0.0)
+
+        elif service_type == "nightcare":
+            if not petsitter.offers_nightcare:
+                 return jsonify({"msg": "Este cuidador no ofrece servicio de cuidado nocturno"}), 400
+            total_price = days * (petsitter.price_per_night or 0.0)
+
+        elif service_type == "paseo":
+            if not petsitter.offers_walk:
+             return jsonify({"msg": "Este cuidador no ofrece servicio de paseo"}), 400
+            total_price = hours * (petsitter.price_per_hour or 0.0)
+
+        elif service_type == "guarderia":
+            if not petsitter.offers_daycare:
+              return jsonify({"msg": "Este cuidador no ofrece servicio de guardería"}), 400
+            total_price = hours * (petsitter.price_per_hour or 0.0)
+        else:
+            return jsonify({"msg": "Tipo de servicio no válido"}), 400
+        
+        #Si tiene horas de inicio y fin, se calcula por horas
+        if start_time and end_time:
+                t1 = datetime.strptime(start_time, "%H:%M")
+                t2 = datetime.strptime(end_time, "%H:%M")
+                hours = (t2 - t1).seconds / 3600.0
+                if hours <= 0:
+                    hours = 1.0 # Mínimo una hora
+                total_price = days * hours * (petsitter.price_per_hour or 0.0)
+        else:
+                # Si no se definen horas, asumimos un valor plano por día basado en precio de hora (ej: estimación estándar de 4 horas)
+                total_price = days * 4.0 * (petsitter.price_per_hour or 0.0)
+
+    except ValueError:
+        return jsonify({"msg": "Formato de fechas u horas inválido"}), 400
+
+    # Crear la Reserva
+    new_booking = Booking(
+        owner_id=owner.id,
+        petsitter_id=petsitter.id,
+        pet_id=pet.id,
+        service_type=service_type,
+        start_date=start_date,
+        end_date=end_date,
+        start_time=start_time,
+        end_time=end_time,
+        total_price=total_price,
+        comments=comments,
+        status="pending"
+    )
+
+    db.session.add(new_booking)
+    db.session.commit()
+
+    return jsonify({
+        "msg": "Reserva creada exitosamente",
+        "booking": new_booking.serialize()
+    }), 201
+
+
+# ==========================================
+# CAMBIAR ESTADO DE LA RESERVA
+# ==========================================
+@bookings_bp.route('/bookings/<int:booking_id>/status', methods=['PATCH'])
+def update_booking_status(booking_id):
+    data = request.json
+    new_status = data.get('status') # "approvado", "rechazado", "completado", "cancelado"
+
+    if not new_status:
+        return jsonify({"msg": "Falta el nuevo estado"}), 400
+
+    booking = db.session.get(Booking, booking_id)
+    if not booking:
+        return jsonify({"msg": "Reserva no encontrada"}), 404
+
+    # Validación de estados permitidos
+    if new_status not in ["approved", "rejected", "completed", "cancelled"]:
+        return jsonify({"msg": "Estado de reserva inválido"}), 400
+
+    booking.status = new_status
+
+    # Si se completa, podemos autoincrementar la cantidad de bookings en el cuidador
+    if new_status == "completed":
+        petsitter = booking.petsitter
+        if petsitter:
+            petsitter.booking_count += 1
+
+    db.session.commit()
+    return jsonify({
+        "msg": f"El estado de la reserva ha cambiado a: {new_status}",
+        "booking": booking.serialize()
+    }), 200
+
+
+# ==========================================
+# VER RESERVAS DE UN DUEÑO O CUIDADOR
+# ==========================================
+@bookings_bp.route('/bookings/user/<string:role>/<int:profile_id>', methods=['GET'])
+def get_user_bookings(role, profile_id):
+    if role == 'owner':
+        bookings = db.session.execute(db.select(Booking).filter_by(owner_id=profile_id)).scalars().all()
+    elif role == 'petsitter':
+        bookings = db.session.execute(db.select(Booking).filter_by(petsitter_id=profile_id)).scalars().all()
+    else:
+        return jsonify({"msg": "Rol no válido para consultar reservas"}), 400
+
+    return jsonify([booking.serialize() for booking in bookings]), 200
+=== ARCHIVO: ./backend/flask/routes/pets.py ===
+from flask import Blueprint, jsonify, request
+from database import db
+from models.pets import Pet
+from models.user import User
+from utils.auth import token_required
+
+pets_bp = Blueprint('pets', __name__)
+
+# OBTENER LAS MASCOTAS DEL USUARIO AUTENTICADO
+@pets_bp.route('/api/pets', methods=['GET'])
+@token_required
+def get_my_pets(current_user_id):
+    #  Buscamos al usuario base
+    user = db.session.get(User, current_user_id)
+    
+    # Verificamos que tenga un perfil de dueño (Owner)
+    if not user or not user.owner_profile:
+        return jsonify({"msg": "No se encontró un perfil de dueño para este usuario"}), 404
+    
+    # cambiamos .query.filter_by por db.select para evitar problemas de sesión
+    pets = db.session.execute(
+        db.select(Pet).filter_by(owner_id=user.owner_profile.id)
+    ).scalars().all()
+    
+    return jsonify([pet.serialize() for pet in pets]), 200
+
+
+# REGISTRAR UNA NUEVA MASCOTA
+@pets_bp.route('/api/pets', methods=['POST'])
+@token_required
+def create_pet(current_user_id):
+    #agregamos validación para asegurarnos de que el usuario tenga un perfil de dueño antes de crear la mascota
+    user = db.session.get(User, current_user_id)
+    if not user or not user.owner_profile:
+        return jsonify({"msg": "solo los dueños pueden registrar mascotas"}), 404
+
+    body = request.get_json()
+    
+    name = body.get("name")
+    species = body.get("species")
+    
+    if not name or not species:
+        return jsonify({"msg": "Faltan datos de la mascota (nombre, especie)"}), 400
+
+    new_pet = Pet(
+        name=name,
+        species=species,
+        breed=body.get("breed", ""),
+        age=body.get("age"),
+        size=body.get("size", ""),
+        tags=body.get("tags", ""),
+        behavior=body.get("behavior", ""),
+        allergies=body.get("allergies", ""),
+        medications=body.get("medications", ""),
+        special_notes=body.get("special_notes", ""),
+        photo=body.get("photo", ""),
+        owner_id=user.owner_profile.id
+    )
+
+    db.session.add(new_pet)
+    db.session.commit()
+
+    return jsonify({"msg": "Mascota creada con éxito", "pet": new_pet.serialize()}), 201
+=== ARCHIVO: ./backend/flask/routes/user.py ===
+from flask import Blueprint, request, jsonify, current_app
+from database import db
+from models.user import User, Owner, Petsitter
+from werkzeug.security import generate_password_hash, check_password_hash
+from utils.auth import token_required
+import jwt
+import datetime
+
+user_bp = Blueprint('user_bp', __name__, url_prefix='/api')
+
+# ==========================================
+# 1ra RUTA DE PRUEBA (clase horacio)
+# ==========================================
+@user_bp.route('/user', methods=['GET'])
+def get_users():
+    return jsonify({"msg": "Todo bien"})
+
+# ==========================================
+# REGISTRO DE USUARIOS
+# ==========================================
+@user_bp.route('/register', methods=['POST'])
+def register():
+    data = request.json
+    if not data:
+        return jsonify({"msg": "Faltan datos en la solicitud"}), 400
+
+    email = data.get('email')
+    password = data.get('password')
+    role = data.get('role') # "owner" o "petsitter"
+    name = data.get('name')
+
+    if not email or not password or not role or not name:
+        return jsonify({"msg": "Todos los campos obligatorios (email, password, role, name) son requeridos"}), 400
+
+    if role not in ['owner', 'petsitter']:
+        return jsonify({"msg": "Rol inválido. 'Debes elegir un rol'"}), 400
+
+    # Verificar si el usuario ya existe
+    user_exists = db.session.execute(db.select(User).filter_by(email=email)).scalar_one_or_none()
+    if user_exists:
+        return jsonify({"msg": "El correo electrónico ya está registrado"}), 400
+
+    # Crear el usuario base usando los campos exactos del modelo 
+    hashed_password = generate_password_hash(password)
+
+    new_user = User(
+        email=email,
+        password=hashed_password,
+        role=role,
+        is_active=True
+    )
+    db.session.add(new_user)
+    db.session.flush() # Obtiene el new_user.id antes de hacer el commit
+
+    # Creación del perfil correspondiente según el rol
+    if role == 'owner':
+        new_profile = Owner(
+            user_id=new_user.id,
+            name=name,
+            phone=data.get('phone'),
+            city=data.get('city'),
+            neighborhood=data.get('neighborhood'),
+            bio=data.get('bio', ""),
+            profile_pic=data.get('profile_pic', ""),
+            max_budget=data.get('max_budget')
+        )
+    else:
+        new_profile = Petsitter(
+            user_id=new_user.id,
+            name=name,
+            phone=data.get('phone'),
+            city=data.get('city'),
+            neighborhood=data.get('neighborhood'),
+            bio=data.get('bio', ""),
+            profile_pic=data.get('profile_pic', ""),
+            experience_years=data.get('experience_years', 0),
+            certifications=data.get('certifications', ""),
+            price_per_hour=data.get('price_per_hour', 0.0),
+            price_per_night=data.get('price_per_night', 0.0)
+        )
+
+    db.session.add(new_profile)
+    db.session.commit()
+
+    return jsonify({
+        "msg": "Usuario y perfil creados exitosamente",
+        "user": new_user.serialize()
+    }), 201
+
+
+# ==========================================
+# INICIO DE SESIÓN
+# ==========================================
+@user_bp.route('/login', methods=['POST'])
+def login():
+    data = request.json
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
+        return jsonify({"msg": "Faltan credenciales"}), 400
+
+    user = db.session.execute(db.select(User).filter_by(email=email)).scalar_one_or_none()
+    if not user or not check_password_hash(user.password, password):
+        return jsonify({"msg": "Correo o contraseña incorrectos"}), 401
+
+    if not user.is_active:
+        return jsonify({"msg": "Cuenta de usuario desactivada"}), 403
+
+    # Obtener información básica de perfil para el frontend
+    profile_id = None
+    profile_name = ""
+    if user.role == 'owner' and user.owner_profile:
+        profile_id = user.owner_profile.id
+        profile_name = user.owner_profile.name
+    elif user.role == 'petsitter' and user.petsitter_profile:
+        profile_id = user.petsitter_profile.id
+        profile_name = user.petsitter_profile.name
+
+    # Generación de token JWT con expiración de 24 horas (idéntico a tu lógica original)
+    expiration_time = datetime.datetime.now() + datetime.timedelta(hours=24)
+    jwt_token = jwt.encode(
+        {
+            "sub": user.id,  
+            "exp": expiration_time
+        },
+        current_app.config['SECRET_KEY'],  
+        algorithm="HS256"
+    )
+    
+    return jsonify({
+        "msg": "Sesión iniciada correctamente",
+        "user": user.serialize(),
+        "profile": {
+            "profile_id": profile_id,
+            "name": profile_name
+        },
+        "token": jwt_token
+    }), 200
+
+
+# ==========================================
+# OBTENER PERFIL PROPIO 
+# ==========================================
+@user_bp.route('/profile/me', methods=['GET'])
+@token_required
+def get_my_profile(current_user_id):
+    user = db.session.get(User, current_user_id)
+    if not user:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+
+    # Serializar el perfil completo basado en el rol del usuario
+    profile_data = None
+    if user.role == 'owner' and user.owner_profile:
+        profile_data = user.owner_profile.serialize()
+    elif user.role == 'petsitter' and user.petsitter_profile:
+        profile_data = user.petsitter_profile.serialize()
+
+    return jsonify({
+        "user": user.serialize(),
+        "profile": profile_data
+    }), 200
+
+
+# ==========================================
+# OBTENER PERFIL DE OTRO USUARIO (Público)
+# ==========================================
+@user_bp.route('/profile/<int:user_id>', methods=['GET'])
+def get_public_profile(user_id):
+    user = db.session.get(User, user_id)
+    if not user:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+
+    profile_data = None
+    if user.role == 'owner' and user.owner_profile:
+        profile_data = user.owner_profile.serialize()
+    elif user.role == 'petsitter' and user.petsitter_profile:
+        profile_data = user.petsitter_profile.serialize()
+
+    return jsonify({
+        "id": user.id,
+        "email": user.email,
+        "role": user.role,
+        "profile": profile_data
+    }), 200
+
+
+# ==========================================
+# ACTUALIZACIÓN DE PERFIL PROPIO 
+# ==========================================
+@user_bp.route('/profile/update', methods=['PUT'])
+@token_required
+def update_profile(current_user_id):
+    data = request.json
+    user = db.session.get(User, current_user_id)
+    if not user:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+
+    if user.role == 'owner':
+        profile = user.owner_profile
+        if not profile:
+            return jsonify({"msg": "Perfil de dueño no encontrado"}), 404
+        
+        # Actualización de campos permitidos para Owner
+        profile.name = data.get('name', profile.name)
+        profile.phone = data.get('phone', profile.phone)
+        profile.city = data.get('city', profile.city)
+        profile.neighborhood = data.get('neighborhood', profile.neighborhood)
+        profile.bio = data.get('bio', profile.bio)
+        profile.profile_pic = data.get('profile_pic', profile.profile_pic)
+        profile.max_budget = data.get('max_budget', profile.max_budget)
+
+    elif user.role == 'petsitter':
+        profile = user.petsitter_profile
+        if not profile:
+            return jsonify({"msg": "Perfil de cuidador no encontrado"}), 404
+        
+        # Actualización de campos permitidos para Petsitter
+        profile.name = data.get('name', profile.name)
+        profile.phone = data.get('phone', profile.phone)
+        profile.city = data.get('city', profile.city)
+        profile.neighborhood = data.get('neighborhood', profile.neighborhood)
+        profile.bio = data.get('bio', profile.bio)
+        profile.profile_pic = data.get('profile_pic', profile.profile_pic)
+        profile.experience_years = data.get('experience_years', profile.experience_years)
+        profile.certifications = data.get('certifications', profile.certifications)
+        profile.available_days = data.get('available_days', profile.available_days)
+        profile.accepted_dog_sizes = data.get('accepted_dog_sizes', profile.accepted_dog_sizes)
+        
+        # Servicios (booleanos)
+        profile.offers_walk = data.get('offers_walk', profile.offers_walk)
+        profile.offers_hotel = data.get('offers_hotel', profile.offers_hotel)
+        profile.offers_daycare = data.get('offers_daycare', profile.offers_daycare)
+        profile.offers_nightcare = data.get('offers_nightcare', profile.offers_nightcare)
+        
+        # Precios
+        profile.price_per_hour = data.get('price_per_hour', profile.price_per_hour)
+        profile.price_per_night = data.get('price_per_night', profile.price_per_night)
+        profile.google_calendar_id = data.get('google_calendar_id', profile.google_calendar_id)
+
+    db.session.commit()
+    return jsonify({
+        "msg": "Perfil actualizado exitosamente",
+        "profile": profile.serialize()
+    }), 200
+=== ARCHIVO: ./backend/flask/utils/auth.py ===
+from functools import wraps
+from flask import request, jsonify, current_app
+import jwt
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+
+        # 1. Verificar si el encabezado de autorización está presente
+        if 'Authorization' in request.headers:
+            auth_header = request.headers['Authorization']
+            
+            # El formato debe ser "Bearer <token>"
+            try:
+                token = auth_header.split(" ")[1]
+            except IndexError:
+                return jsonify({"msg": "El formato del token debe ser 'Bearer <token>'"}), 401
+
+        # Si no hay token
+        if not token:
+            return jsonify({"msg": "Token ausente, autorización denegada"}), 401
+
+        # 2. Decodificar el token con el current_app
+        try:
+            # Obtenemos la clave secreta directamente de la configuración de la app
+            secret_key = current_app.config['SECRET_KEY']
+            
+            data = jwt.decode(token, secret_key, algorithms=["HS256"])
+            
+            # Buscamos 'sub' que es donde guardamos el ID del usuario al generar el token
+            current_user_id = data.get("sub")
+            
+        except jwt.ExpiredSignatureError:
+            return jsonify({"msg": "la sesion ha expirado, inicia sesión nuevamente"}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({"msg": "clave incorrecta"}), 401
+
+        # Pasamos el ID del usuario a la ruta protegida
+        return f(current_user_id, *args, **kwargs)
+
+    return decorated
+=== ARCHIVO: ./frontend/node_modules/flatted/python/flatted.py ===
+# ISC License
+#
+# Copyright (c) 2018-2025, Andrea Giammarchi, @WebReflection
+#
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+# REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+# AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+# INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+# LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
+# OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+# PERFORMANCE OF THIS SOFTWARE.
+
+import json as _json
+
+class _Known:
+    def __init__(self):
+        self.key = []
+        self.value = []
+
+class _String:
+    def __init__(self, value):
+        self.value = value
+
+def _array_keys(value):
+    for i in range(len(value)):
+        yield i
+
+def _object_keys(value):
+    for key in value:
+        yield key
+
+def _is_array(value):
+    return isinstance(value, (list, tuple))
+
+def _is_object(value):
+    return isinstance(value, dict)
+
+def _is_string(value):
+    return isinstance(value, str)
+
+def _index(known, input, value):
+    input.append(value)
+    index = str(len(input) - 1)
+    known.key.append(value)
+    known.value.append(index)
+    return index
+
+def _relate(known, input, value):
+    if _is_string(value) or _is_array(value) or _is_object(value):
+        try:
+            return known.value[known.key.index(value)]
+        except:
+            return _index(known, input, value)
+
+    return value
+
+def _resolver(input, lazy, parsed):
+    def resolver(output):
+        keys = _array_keys(output) if _is_array(output) else _object_keys(output) if _is_object(output) else []
+        for key in keys:
+            value = output[key]
+            if isinstance(value, _String):
+                tmp = input[int(value.value)]
+                output[key] = tmp
+                if (_is_array(tmp) or _is_object(tmp)) and tmp not in parsed:
+                    parsed.append(tmp)
+                    lazy.append([output, key])
+
+        return output
+
+    return resolver
+
+def _transform(known, input, value):
+    if _is_array(value):
+        output = []
+        for val in value:
+            output.append(_relate(known, input, val))
+        return output
+
+    if _is_object(value):
+        obj = {}
+        for key in value:
+            obj[key] = _relate(known, input, value[key])
+        return obj
+
+    return value
+
+def _wrap(value):
+    if _is_string(value):
+        return _String(value)
+
+    if _is_array(value):
+        i = 0
+        for val in value:
+            value[i] = _wrap(val)
+            i += 1
+
+    elif _is_object(value):
+        for key in value:
+            value[key] = _wrap(value[key])
+
+    return value
+
+def parse(value, *args, **kwargs):
+    json = _json.loads(value, *args, **kwargs)
+    wrapped = []
+    for value in json:
+        wrapped.append(_wrap(value))
+
+    input = []
+    for value in wrapped:
+        if isinstance(value, _String):
+            input.append(value.value)
+        else:
+            input.append(value)
+
+    value = input[0]
+    lazy = []
+    revive = _resolver(input, lazy, [value])
+
+    value = revive(value)
+
+    i = 0
+    while i < len(lazy):
+        o, k = lazy[i]
+        i += 1
+        o[k] = revive(o[k])
+
+    return value
+
+
+def stringify(value, *args, **kwargs):
+    known = _Known()
+    input = []
+    output = []
+    i = int(_index(known, input, value))
+    while i < len(input):
+        output.append(_transform(known, input, input[i]))
+        i += 1
+    return _json.dumps(output, *args, **kwargs)
+

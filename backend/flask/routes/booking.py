@@ -16,18 +16,16 @@ def create_booking():
     owner_id = data.get('owner_id')
     petsitter_id = data.get('petsitter_id')
     pet_id = data.get('pet_id')
-    service_type = data.get('service_type') # "paseo", "hotel", "guarderia", "paseo nocturno"
-    start_date = data.get('start_date')     # Formato "YYYY-MM-DD"
-    end_date = data.get('end_date')         # Formato "YYYY-MM-DD"
-    
-    # Horas opcionales (principalmente paseos)
+    service_type = data.get('service_type') 
+    start_date = data.get('start_date')     
+    end_date = data.get('end_date')  
+
     start_time = data.get('start_time')
     end_time = data.get('end_time')
     comments = data.get('comments')
 
-    # Validaciones iniciales
     if not all([owner_id, petsitter_id, pet_id, service_type, start_date, end_date]):
-        return jsonify({"msg": "Faltan campos requeridos para la reserva"}), 400
+         return jsonify({"msg": "Faltan campos requeridos para la reserva"}), 400
 
     owner = db.session.get(Owner, owner_id)
     petsitter = db.session.get(Petsitter, petsitter_id)
@@ -36,44 +34,56 @@ def create_booking():
     if not owner or not petsitter or not pet:
         return jsonify({"msg": "Dueño, cuidador o mascota no válidos"}), 404
 
-    # Verificar si la mascota pertenece al dueño solicitante
     if pet.owner_id != owner.id:
         return jsonify({"msg": "La mascota seleccionada no pertenece al dueño"}), 403
 
-    # Calcular precio de forma dinámica según el tipo de servicio ofrecido por el petsitter
-    # Reemplazando el comportamiento de la anterior tabla intermedia de "Service"
     total_price = 0.0
+    
     try:
-        # Calcular diferencia en días
+        # REFACTORIZACIÓN:  (días y horas)
         d1 = datetime.strptime(start_date, "%Y-%m-%d")
         d2 = datetime.strptime(end_date, "%Y-%m-%d")
         days = (d2 - d1).days
 
         if days < 0:
             return jsonify({"msg": "La fecha de fin no puede ser anterior a la de inicio"}), 400
-        
-        if days <= 0:
-            days = 1 # Considerar mínimo 1 día para reservas básicas de horas o paseos individuales
-        
-        if service_type in ["hotel", "nightcare"]:
-            if not petsitter.offers_hotel and not petsitter.offers_nightcare:
-                return jsonify({"msg": "Este cuidador no ofrece el servicio seleccionado"}), 400
-            total_price = days * (petsitter.price_per_night or 0.0)
-        else: # "paseo" o "guarderia"
-            if not petsitter.offers_walk and not petsitter.offers_daycare:
-                return jsonify({"msg": "Este cuidador no ofrece el servicio seleccionado"}), 400
+        if days == 0:
+            days = 1 # Mínimo 1 día para el cálculo
             
-            # Si tiene horas de inicio y fin, se calcula por horas
-            if start_time and end_time:
-                t1 = datetime.strptime(start_time, "%H:%M")
-                t2 = datetime.strptime(end_time, "%H:%M")
-                hours = (t2 - t1).seconds / 3600.0
-                if hours <= 0:
-                    hours = 1.0 # Mínimo una hora
-                total_price = days * hours * (petsitter.price_per_hour or 0.0)
-            else:
-                # Si no se definen horas, asumimos un valor plano por día basado en precio de hora (ej: estimación estándar de 4 horas)
-                total_price = days * 4.0 * (petsitter.price_per_hour or 0.0)
+        # Calcular horas si se proporcionaron 
+        hours = 0.0
+        if start_time and end_time:
+            t1 = datetime.strptime(start_time, "%H:%M")
+            t2 = datetime.strptime(end_time, "%H:%M")
+            hours = (t2 - t1).total_seconds() / 3600.0 
+            if hours <= 0:
+                hours = 1.0 # Mínimo una hora
+        else:
+            hours = 4.0 
+
+        if service_type == "hotel":
+            if not petsitter.offers_hotel:
+                 return jsonify({"msg": "Este cuidador no ofrece servicio de hotel"}), 400
+            total_price = days * (petsitter.price_per_night or 0.0)
+
+        elif service_type == "nightcare":
+            if not petsitter.offers_nightcare:
+                 return jsonify({"msg": "Este cuidador no ofrece servicio de cuidado nocturno"}), 400
+            total_price = days * (petsitter.price_per_night or 0.0)
+
+        elif service_type == "paseo":
+            if not petsitter.offers_walk:
+                 return jsonify({"msg": "Este cuidador no ofrece servicio de paseo"}), 400
+            
+            total_price = days * hours * (petsitter.price_per_hour or 0.0)
+
+        elif service_type == "guarderia":
+            if not petsitter.offers_daycare:
+                  return jsonify({"msg": "Este cuidador no ofrece servicio de guardería"}), 400
+            
+            total_price = days * hours * (petsitter.price_per_hour or 0.0)
+        else:
+            return jsonify({"msg": "Tipo de servicio no válido"}), 400
 
     except ValueError:
         return jsonify({"msg": "Formato de fechas u horas inválido"}), 400
@@ -101,14 +111,13 @@ def create_booking():
         "booking": new_booking.serialize()
     }), 201
 
-
 # ==========================================
 # CAMBIAR ESTADO DE LA RESERVA
 # ==========================================
 @bookings_bp.route('/bookings/<int:booking_id>/status', methods=['PATCH'])
 def update_booking_status(booking_id):
     data = request.json
-    new_status = data.get('status') # "approvado", "rechazado", "completado", "cancelado"
+    new_status = data.get('status')
 
     if not new_status:
         return jsonify({"msg": "Falta el nuevo estado"}), 400
@@ -117,13 +126,11 @@ def update_booking_status(booking_id):
     if not booking:
         return jsonify({"msg": "Reserva no encontrada"}), 404
 
-    # Validación de estados permitidos
-    if new_status not in ["approved", "rejected", "completed", "cancelled"]:
+    if new_status not in ["aceptado", "rechazado", "completado", "canceled"]:
         return jsonify({"msg": "Estado de reserva inválido"}), 400
 
     booking.status = new_status
 
-    # Si se completa, podemos autoincrementar la cantidad de bookings en el cuidador
     if new_status == "completed":
         petsitter = booking.petsitter
         if petsitter:
@@ -134,7 +141,6 @@ def update_booking_status(booking_id):
         "msg": f"El estado de la reserva ha cambiado a: {new_status}",
         "booking": booking.serialize()
     }), 200
-
 
 # ==========================================
 # VER RESERVAS DE UN DUEÑO O CUIDADOR

@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from database import db
 from models.pets import Pet
+from models.user import User
 from utils.auth import token_required
 
 pets_bp = Blueprint('pets', __name__)
@@ -8,15 +9,31 @@ pets_bp = Blueprint('pets', __name__)
 # OBTENER LAS MASCOTAS DEL USUARIO AUTENTICADO
 @pets_bp.route('/api/pets', methods=['GET'])
 @token_required
-def get_my_pets(current_user):
-    # current_user viene del decorador @token_required
-    pets = Pet.query.filter_by(owner_id=current_user.id).all()
+def get_my_pets(current_user_id):
+    #  Buscamos al usuario base
+    user = db.session.get(User, current_user_id)
+    
+    # Verificamos que tenga un perfil de dueño (Owner)
+    if not user or not user.owner_profile:
+        return jsonify({"msg": "No se encontró un perfil de dueño para este usuario"}), 404
+    
+    # cambiamos .query.filter_by por db.select para evitar problemas de sesión
+    pets = db.session.execute(
+        db.select(Pet).filter_by(owner_id=user.owner_profile.id)
+    ).scalars().all()
+    
     return jsonify([pet.serialize() for pet in pets]), 200
+
 
 # REGISTRAR UNA NUEVA MASCOTA
 @pets_bp.route('/api/pets', methods=['POST'])
 @token_required
-def create_pet(current_user):
+def create_pet(current_user_id):
+    #agregamos validación para asegurarnos de que el usuario tenga un perfil de dueño antes de crear la mascota
+    user = db.session.get(User, current_user_id)
+    if not user or not user.owner_profile:
+        return jsonify({"msg": "solo los dueños pueden registrar mascotas"}), 404
+
     body = request.get_json()
     
     name = body.get("name")
@@ -30,8 +47,14 @@ def create_pet(current_user):
         species=species,
         breed=body.get("breed", ""),
         age=body.get("age"),
-        description=body.get("description", ""),
-        owner_id=current_user.id # Se asigna automáticamente al usuario logueado
+        size=body.get("size", ""),
+        tags=body.get("tags", ""),
+        behavior=body.get("behavior", ""),
+        allergies=body.get("allergies", ""),
+        medications=body.get("medications", ""),
+        special_notes=body.get("special_notes", ""),
+        photo=body.get("photo", ""),
+        owner_id=user.owner_profile.id
     )
 
     db.session.add(new_pet)

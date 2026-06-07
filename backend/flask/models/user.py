@@ -23,7 +23,7 @@ class User(db.Model):
     email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
     role: Mapped[str] = mapped_column(String(20), nullable=False) # "owner" o "petsitter"
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
     # Relaciones 1 a 1
@@ -59,7 +59,7 @@ class Owner(db.Model):
     bio: Mapped[str] = mapped_column(Text, nullable=True)
     profile_pic: Mapped[str] = mapped_column(String(255), nullable=True)
     max_budget: Mapped[float] = mapped_column(Float, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
     # Relaciones
     user: Mapped[User] = relationship(back_populates="owner_profile")
