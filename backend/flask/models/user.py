@@ -6,6 +6,8 @@ from database import db
 from typing import List, TYPE_CHECKING
 
 # Usamos TYPE_CHECKING para evitar importaciones circulares
+#comentario israel 
+
 if TYPE_CHECKING:
     from .pets import Pet
     from .booking import Booking
