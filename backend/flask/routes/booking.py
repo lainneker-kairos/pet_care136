@@ -41,25 +41,30 @@ def create_booking():
     
     try:
         # REFACTORIZACIÓN:  (días y horas)
-        d1 = datetime.strptime(start_date, "%Y-%m-%d")
-        d2 = datetime.strptime(end_date, "%Y-%m-%d")
+        d1 = datetime.strptime(start_date, "%Y-%m-%d") .date()
+        d2 = datetime.strptime(end_date, "%Y-%m-%d") .date()
         days = (d2 - d1).days
 
         if days < 0:
             return jsonify({"msg": "La fecha de fin no puede ser anterior a la de inicio"}), 400
         if days == 0:
-            days = 1 # Mínimo 1 día para el cálculo
+            days = 1 
+
+        t1_obj = datetime.strptime(start_time, "%H:%M").time() if start_time else None
+        t2_obj = datetime.strptime(end_time, "%H:%M").time() if end_time else None
             
-        # Calcular horas si se proporcionaron 
+        # Calcular horas si se proporcionaron  
         hours = 0.0
-        if start_time and end_time:
-            t1 = datetime.strptime(start_time, "%H:%M")
-            t2 = datetime.strptime(end_time, "%H:%M")
-            hours = (t2 - t1).total_seconds() / 3600.0 
-            if hours <= 0:
-                hours = 1.0 # Mínimo una hora
+        if t1_obj and t2_obj:
+            dt1 = datetime.combine(d1, t1_obj)
+            dt2 = datetime.combine(d1, t2_obj)
+            hours = (dt2 - dt1).total_seconds() / 3600.0             
+            if hours < 0:
+                hours += 24.0  # Cruce de medianoche
+            elif hours == 0:
+                hours = 1.0
         else:
-            hours = 4.0 
+            hours = 4.0
 
         if service_type == "hotel":
             if not petsitter.offers_hotel:
@@ -94,10 +99,10 @@ def create_booking():
         petsitter_id=petsitter.id,
         pet_id=pet.id,
         service_type=service_type,
-        start_date=start_date,
-        end_date=end_date,
-        start_time=start_time,
-        end_time=end_time,
+        start_date=d1,
+        end_date=d2,
+        start_time=t1_obj,
+        end_time=t2_obj,
         total_price=total_price,
         comments=comments,
         status="pending"
@@ -126,12 +131,12 @@ def update_booking_status(booking_id):
     if not booking:
         return jsonify({"msg": "Reserva no encontrada"}), 404
 
-    if new_status not in ["aceptado", "rechazado", "completado", "canceled"]:
+    if new_status not in ["aceptado", "rechazado", "completado", "cancelado"]:
         return jsonify({"msg": "Estado de reserva inválido"}), 400
 
     booking.status = new_status
 
-    if new_status == "completed":
+    if new_status == "completado":
         petsitter = booking.petsitter
         if petsitter:
             petsitter.booking_count += 1

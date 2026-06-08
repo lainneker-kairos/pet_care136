@@ -4,10 +4,10 @@ from models.pets import Pet
 from models.user import User
 from utils.auth import token_required
 
-pets_bp = Blueprint('pets', __name__)
+pets_bp = Blueprint('pets_bp', __name__, url_prefix='/api')
 
 # OBTENER LAS MASCOTAS DEL USUARIO AUTENTICADO
-@pets_bp.route('/api/pets', methods=['GET'])
+@pets_bp.route('/pets', methods=['GET'])
 @token_required
 def get_my_pets(current_user_id):
     #  Buscamos al usuario base

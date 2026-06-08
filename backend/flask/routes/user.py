@@ -55,28 +55,28 @@ def register():
     # Creación del perfil correspondiente según el rol
     if role == 'owner':
         new_profile = Owner(
-            user_id=new_user.id,
-            name=name,
-            phone=data.get('phone'),
-            city=data.get('city'),
-            neighborhood=data.get('neighborhood'),
-            bio=data.get('bio', ""),
-            profile_pic=data.get('profile_pic', ""),
-            max_budget=data.get('max_budget')
+        user_id=new_user.id,
+        name=name,
+        phone=data.get('phone'),
+        city=data.get('city'),
+        neighborhood=data.get('neighborhood'),
+        bio=data.get('bio', ""),
+        profile_pic=data.get('profile_pic', ""),
+        max_budget=data.get('max_budget')
         )
     else:
         new_profile = Petsitter(
-            user_id=new_user.id,
-            name=name,
-            phone=data.get('phone'),
-            city=data.get('city'),
-            neighborhood=data.get('neighborhood'),
-            bio=data.get('bio', ""),
-            profile_pic=data.get('profile_pic', ""),
-            experience_years=data.get('experience_years', 0),
-            certifications=data.get('certifications', ""),
-            price_per_hour=data.get('price_per_hour', 0.0),
-            price_per_night=data.get('price_per_night', 0.0)
+        user_id=new_user.id,
+        name=name,
+        phone=data.get('phone'),
+        city=data.get('city'),
+        neighborhood=data.get('neighborhood'),
+        bio=data.get('bio', ""),
+        profile_pic=data.get('profile_pic', ""),
+        experience_years=data.get('experience_years', 0),
+        certifications=data.get('certifications', ""),
+        price_per_hour=data.get('price_per_hour', 0.0),
+        price_per_night=data.get('price_per_night', 0.0)
         )
 
     db.session.add(new_profile)
@@ -196,6 +196,7 @@ def update_profile(current_user_id):
     if not user:
         return jsonify({"msg": "Usuario no encontrado"}), 404
 
+    profile = None
     if user.role == 'owner':
         profile = user.owner_profile
         if not profile:

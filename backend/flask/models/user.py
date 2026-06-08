@@ -4,6 +4,8 @@ from sqlalchemy import String, Integer, Float, Boolean, ForeignKey, Text, DateTi
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database import db
 from typing import List, TYPE_CHECKING
+from decimal import Decimal
+from sqlalchemy import Numeric
 
 # Usamos TYPE_CHECKING para evitar importaciones circulares
 #comentario israel 
@@ -58,7 +60,7 @@ class Owner(db.Model):
     neighborhood: Mapped[str] = mapped_column(String(100), nullable=True)
     bio: Mapped[str] = mapped_column(Text, nullable=True)
     profile_pic: Mapped[str] = mapped_column(String(255), nullable=True)
-    max_budget: Mapped[float] = mapped_column(Float, nullable=True)
+    max_budget: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
     # Relaciones
@@ -76,7 +78,7 @@ class Owner(db.Model):
             "neighborhood": self.neighborhood,
             "bio": self.bio,
             "profile_pic": self.profile_pic,
-            "max_budget": self.max_budget,
+            "max_budget": float(self.max_budget) if self.max_budget is not None else None,
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
 
@@ -109,8 +111,8 @@ class Petsitter(db.Model):
     available_days: Mapped[str] = mapped_column(String(100), nullable=True)
     accepted_dog_sizes: Mapped[str] = mapped_column(String(100), nullable=True)
     
-    price_per_hour: Mapped[float] = mapped_column(Float, nullable=True)
-    price_per_night: Mapped[float] = mapped_column(Float, nullable=True)
+    price_per_hour: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=True)
+    price_per_night: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=True)
     
     rating: Mapped[float] = mapped_column(Float, default=0.0)
     booking_count: Mapped[int] = mapped_column(Integer, default=0)
@@ -140,8 +142,8 @@ class Petsitter(db.Model):
             "offers_nightcare": self.offers_nightcare,
             "available_days": self.available_days,
             "accepted_dog_sizes": self.accepted_dog_sizes,
-            "price_per_hour": self.price_per_hour,
-            "price_per_night": self.price_per_night,
+            "price_per_hour": float(self.price_per_hour) if self.price_per_hour is not None else None,
+            "price_per_night": float(self.price_per_night) if self.price_per_night is not None else None,
             "rating": self.rating,
             "booking_count": self.booking_count,
             "google_calendar_id": self.google_calendar_id,

@@ -1,9 +1,11 @@
 from __future__ import annotations
-from datetime import datetime
-from sqlalchemy import String, Float, ForeignKey, Text, DateTime
+from datetime import datetime, date, time
+from sqlalchemy import String, Float, ForeignKey, Text, DateTime, date, time
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database import db
 from typing import List, TYPE_CHECKING
+from decimal import Decimal
+from sqlalchemy import Numeric
 
 if TYPE_CHECKING:
     from .user import Owner, Petsitter
@@ -19,13 +21,14 @@ class Booking(db.Model):
     pet_id: Mapped[int] = mapped_column(ForeignKey("pet.id"), nullable=False)
     
     service_type: Mapped[str] = mapped_column(String(50), nullable=False) # paseo, hotel, guarderia, etc.
-    start_date: Mapped[str] = mapped_column(String(20), nullable=False)
-    end_date: Mapped[str] = mapped_column(String(20), nullable=False)
-    start_time: Mapped[str] = mapped_column(String(10), nullable=True)
-    end_time: Mapped[str] = mapped_column(String(10), nullable=True)
+
+    start_date: Mapped[date] = mapped_column(date, nullable=False)
+    end_date: Mapped[date] = mapped_column(date, nullable=False)
+    start_time: Mapped[time] = mapped_column(time, nullable=True)
+    end_time: Mapped[time] = mapped_column(time, nullable=True)
     
     status: Mapped[str] = mapped_column(String(20), default="pending")
-    total_price: Mapped[float] = mapped_column(Float, nullable=False)
+    total_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     comments: Mapped[str] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
@@ -42,12 +45,12 @@ class Booking(db.Model):
             "petsitter_id": self.petsitter_id,
             "pet_id": self.pet_id,
             "service_type": self.service_type,
-            "start_date": self.start_date,
-            "end_date": self.end_date,
-            "start_time": self.start_time,
-            "end_time": self.end_time,
+            "start_date": self.start_date.isoformat() if self.start_date else None,
+            "end_date": self.end_date.isoformat() if self.end_date else None,
+            "start_time": self.start_time.isoformat() if self.start_time else None,
+            "end_time": self.end_time.isoformat() if self.end_time else None,
             "status": self.status,
-            "total_price": self.total_price,
+            "total_price": float(self.total_price) if self.total_price is not None else 0.0,
             "comments": self.comments,
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
