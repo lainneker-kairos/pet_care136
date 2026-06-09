@@ -215,7 +215,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* TestimonialsSection pendiente: se mostrara cuando existan reseñas reales */}
+      {/* Testimonials Section pendiente: se mostrara cuando existan reseñas reales */}
 
       <section>
         <h2 className="mb-8 text-4xl font-bold text-center text-purple-700">Lo que dicen los Pet Parents</h2>
