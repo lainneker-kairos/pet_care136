@@ -26,7 +26,7 @@ def get_my_pets(current_user_id):
 
 
 # REGISTRAR UNA NUEVA MASCOTA
-@pets_bp.route('/api/pets', methods=['POST'])
+@pets_bp.route('/pets', methods=['POST'])
 @token_required
 def create_pet(current_user_id):
     #agregamos validación para asegurarnos de que el usuario tenga un perfil de dueño antes de crear la mascota
@@ -61,3 +61,24 @@ def create_pet(current_user_id):
     db.session.commit()
 
     return jsonify({"msg": "Mascota creada con éxito", "pet": new_pet.serialize()}), 201
+
+# Metodo para eliminar una mascota
+@pets_bp.route('/api/pets/<int:pet_id>', methods=['DELETE'])
+@token_required
+def delete_pet(current_user_id, pet_id):
+    # Buscamos la mascota por su ID
+    pet = db.session.get(Pet, pet_id)
+    
+    if not pet:
+        return jsonify({"msg": "Mascota no encontrada"}), 404
+
+    # Verificamos que el usuario autenticado sea el dueño de la mascota
+    user = db.session.get(User, current_user_id)
+    if not user or user.owner_profile.id != pet.owner_id:
+        return jsonify({"msg": "No tienes permiso para eliminar esta mascota"}), 403
+
+    # Eliminamos la mascota
+    db.session.delete(pet)
+    db.session.commit()
+
+    return jsonify({"msg": "Mascota eliminada con éxito"}), 200
