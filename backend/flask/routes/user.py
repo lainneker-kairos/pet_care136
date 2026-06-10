@@ -6,7 +6,7 @@ from utils.auth import token_required
 import jwt
 import datetime
 
-user_bp = Blueprint('user_bp', __name__, url_prefix='/api')
+user_bp = Blueprint('user_bp', __name__)
 
 # ==========================================
 # 1ra RUTA DE PRUEBA (clase horacio)
@@ -26,14 +26,11 @@ def register():
 
     email = data.get('email')
     password = data.get('password')
-    role = data.get('role') # "owner" o "petsitter"
+    role = data.get('role', 'owner') # "owner" o "petsitter"
     name = data.get('name')
 
-    if not email or not password or not role or not name:
+    if not email or not password or not name:
         return jsonify({"msg": "Todos los campos obligatorios (email, password, role, name) son requeridos"}), 400
-
-    if role not in ['owner', 'petsitter']:
-        return jsonify({"msg": "Rol inválido. 'Debes elegir un rol'"}), 400
 
     # Verificar si el usuario ya existe
     user_exists = db.session.execute(db.select(User).filter_by(email=email)).scalar_one_or_none()
@@ -121,7 +118,7 @@ def login():
     expiration_time = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
     jwt_token = jwt.encode(
         {
-            "sub": user.id,  
+            "sub": str(user.id),  
             "exp": expiration_time
         },
         current_app.config['SECRET_KEY'],  
