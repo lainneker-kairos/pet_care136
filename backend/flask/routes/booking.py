@@ -5,7 +5,7 @@ from models.user import Owner, Petsitter
 from models.pets import Pet
 from datetime import datetime
 
-bookings_bp = Blueprint('bookings_bp', __name__, url_prefix='/api')
+bookings_bp = Blueprint('bookings_bp', __name__,)
 
 # ==========================================
 # CREAR NUEVA RESERVA

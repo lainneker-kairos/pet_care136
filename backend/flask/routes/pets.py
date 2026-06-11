@@ -4,7 +4,7 @@ from models.pets import Pet
 from models.user import User
 from utils.auth import token_required
 
-pets_bp = Blueprint('pets_bp', __name__, url_prefix='/api')
+pets_bp = Blueprint('pets_bp', __name__)
 
 # OBTENER LAS MASCOTAS DEL USUARIO AUTENTICADO
 @pets_bp.route('/pets', methods=['GET'])
@@ -26,11 +26,12 @@ def get_my_pets(current_user_id):
 
 
 # REGISTRAR UNA NUEVA MASCOTA
-@pets_bp.route('/api/pets', methods=['POST'])
+@pets_bp.route('/pets', methods=['POST'])
 @token_required
 def create_pet(current_user_id):
     #agregamos validación para asegurarnos de que el usuario tenga un perfil de dueño antes de crear la mascota
     user = db.session.get(User, current_user_id)
+    print(user, user.owner_profile)  # Debug: Verificar el usuario y su perfil de dueño
     if not user or not user.owner_profile:
         return jsonify({"msg": "solo los dueños pueden registrar mascotas"}), 404
 
