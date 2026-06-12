@@ -26,10 +26,13 @@ def token_required(f):
             # Obtenemos la clave secreta directamente de la configuración de la app
             secret_key = current_app.config['SECRET_KEY']
             
+            print("TOKEN RECIBIDO:", token)
+            print("SECRET KEY:", secret_key)
+
             data = jwt.decode(token, secret_key, algorithms=["HS256"])
             
             # Buscamos 'sub' que es donde guardamos el ID del usuario al generar el token
-            current_user_id = data.get("sub")
+            current_user_id = int(data.get("sub"))
             
         except jwt.ExpiredSignatureError:
             return jsonify({"msg": "la sesion ha expirado, inicia sesión nuevamente"}), 401

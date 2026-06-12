@@ -52,7 +52,7 @@ export default function Register() {
 
     // lógica de registro real (API call)
 
-    await fetch('http://127.0.0.1:5000/api/user/register', {
+    await fetch('http://127.0.0.1:5000/api/register', {
       method: 'POST',
       body: JSON.stringify(formData),
       headers: {
