@@ -208,6 +208,8 @@ def update_profile(current_user_id):
         profile.profile_pic = data.get('profile_pic', profile.profile_pic)
         profile.max_budget = data.get('max_budget', profile.max_budget)
 
+    
+
     elif user.role == 'petsitter':
         profile = user.petsitter_profile
         if not profile:
