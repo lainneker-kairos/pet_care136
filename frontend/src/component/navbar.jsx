@@ -32,7 +32,7 @@ export default function Navbar() {
                 </Link>
 
                 <div className="hidden items-center gap-8 text-sm font-semibold text-gray-600 md:flex">
-                    <a href="#services" className="hover:text-purple-700">
+                    <a href="/DogWalkingPage" className="hover:text-purple-700">
                         Paseo de perros
                     </a>
                     <a href="#services" className="hover:text-purple-700">
