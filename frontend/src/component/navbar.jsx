@@ -1,6 +1,28 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
+
+    const [userName, setUserName] = useState(null);
+
+    useEffect(() => {
+        const storedName = localStorage.getItem("userName");
+        const token = localStorage.getItem("TOKENJWT");
+
+        if (token && storedName) {
+            setUserName(storedName);
+        }
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem("TOKENJWT");
+        localStorage.removeItem("userName");
+        setUserName(null);
+    };
+
+
     return (
         <header className="sticky top-0 z-50 border-b border-purple-100 bg-white/90 backdrop-blur">
             <nav className="mx-auto flex max-w-6xl items-center justify-between px-8 py-5">
