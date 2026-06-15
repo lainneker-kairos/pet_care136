@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import Image from 'next/image';
 
 export default function Login() {
 
@@ -83,8 +84,14 @@ export default function Login() {
       {/* Contenedor principal */}
       <div className="relative z-10 w-full max-w-md p-4">
         {/* Logo flotante */}
-        <div className="absolute top-[-30px] left-4 text-white font-semibold text-sm tracking-wider opacity-60">
-          <h1 className="text-2xl font-extrabold text-purple-600">PetCare</h1>
+        <div className="absolute top-[-30px] left-2 text-white font-semibold text-sm tracking-wider opacity-80 z-30">
+            <Image 
+            src="/logo_petcare.svg" 
+            alt="Logo de PetCare" 
+            width={150} 
+            height={150} 
+            className="w-20 h-20" 
+          />
         </div>
 
         {/* Tarjeta Glassmorphism */}
