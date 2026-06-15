@@ -1,9 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import Image from 'next/image';
 
 export default function Login() {
-
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -13,7 +11,6 @@ export default function Login() {
 
   // Estados extra para el diseño (mostrar/ocultar contraseñas)
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // función de validación exacta
   const validateForm = () => {
@@ -77,6 +74,7 @@ export default function Login() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-green-600/20 overflow-hidden font-sans">
+      
       {/* Luces de fondo de neón (ambiente detrás del vidrio) */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-600/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-[15%] w-96 h-96 bg-purple-400/50 rounded-full blur-[120px] pointer-events-none" />
@@ -85,7 +83,7 @@ export default function Login() {
       <div className="relative z-10 w-full max-w-md p-4">
         {/* Logo flotante */}
         <div className="absolute top-[-30px] left-2 text-white font-semibold text-sm tracking-wider opacity-80 z-30">
-            <Image 
+          <img
             src="/logo_petcare.svg" 
             alt="Logo de PetCare" 
             width={150} 
@@ -95,7 +93,7 @@ export default function Login() {
         </div>
 
         {/* Tarjeta Glassmorphism */}
-        <div className="w-full bg-white/15 backdrop-blur-2xl border-2 border-white shadow-[0_16px_8px_0_rgba(0,0,0,0.3)] rounded-3xl p-8 sm:p-10 transition-all duration-300">
+        <div className="w-full bg-white/15 backdrop-blur-2xl border-2 border-white shadow-[0_25px_15px_0_rgba(0,0,0,0.3)] rounded-3xl p-8 sm:p-10 transition-all duration-300">
 
           {/* Cabecera */}
           <div className="text-center mb-8">
@@ -126,7 +124,6 @@ export default function Login() {
                     ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/50"
                     : "border border-white focus:ring-green-500/70 focus:border-green-500/70"
                   }`}
-                  
               />
               {errors.email && (
                 <p className="text-red-400 text-xs mt-1.5 ml-1 font-medium">{errors.email}</p>
@@ -177,7 +174,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={isLoading}
-              className="group w-full flex items-center justify-center gap-2 py-3.5 px-4 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg active:scale-[0.58] disabled:opacity-75 disabled:cursor-not-allowed mt-6 border border-transparent hover:border-green-900/50 hover:shadow-[0_0_10px_rgba(34,197,94,0.5)]"
+              className="group w-full flex items-center justify-center gap-2 py-3.5 px-4 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg active:scale-[0.70] disabled:opacity-75 disabled:cursor-not-allowed mt-6 border border-transparent hover:border-green-900/50 hover:shadow-[0_0_10px_rgba(34,197,94,0.5)]"
             >
               {isLoading ? (
                 <>
@@ -199,7 +196,6 @@ export default function Login() {
               )}
             </button>
           </form>
-
 
         </div>
       </div>
