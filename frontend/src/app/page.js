@@ -1,9 +1,9 @@
-import Navbar from "../component/Navbar"
-import HeroSection from "../component/HeroSection";
-import ServiceSection from "../component/ServicesSection";
-import TrustSection from "../component/TrustSection";
-import CallToAction from "../component/CallToAction";
-import Footer from "../component/Footer";
+import Navbar from "../components/Navbar"
+import HeroSection from "../components/HeroSection";
+import ServiceSection from "../components/ServicesSection";
+import TrustSection from "../components/TrustSection";
+import CallToAction from "../components/CallToAction";
+import Footer from "../components/Footer";
 
 export default function HomePage() {
   return (

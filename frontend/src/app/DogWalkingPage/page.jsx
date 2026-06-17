@@ -1,5 +1,5 @@
-import Navbar from "../../component/Navbar";
-import Footer from "../../component/Footer";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export default function DogWalkingPage() {
     return (
@@ -13,43 +13,42 @@ export default function DogWalkingPage() {
                         {/* Lado izquierdo */}
                         <div className="flex flex-col gap-6">
                             <span className="w-fit rounded-full bg-teal-100 px-4 py-2 text-sm font-semibold text-teal-700">
-                                Confianza en cada paso
+                                ✓ Confianza en cada paso
                             </span>
 
                             <h1 className="text-5xl font-bold leading-tight text-purple-700">
-                                Paseos Personalizados
+                                Paseos Personalizados para tu Perro
                             </h1>
-                            <p>Paseos individuales o grupales adaptados al ritmo de tu mascota</p>
+
+                            <p className="text-lg leading-7 text-gray-600">
+                                Paseos individuales o grupales adaptados al ritmo de tu mascota. Nuestros paseadores expertos garantizan seguridad y diversión en cada salida.
+                            </p>
+
+                            <div className="flex flex-col gap-4 sm:flex-row">
+                                <a href="#" className="rounded-lg bg-purple-700 px-8 py-4 text-center font-bold text-white hover:bg-purple-800">
+                                    Buscar Paseador
+                                </a>
+                                <a href="#" className="rounded-lg border-2 border-purple-700 px-8 py-4 text-center font-bold text-purple-700 hover:bg-purple-50">
+                                    Más Información
+                                </a>
+                            </div>
                         </div>
+
+                        {/* Lado derecho - Imagen */}
+                        <div className="relative">
+                            <img
+                                src="https://images.unsplash.com/photo-1558788353-f76d92427f16"
+                                alt="Persona paseando perros"
+                                className="h-[420px] w-full rounded-[28px] object-cover"
+                            />
+
+                            <div className="absolute bottom-[-16px] right-[-16px] rounded-xl bg-white p-4 shadow-xl">
+                                <p className="text-2xl font-bold text-purple-700">500+</p>
+                                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Paseos Realizados</p>
+                            </div>
+                        </div>
+
                     </div>
-                </section>
-
-                {/* Trust bar */}
-                <section>
-                    <p>
-                        Siéntete segura con cuidadores verificados y atención veterinaria
-                        disponible.
-                    </p>
-                </section>
-
-                {/* Benefits */}
-                <section>
-                    <h2>Paseos que se adaptan a la energía de tu perro</h2>
-                </section>
-
-                {/* Recommended walkers */}
-                <section>
-                    <h2>Paseadores de perros recomendados en tu zona</h2>
-                </section>
-
-                {/* FAQ */}
-                <section>
-                    <h2>Paseos para perros cerca de ti</h2>
-                </section>
-
-                {/* How it works */}
-                <section>
-                    <h2>Cómo reservar al paseador de perros perfecto</h2>
                 </section>
             </main>
 
