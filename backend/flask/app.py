@@ -9,6 +9,7 @@ from routes.pets import pets_bp
 from routes.booking import bookings_bp
 
 
+
 # Importacion de modelos
 from models.user import User, Owner, Petsitter
 from models.pets import Pet

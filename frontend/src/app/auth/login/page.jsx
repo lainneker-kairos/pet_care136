@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { loginUser } from "@/Services/api";
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
@@ -31,7 +32,7 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // función de envío de formulario 
+  // función de envío de formulario exactarte a JSON
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -39,16 +40,16 @@ export default function Login() {
     setIsLoading(true);
 
     // lógica de registro real (API call)
+    const response = await loginUser(formData.email, formData.password);
 
-    let result = await fetch('http://127.0.0.1:5000/api/user/login', {
-      method: 'POST',
-      body: JSON.stringify(formData),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
+    // Si la respuesta trae el error que manejamos en api.js o el backend falló
+    if (response.error || !response.token) {
+      alert(response.message || "Credenciales incorrectas. Inténtalo de nuevo.");
+      setIsLoading(false);
+      return; // Detenemos la ejecución aquí
+    }
 
-    let data = await result.json();
+    let data = await response.json();
     console.log(data);
 
     localStorage.setItem("TOKENJWT", data.token);
@@ -120,9 +121,15 @@ export default function Login() {
                 onChange={handleChange}
                 disabled={isLoading}
                 placeholder="correo@ejemplo.com"
+<<<<<<< HEAD
+                className={`w-full px-4 py-3 rounded-xl bg-white/[0.03] text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 transition-all duration-200 disabled:opacity-50 ${errors.email
+                  ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/50"
+                  : "border border-white/[0.08] focus:ring-purple-500/30 focus:border-purple-900/50"
+=======
                 className={`w-full px-4 py-3 rounded-xl bg-white/[0.03] text-black placeholder-black-500 text-sm focus:outline-none focus:ring-2 transition-all duration-200 disabled:opacity-50 ${errors.email
                     ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/50"
                     : "border border-white focus:ring-green-500/70 focus:border-green-500/70"
+>>>>>>> 0a4edbf6c335b01cd7446e75af81cf80abc2fc45
                   }`}
               />
               {errors.email && (
@@ -143,9 +150,15 @@ export default function Login() {
                   onChange={handleChange}
                   disabled={isLoading}
                   placeholder="••••••••"
+<<<<<<< HEAD
+                  className={`w-full px-4 py-3 rounded-xl bg-white/[0.03] text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 transition-all duration-200 pr-10 disabled:opacity-50 ${errors.password
+                    ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/50"
+                    : "border border-white/[0.08] focus:ring-purple-500/30 focus:border-purple-900/50"
+=======
                   className={`w-full px-4 py-3 rounded-xl bg-white/[0.03] text-black placeholder-gray-500 text-sm focus:outline-none focus:ring-2 transition-all duration-200 pr-10 disabled:opacity-50 ${errors.password
                       ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/50"
                       : "border border-white focus:ring-green-500/70 focus:border-green-500/70"
+>>>>>>> 0a4edbf6c335b01cd7446e75af81cf80abc2fc45
                     }`}
                 />
                 <button
