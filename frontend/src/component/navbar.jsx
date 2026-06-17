@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 export default function Navbar() {
 
@@ -28,9 +29,15 @@ export default function Navbar() {
             <nav className="mx-auto flex max-w-6xl items-center justify-between px-8 py-5">
                 {/* contenido del navbar */}
                 <Link href="/" className="text-2xl font-bold text-purple-700">
-                    PetCare
+                    <Image 
+                        src="/logo_petcare.svg" 
+                        alt="Logo de PetCare" 
+                        width={150} 
+                        height={150} 
+                        className="w-18 h-18" 
+                    />
                 </Link>
-
+                
                 <div className="hidden items-center gap-8 text-sm font-semibold text-gray-600 md:flex">
                     <a href="/DogWalkingPage" className="hover:text-purple-700">
                         Paseo de perros
