@@ -40,7 +40,7 @@ export default function Login() {
 
     // lógica de registro real (API call)
 
-    let result = await fetch('http://127.0.0.1:5000/api/user/login', {
+    let result = await fetch('http://127.0.0.1:5000/api/login', {
       method: 'POST',
       body: JSON.stringify(formData),
       headers: {
