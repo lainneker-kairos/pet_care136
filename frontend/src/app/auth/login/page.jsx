@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { loginUser } from "/geek/Services/api";
+import { loginUser } from "@/Services/api";
 
 export default function Login() {
 
