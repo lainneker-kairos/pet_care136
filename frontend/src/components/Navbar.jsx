@@ -6,11 +6,37 @@ import Image from "next/image";
 
 export default function Navbar() {
 
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [user, setUser] = useState(null)
 
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        setIsLoggedIn(true);
+
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/profile`, {
+            headers: { Authorization: `Bearer ${token}` },
+        })
+            .then((res) => {
+                if (!res.ok) throw new Error("Token inválido o expirado");
+                return res.json();
+            })
+            .then((data) => setUser(data))
+            .catch(() => {
+                localStorage.removeItem("token");
+                setIsLoggedIn(false);
+            });
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        setIsLoggedIn(false);
+        setUser(null);
+    };
+
     return (
-        <header className="sticky top-0 z-50 border-b border-purple-100 bg-white/90 backdrop-blur">
+        <div className="sticky top-0 z-50 border-b border-purple-100 bg-white/90 backdrop-blur">
             <nav className="mx-auto flex max-w-6xl items-center justify-between px-8 py-5">
                 {/* contenido del navbar */}
                 <Link href="/" className="text-2xl font-bold text-purple-700">
@@ -33,7 +59,7 @@ export default function Navbar() {
                     <a href="hotel" className="hover:text-purple-700">
                         Hotel de mascotas
                     </a>
-                    <a href="#trust" className="hover:text-purple-700">
+                    <a href="listacuidador" className="hover:text-purple-700">
                         Cuidadores
                     </a>
                 </div>
@@ -42,8 +68,15 @@ export default function Navbar() {
                     {isLoggedIn ? (
 
                         <>
-                            <p>Has inciado sesión</p>
-                            <button> Cerrar sesión </button>
+                        <span className="hidden text-sm font-semibold text-gray-700 sm:inline">
+                                Hola, {user?.username || "usuario"}
+                            </span>
+                            <button
+                                onClick={handleLogout}
+                                className="rounded-full bg-purple-700 px-5 py-3 text-sm font-bold text-white hover:bg-purple-800"
+                            >
+                                Cerrar sesión
+                            </button>
                         </>
                     ) : (
                         <>
@@ -60,6 +93,6 @@ export default function Navbar() {
                     )}
                 </div>
             </nav>
-        </header>
+        </div>
     );
 }

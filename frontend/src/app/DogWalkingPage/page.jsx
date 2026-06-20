@@ -1,11 +1,20 @@
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+"use client";
+
 import Accordion from "@/components/Accordion";
+import { useRouter } from "next/navigation";
 
 export default function DogWalkingPage() {
+    const router = useRouter();
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const params = new URLSearchParams(formData).toString();
+        router.push(`/listacuidador?${params}`)
+    }
+
     return (
         <>
-            <Navbar />
             <main>
                 {/* 1. SECCIÓN HERO (Con el buscador y SIN botones repetidos) */}
                 <section className="bg-[#f7f8ff] px-8 py-20">
@@ -27,16 +36,16 @@ export default function DogWalkingPage() {
 
                             {/* El Widget Buscador que interactúa con el Back */}
                             <div className="mt-2 rounded-2xl bg-white p-6 shadow-xl border border-gray-100">
-                                <h3 className="text-lg font-bold text-teal-700 mb-4">Encuentra el paseador ideal</h3>
-                                
-                                <form action="/cuidadores" className="flex flex-col gap-4">
+                                <h3 className="text-lg font-bold text-teal-700 mb-4">Encuentra al paseador ideal</h3>
+
+                                <form onSubmit={handleSearch} className="flex flex-col gap-4">
                                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                        
+
                                         {/* Selector de Tiempo/Duración */}
                                         <div className="flex flex-col gap-1">
                                             <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">¿Cuánto tiempo?</label>
-                                            <select 
-                                                name="duration_hours" 
+                                            <select
+                                                name="duration_hours"
                                                 className="rounded-lg border border-gray-300 p-3 text-sm text-gray-700 focus:border-purple-500 focus:outline-none bg-gray-50"
                                             >
                                                 <option value="0.5">Paseo de 30 minutos</option>
@@ -47,8 +56,8 @@ export default function DogWalkingPage() {
                                         {/* Selector de Fecha */}
                                         <div className="flex flex-col gap-1">
                                             <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">¿Qué día?</label>
-                                            <input 
-                                                type="date" 
+                                            <input
+                                                type="date"
                                                 name="start_date"
                                                 className="rounded-lg border border-gray-300 p-3 text-sm text-gray-700 focus:border-purple-500 focus:outline-none bg-gray-50"
                                             />
@@ -58,8 +67,8 @@ export default function DogWalkingPage() {
 
                                     <input type="hidden" name="service_type" value="paseo" />
 
-                                    <button 
-                                        type="submit" 
+                                    <button
+                                        type="submit"
                                         className="w-full rounded-lg bg-purple-700 py-4 text-center font-bold text-white transition-colors hover:bg-purple-800 shadow-md shadow-purple-200 mt-2"
                                     >
                                         Buscar Cuidador
@@ -67,7 +76,7 @@ export default function DogWalkingPage() {
                                 </form>
                             </div>
                         </div>
-                    
+
                         {/* Lado derecho - Imagen */}
                         <div className="relative">
                             <img
@@ -87,8 +96,8 @@ export default function DogWalkingPage() {
                 {/* 2. NUEVA SECCIÓN INTERMEDIA: BENEFICIOS (Llena el espacio de forma espectacular) */}
                 <section className="bg-white px-8 py-16">
                     <div className="mx-auto max-w-6xl text-center">
-                        <h2 className="text-3xl font-bold text-gray-800 mb-12">¿Por qué elegirnos?</h2>
-                        
+                        <h2 className="text-3xl font-bold text-purple-700 mb-12">¿Por qué elegirnos?</h2>
+
                         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
                             {/* Tarjeta 1 */}
                             <div className="flex flex-col items-center p-6 rounded-2xl bg-[#f7f8ff] border border-gray-100">
@@ -123,7 +132,7 @@ export default function DogWalkingPage() {
                 {/* 3. SECCIÓN DE FAQ */}
                 <section className="bg-white px-8 py-16 border-t border-gray-100">
                     <div className="mx-auto max-w-3xl">
-                    
+
                         <Accordion
                             faqs={[
                                 {
@@ -132,7 +141,7 @@ export default function DogWalkingPage() {
                                 },
                                 {
                                     pregunta: "¿Cuál es el precio de los paseos?",
-                                    respuesta: "Los precios varían según la duración: 30 min (€8) y 1 hora (€12). También ofrecemos paquetes mensuales con descuento."
+                                    respuesta: "Los precios varían según la duración: 30 min (a partir de €8) y 1 hora (a partir de €12). También ofrecemos paquetes mensuales con descuento."
                                 },
                                 {
                                     pregunta: "¿Qué incluye el servicio?",
@@ -147,8 +156,6 @@ export default function DogWalkingPage() {
                     </div>
                 </section>
             </main>
-
-            <Footer />
         </>
     );
 }
