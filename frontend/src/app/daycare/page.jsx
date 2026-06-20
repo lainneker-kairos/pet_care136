@@ -2,45 +2,45 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Accordion from "@/components/Accordion";
 
-export default function DogWalkingPage() {
+export default function GuarderiaPage() {
     return (
         <>
             <Navbar />
             <main>
-                {/* 1. SECCIÓN HERO (Con el buscador y SIN botones repetidos) */}
+                {/* 1. SECCIÓN HERO (Guardería y Cuidado Nocturno) */}
                 <section className="bg-[#f7f8ff] px-8 py-20">
                     <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-16 md:grid-cols-2">
 
                         {/* Lado izquierdo - Texto y Buscador */}
                         <div className="flex flex-col gap-6">
                             <span className="w-fit rounded-full bg-teal-100 px-4 py-2 text-sm font-semibold text-teal-700">
-                                ✓ Confianza en cada paso
+                                ✓ Entorno seguro y divertido
                             </span>
 
                             <h1 className="text-5xl font-bold leading-tight text-purple-700">
-                                Paseos Personalizados para tu mascota
+                                Cuidado y Guardería para tu mascota
                             </h1>
 
                             <p className="text-lg leading-7 text-gray-600">
-                                Paseos individuales o grupales adaptados al ritmo de tu mascota. Nuestros paseadores expertos garantizan seguridad y diversión en cada salida.
+                                El lugar perfecto para que tu mascota socialice, juegue o pase la noche de forma segura. Supervisión experta y amigos peludos garantizados en cada estancia.
                             </p>
 
-                            {/* El Widget Buscador que interactúa con el Back */}
+                            {/* Widget Buscador sincronizado con el Back (daycare / nightcare) */}
                             <div className="mt-2 rounded-2xl bg-white p-6 shadow-xl border border-gray-100">
-                                <h3 className="text-lg font-bold text-teal-700 mb-4">Encuentra el paseador ideal</h3>
+                                <h3 className="text-lg font-bold text-teal-700 mb-4">Reserva su lugar hoy</h3>
                                 
                                 <form action="/cuidadores" className="flex flex-col gap-4">
                                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                         
-                                        {/* Selector de Tiempo/Duración */}
+                                        {/* Selector de Tipo de Cuidado (Modifica el service_type dinámicamente) */}
                                         <div className="flex flex-col gap-1">
-                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">¿Cuánto tiempo?</label>
+                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">¿Qué servicio necesitas?</label>
                                             <select 
-                                                name="duration_hours" 
+                                                name="service_type" // Hace match directo con service_type en el modelo Booking
                                                 className="rounded-lg border border-gray-300 p-3 text-sm text-gray-700 focus:border-purple-500 focus:outline-none bg-gray-50"
                                             >
-                                                <option value="0.5">Paseo de 30 minutos</option>
-                                                <option value="1">Paseo de 1 hora</option>
+                                                <option value="daycare">Guardería de día (Por hora)</option>
+                                                <option value="nightcare">Cuidado nocturno (Por noche)</option>
                                             </select>
                                         </div>
 
@@ -56,8 +56,6 @@ export default function DogWalkingPage() {
 
                                     </div>
 
-                                    <input type="hidden" name="service_type" value="paseo" />
-
                                     <button 
                                         type="submit" 
                                         className="w-full rounded-lg bg-purple-700 py-4 text-center font-bold text-white transition-colors hover:bg-purple-800 shadow-md shadow-purple-200 mt-2"
@@ -67,80 +65,77 @@ export default function DogWalkingPage() {
                                 </form>
                             </div>
                         </div>
-                    
+
                         {/* Lado derecho - Imagen */}
                         <div className="relative">
                             <img
-                                src="https://images.unsplash.com/photo-1560743173-567a3b5658b1?q=80&w=1469&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                                alt="Perros corriendo"
+                                src="https://images.unsplash.com/photo-1558788353-f76d92427f16"
+                                alt="Perro golden"
                                 className="h-[460px] w-full rounded-[28px] object-cover shadow-lg"
                             />
 
                             <div className="absolute bottom-[-16px] right-[-16px] rounded-xl bg-white p-4 shadow-xl border border-gray-50">
-                                <p className="text-2xl font-bold text-purple-700">500+</p>
-                                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Paseos Realizados</p>
+                                <p className="text-2xl font-bold text-purple-700">100%</p>
+                                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Supervisión Profesional</p>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* 2. NUEVA SECCIÓN INTERMEDIA: BENEFICIOS (Llena el espacio de forma espectacular) */}
+                {/* 2. SECCIÓN DE BENEFICIOS (Corregido a color Púrpura) */}
                 <section className="bg-white px-8 py-16">
                     <div className="mx-auto max-w-6xl text-center">
-                        <h2 className="text-3xl font-bold text-gray-800 mb-12">¿Por qué elegirnos?</h2>
+                        <h2 className="text-3xl font-bold text-purple-700 mb-12">Beneficios de nuestra Guardería</h2>
                         
                         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-                            {/* Tarjeta 1 */}
                             <div className="flex flex-col items-center p-6 rounded-2xl bg-[#f7f8ff] border border-gray-100">
-                                <div className="text-4xl mb-4">🛡️</div>
-                                <h3 className="text-xl font-bold text-purple-700 mb-2">Paseadores Verificados</h3>
+                                <div className="text-4xl mb-4">🐾</div>
+                                <h3 className="text-xl font-bold text-purple-700 mb-2">Socialización Sana</h3>
                                 <p className="text-gray-600 text-sm leading-relaxed">
-                                    Validamos la identidad y antecedentes de cada cuidador para garantizar la máxima seguridad.
+                                    Grupos de juego controlados por tamaño y energía para que hagan amigos de forma segura.
                                 </p>
                             </div>
 
-                            {/* Tarjeta 2 */}
                             <div className="flex flex-col items-center p-6 rounded-2xl bg-[#f7f8ff] border border-gray-100">
-                                <div className="text-4xl mb-4">📍</div>
-                                <h3 className="text-xl font-bold text-purple-700 mb-2">Seguimiento por GPS</h3>
+                                <div className="text-4xl mb-4">🏠</div>
+                                <h3 className="text-xl font-bold text-purple-700 mb-2">Espacios Adaptados</h3>
                                 <p className="text-gray-600 text-sm leading-relaxed">
-                                    Mira la ruta de tu perrito en tiempo real directamente desde tu perfil de usuario.
+                                    Zonas de juego interiores climatizadas y patios seguros para disfrutar al aire libre.
                                 </p>
                             </div>
 
-                            {/* Tarjeta 3 */}
                             <div className="flex flex-col items-center p-6 rounded-2xl bg-[#f7f8ff] border border-gray-100">
-                                <div className="text-4xl mb-4">📞</div>
-                                <h3 className="text-xl font-bold text-purple-700 mb-2">Soporte Continuo</h3>
+                                <div className="text-4xl mb-4">📷</div>
+                                <h3 className="text-xl font-bold text-purple-700 mb-2">Reportes Diarios</h3>
                                 <p className="text-gray-600 text-sm leading-relaxed">
-                                    Nuestro equipo está disponible para ayudarte en cualquier momento antes, durante o después del paseo.
+                                    Recibe fotos y actualizaciones de las actividades de tu perro durante todo el día o noche.
                                 </p>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* 3. SECCIÓN DE FAQ */}
+                {/* 3. SECCIÓN DE FAQ (Cambiado el título a Preguntas Frecuentes) */}
                 <section className="bg-white px-8 py-16 border-t border-gray-100">
                     <div className="mx-auto max-w-3xl">
-                    
+                        
                         <Accordion
                             faqs={[
                                 {
-                                    pregunta: "¿Cuál es la duración de los paseos?",
-                                    respuesta: "Ofrecemos paseos de 30 minutos y 1 hora, adaptados a la energía y necesidades de tu perro."
+                                    pregunta: "¿Qué horarios de entrega y recogida tienen?",
+                                    respuesta: "Para guardería de día (daycare) puedes dejarlo desde las 8:00 AM y recogerlo hasta las 7:00 PM. Para estancias nocturnas (nightcare), coordinas la hora de check-in y check-out directamente en la reserva."
                                 },
                                 {
-                                    pregunta: "¿Cuál es el precio de los paseos?",
-                                    respuesta: "Los precios varían según la duración: 30 min (€8) y 1 hora (€12). También ofrecemos paquetes mensuales con descuento."
+                                    pregunta: "¿Mi perro necesita vacunas?",
+                                    respuesta: "Sí, por seguridad de todos, exigimos cartilla de vacunación al día y tratamiento antiparasitario vigente."
                                 },
                                 {
-                                    pregunta: "¿Qué incluye el servicio?",
-                                    respuesta: "Incluye paseo seguro, fotos de tu mascota durante el paseo, reporte de actividad y atención personalizada."
+                                    pregunta: "¿Debo llevar su comida?",
+                                    respuesta: "Recomendamos traer su ración de alimento para evitar cambios bruscos en su dieta, especialmente si se queda a pasar la noche."
                                 },
                                 {
-                                    pregunta: "¿Cómo reservo un paseo?",
-                                    respuesta: "Puedes reservar directamente desde nuestra app seleccionando la fecha, hora y duración deseada. El paseador confirmará tu solicitud."
+                                    pregunta: "¿Cómo reservo una jornada?",
+                                    respuesta: "Selecciona el día y si prefieres guardería de día o cuidado nocturno. El cuidador confirmará la disponibilidad basándose en su calendario."
                                 }
                             ]}
                         />

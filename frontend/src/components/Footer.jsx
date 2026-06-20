@@ -1,11 +1,20 @@
+import Link from "next/link";
+import Image from "next/image";
+
 export default function Footer() {
     return (
         <footer className="bg-[#eaf1ff] px-8 pt-16 pb-8">
             <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 md:grid-cols-4">
                 <div>
-                    <h2 className="mb-4 text-2xl font-bold text-purple-700">
-                        PetCare
-                    </h2>
+                    <Link href="/" className="text-2xl font-bold text-purple-700">
+                    <Image 
+                        src="/logo_petcare.svg" 
+                        alt="Logo de PetCare" 
+                        width={150} 
+                        height={150} 
+                        className="w-18 h-18" 
+                    />
+                </Link>
                     <p className="max-w-xs text-sm leading-6 text-gray-600">
                         Brindando cuidado profesional para cada mascota, todos los días.
                     </p>

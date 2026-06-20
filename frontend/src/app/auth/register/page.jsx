@@ -7,6 +7,8 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
+    phone: "",
+    city: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -66,6 +68,8 @@ export default function Register() {
 
     setFormData({
       username: "",
+      phone: "",
+      city: "",
       email: "",
       password: "",
       confirmPassword: ""
@@ -137,6 +141,50 @@ export default function Register() {
               />
               {errors.username && (
                 <p className="text-red-400 text-xs mt-1.5 ml-1 font-medium">{errors.username}</p>
+              )}
+            </div>
+
+            {/* Campo: Telefono */}
+            <div>
+              <label className="block text-gray-600 text-xs font-semibold uppercase tracking-wider mb-2">
+                Teléfono
+              </label>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                disabled={isLoading}
+                placeholder="612-345-678"
+                className={`w-full px-4 py-3 rounded-xl bg-white/[0.03] text-black placeholder-gray-500 text-sm focus:outline-none focus:ring-2 transition-all duration-200 disabled:opacity-50 ${errors.username
+                    ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/90"
+                    : "border border-white focus:ring-green-500/70 focus:border-green-500/70"
+                  }`}
+              />
+              {errors.username && (
+                <p className="text-red-400 text-xs mt-1.5 ml-1 font-medium">{errors.phone}</p>
+              )}
+            </div>
+
+            {/* Campo: Ciudad */}
+            <div>
+              <label className="block text-gray-600 text-xs font-semibold uppercase tracking-wider mb-2">
+                Ciudad
+              </label>
+              <input
+                type="text"
+                name="city"
+                value={formData.city}
+                onChange={handleChange}
+                disabled={isLoading}
+                placeholder="Ciudad"
+                className={`w-full px-4 py-3 rounded-xl bg-white/[0.03] text-black placeholder-gray-500 text-sm focus:outline-none focus:ring-2 transition-all duration-200 disabled:opacity-50 ${errors.username
+                    ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/90"
+                    : "border border-white focus:ring-green-500/70 focus:border-green-500/70"
+                  }`}
+              />
+              {errors.username && (
+                <p className="text-red-400 text-xs mt-1.5 ml-1 font-medium">{errors.city}</p>
               )}
             </div>
 
