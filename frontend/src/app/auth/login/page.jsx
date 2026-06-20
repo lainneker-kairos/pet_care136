@@ -39,27 +39,41 @@ export default function Login() {
 
     setIsLoading(true);
 
-    // lógica de registro real (API call)
-    let data = await loginUser({ email: formData["email"], password: formData["password"] })
+    try {
+      // lógica de registro real (API call)
+      
+      let data = await loginUser({ email: formData["email"], password: formData["password"] })
 
-    // Si la respuesta trae el error que manejamos en api.js o el backend falló
-    if (data.error || !data.token) {
-      alert(data.message || "Credenciales incorrectas. Inténtalo de nuevo.");
+      // Si la respuesta trae el error que manejamos en api.js o el backend falló
+      if (data.error || !data.token) {
+        alert(data.message || "Credenciales incorrectas. Inténtalo de nuevo.");
+        setIsLoading(false);
+        return; // Detenemos la ejecución aquí
+      }
+
+      // Guardamos el token 
+      localStorage.setItem("TOKENJWT", data.token);
+      
+      // Guardamos el nombre tal y como viene directamente del backend
+      localStorage.setItem("userName", data.profile.name);
+
       setIsLoading(false);
-      return; // Detenemos la ejecución aquí
+      alert("¡Sesión activa!");
+
+      setFormData({
+        email: "",
+        password: "",
+      });
+
+      window.location.href = "/";
+
+    } catch (error) {
+      console.error("Error en el login:", error);
+      alert("Ocurrió un error inesperado. Por favor, vuelve a intentarlo.");
+      setIsLoading(false);
     }
-
-
-    localStorage.setItem("TOKENJWT", data.token);
-    setIsLoading(false);
-    alert("¡Sesion activa!");
-
-    setFormData({
-      email: "",
-      password: "",
-    });
-    // router push (ruta dinamica)
   };
+
 
   // Manejador de cambios exacto
   const handleChange = (e) => {
@@ -74,21 +88,21 @@ export default function Login() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-green-600/20 overflow-hidden font-sans">
-      
+
       {/* Luces de fondo de neón (ambiente detrás del vidrio) */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-600/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-[15%] w-96 h-96 bg-purple-400/50 rounded-full blur-[120px] pointer-events-none" />
-      
+
       {/* Contenedor principal */}
       <div className="relative z-10 w-full max-w-md p-4">
         {/* Logo flotante */}
         <div className="absolute top-[-30px] left-2 text-white font-semibold text-sm tracking-wider opacity-80 z-30">
           <img
-            src="/logo_petcare.svg" 
-            alt="Logo de PetCare" 
-            width={150} 
-            height={150} 
-            className="w-20 h-20" 
+            src="/logo_petcare.svg"
+            alt="Logo de PetCare"
+            width={150}
+            height={150}
+            className="w-20 h-20"
           />
         </div>
 
@@ -121,8 +135,8 @@ export default function Login() {
                 disabled={isLoading}
                 placeholder="correo@ejemplo.com"
                 className={`w-full px-4 py-3 rounded-xl bg-white/[0.03] text-black placeholder-black-500 text-sm focus:outline-none focus:ring-2 transition-all duration-200 disabled:opacity-50 ${errors.email
-                    ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/50"
-                    : "border border-white focus:ring-green-500/70 focus:border-green-500/70"
+                  ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/50"
+                  : "border border-white focus:ring-green-500/70 focus:border-green-500/70"
                   }`}
               />
               {errors.email && (
@@ -144,8 +158,8 @@ export default function Login() {
                   disabled={isLoading}
                   placeholder="••••••••"
                   className={`w-full px-4 py-3 rounded-xl bg-white/[0.03] text-black placeholder-gray-500 text-sm focus:outline-none focus:ring-2 transition-all duration-200 pr-10 disabled:opacity-50 ${errors.password
-                      ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/50"
-                      : "border border-white focus:ring-green-500/70 focus:border-green-500/70"
+                    ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/50"
+                    : "border border-white focus:ring-green-500/70 focus:border-green-500/70"
                     }`}
                 />
                 <button

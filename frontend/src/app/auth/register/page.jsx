@@ -68,6 +68,8 @@ export default function Register() {
 
     setFormData({
       username: "",
+      phone: "",
+      city: "",
       email: "",
       password: "",
       confirmPassword: ""
@@ -148,12 +150,12 @@ export default function Register() {
                 Teléfono
               </label>
               <input
-                type="text"
-                name="username"
+                type="tel"
+                name="phone"
                 value={formData.phone}
                 onChange={handleChange}
                 disabled={isLoading}
-                placeholder="xxx-xxxxxx"
+                placeholder="612-345-678"
                 className={`w-full px-4 py-3 rounded-xl bg-white/[0.03] text-black placeholder-gray-500 text-sm focus:outline-none focus:ring-2 transition-all duration-200 disabled:opacity-50 ${errors.username
                     ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/90"
                     : "border border-white focus:ring-green-500/70 focus:border-green-500/70"
@@ -171,7 +173,7 @@ export default function Register() {
               </label>
               <input
                 type="text"
-                name="username"
+                name="city"
                 value={formData.city}
                 onChange={handleChange}
                 disabled={isLoading}

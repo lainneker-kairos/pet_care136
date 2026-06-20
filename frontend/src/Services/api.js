@@ -9,7 +9,7 @@ export const registerUser = async (data) => {
         body: JSON.stringify(data),
     })
     return await result.json()
-}
+};
 
 //-- Auth ---- //
 export const loginUser = async (data) => {
@@ -20,3 +20,4 @@ export const loginUser = async (data) => {
     })
     return await result.json() 
 };
+
