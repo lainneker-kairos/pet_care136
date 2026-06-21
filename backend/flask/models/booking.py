@@ -1,6 +1,6 @@
 from __future__ import annotations
 from datetime import datetime, date, time
-from sqlalchemy import String, Float, ForeignKey, Text, DateTime, date, time
+from sqlalchemy import String, Float, ForeignKey, Text, DateTime, Date, Time
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database import db
 from typing import List, TYPE_CHECKING
@@ -22,10 +22,10 @@ class Booking(db.Model):
     
     service_type: Mapped[str] = mapped_column(String(50), nullable=False) # paseo, hotel, guarderia, etc.
 
-    start_date: Mapped[date] = mapped_column(date, nullable=False)
-    end_date: Mapped[date] = mapped_column(date, nullable=False)
-    start_time: Mapped[time] = mapped_column(time, nullable=True)
-    end_time: Mapped[time] = mapped_column(time, nullable=True)
+    start_date: Mapped[date] = mapped_column(Date, nullable=False)
+    end_date: Mapped[date] = mapped_column(Date, nullable=False)
+    start_time: Mapped[time] = mapped_column(Time, nullable=True)
+    end_time: Mapped[time] = mapped_column(Time, nullable=True)
     
     status: Mapped[str] = mapped_column(String(20), default="pending")
     total_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
