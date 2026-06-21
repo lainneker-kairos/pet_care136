@@ -1,8 +1,8 @@
 "use client";
 import React, { useState } from "react";
+import { loginUser } from "@/Services/api";
 
 export default function Login() {
-
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -12,7 +12,6 @@ export default function Login() {
 
   // Estados extra para el diseño (mostrar/ocultar contraseñas)
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // función de validación exacta
   const validateForm = () => {
@@ -33,35 +32,48 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // función de envío de formulario exacta
+  // función de envío de formulario exactarte a JSON
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     setIsLoading(true);
 
-    // lógica de registro real (API call)
+    try {
+      // lógica de registro real (API call)
+      
+      let data = await loginUser({ email: formData["email"], password: formData["password"] })
 
-    let result = await fetch('http://127.0.0.1:5000/api/user/login', {
-      method: 'POST',
-      body: JSON.stringify(formData),
-      headers: {
-        "Content-Type": "application/Json"
+      // Si la respuesta trae el error que manejamos en api.js o el backend falló
+      if (data.error || !data.token) {
+        alert(data.message || "Credenciales incorrectas. Inténtalo de nuevo.");
+        setIsLoading(false);
+        return; // Detenemos la ejecución aquí
       }
-    })
 
-    let data = await result.json();
-    console.log(data);
+      // Guardamos el token 
+      localStorage.setItem("TOKENJWT", data.token);
+      
+      // Guardamos el nombre tal y como viene directamente del backend
+      localStorage.setItem("userName", data.profile.name);
 
-    localStorage.setItem("TOKENJWT", data.token);
-    setIsLoading(false);
-    alert("¡Sesion activa!");
+      setIsLoading(false);
+      alert("¡Sesión activa!");
 
-    setFormData({
-      email: "",
-      password: "",
-    });
+      setFormData({
+        email: "",
+        password: "",
+      });
+
+      window.location.href = "/";
+
+    } catch (error) {
+      console.error("Error en el login:", error);
+      alert("Ocurrió un error inesperado. Por favor, vuelve a intentarlo.");
+      setIsLoading(false);
+    }
   };
+
 
   // Manejador de cambios exacto
   const handleChange = (e) => {
@@ -75,28 +87,35 @@ export default function Login() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-[#09090b] to-[#0f170d]/90 overflow-hidden font-sans">
+    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-green-600/20 overflow-hidden font-sans">
+
       {/* Luces de fondo de neón (ambiente detrás del vidrio) */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-600/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purpple-500/60 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-[15%] w-96 h-96 bg-purple-400/50 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Contenedor principal */}
       <div className="relative z-10 w-full max-w-md p-4">
         {/* Logo flotante */}
-        <div className="absolute top-[-30px] left-4 text-white font-semibold text-sm tracking-wider opacity-60">
-          Logo
+        <div className="absolute top-[-30px] left-2 text-white font-semibold text-sm tracking-wider opacity-80 z-30">
+          <img
+            src="/logo_petcare.svg"
+            alt="Logo de PetCare"
+            width={150}
+            height={150}
+            className="w-20 h-20"
+          />
         </div>
 
         {/* Tarjeta Glassmorphism */}
-        <div className="w-full bg-white/[0.001] backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_32px_0_rgba(0,0,0,0.7)] rounded-3xl p-8 sm:p-10 transition-all duration-300">
+        <div className="w-full bg-white/15 backdrop-blur-2xl border-2 border-white shadow-[0_25px_15px_0_rgba(0,0,0,0.3)] rounded-3xl p-8 sm:p-10 transition-all duration-300">
 
           {/* Cabecera */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-extrabold text-white tracking-tight">
+            <h1 className="text-3xl font-extrabold text-purple-800 tracking-tight drpop-shadow-lg">
               Iniciar sesión
             </h1>
-            <p className="text-gray-400 text-sm mt-2 font-medium">
-              Ingresa tus credenciales para acceder a PetCare
+            <p className="text-gray-700 text-sm mt-2 font-medium">
+              Ingresa tus credenciales para acceder
             </p>
           </div>
 
@@ -105,7 +124,7 @@ export default function Login() {
 
             {/* Campo: Correo electrónico */}
             <div>
-              <label className="block text-gray-300 text-xs font-semibold uppercase tracking-wider mb-2">
+              <label className="block text-gray-600 text-xs font-semibold uppercase tracking-wider mb-2">
                 Correo electrónico
               </label>
               <input
@@ -115,9 +134,9 @@ export default function Login() {
                 onChange={handleChange}
                 disabled={isLoading}
                 placeholder="correo@ejemplo.com"
-                className={`w-full px-4 py-3 rounded-xl bg-white/[0.03] text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 transition-all duration-200 disabled:opacity-50 ${errors.email
-                    ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/50"
-                    : "border border-white/[0.08] focus:ring-purple-500/30 focus:border-purple-900/50"
+                className={`w-full px-4 py-3 rounded-xl bg-white/[0.03] text-black placeholder-black-500 text-sm focus:outline-none focus:ring-2 transition-all duration-200 disabled:opacity-50 ${errors.email
+                  ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/50"
+                  : "border border-white focus:ring-green-500/70 focus:border-green-500/70"
                   }`}
               />
               {errors.email && (
@@ -127,7 +146,7 @@ export default function Login() {
 
             {/* Campo: Contraseña */}
             <div>
-              <label className="block text-gray-300 text-xs font-semibold uppercase tracking-wider mb-2">
+              <label className="block text-gray-600 text-xs font-semibold uppercase tracking-wider mb-2">
                 Contraseña
               </label>
               <div className="relative">
@@ -138,9 +157,9 @@ export default function Login() {
                   onChange={handleChange}
                   disabled={isLoading}
                   placeholder="••••••••"
-                  className={`w-full px-4 py-3 rounded-xl bg-white/[0.03] text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 transition-all duration-200 pr-10 disabled:opacity-50 ${errors.password
-                      ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/50"
-                      : "border border-white/[0.08] focus:ring-purple-500/30 focus:border-purple-900/50"
+                  className={`w-full px-4 py-3 rounded-xl bg-white/[0.03] text-black placeholder-gray-500 text-sm focus:outline-none focus:ring-2 transition-all duration-200 pr-10 disabled:opacity-50 ${errors.password
+                    ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/50"
+                    : "border border-white focus:ring-green-500/70 focus:border-green-500/70"
                     }`}
                 />
                 <button
@@ -169,7 +188,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={isLoading}
-              className="group w-full flex items-center justify-center gap-2 py-3.5 px-4 bg-white hover:bg-neutral-100 text-black font-semibold rounded-xl transition-all duration-300 shadow-lg active:scale-[0.98] disabled:opacity-75 disabled:cursor-not-allowed mt-6 border border-transparent hover:border-green-500/50 hover:shadow-[0_0_20px_rgba(34,197,94,0.5)]"
+              className="group w-full flex items-center justify-center gap-2 py-3.5 px-4 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg active:scale-[0.70] disabled:opacity-75 disabled:cursor-not-allowed mt-6 border border-transparent hover:border-green-900/50 hover:shadow-[0_0_10px_rgba(34,197,94,0.5)]"
             >
               {isLoading ? (
                 <>
@@ -191,7 +210,6 @@ export default function Login() {
               )}
             </button>
           </form>
-
 
         </div>
       </div>

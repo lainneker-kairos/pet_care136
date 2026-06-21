@@ -26,32 +26,44 @@ def register():
 
     email = data.get('email')
     password = data.get('password')
+<<<<<<< HEAD
     role = data.get('role', 'owner') # "owner" o "petsitter"
+=======
+>>>>>>> 53bf570844ad0747945c035df70593904104f25f
     name = data.get('name')
+    phone = data.get('phone')
+    city = data.get('city')
 
     if not email or not password or not name:
+<<<<<<< HEAD
         return jsonify({"msg": "Todos los campos obligatorios (email, password, role, name) son requeridos"}), 400
+=======
+        return jsonify({"msg": "Todos los campos obligatorios (email, password, name) son requeridos"}), 400
+>>>>>>> 53bf570844ad0747945c035df70593904104f25f
 
     # Verificar si el usuario ya existe
     user_exists = db.session.execute(db.select(User).filter_by(email=email)).scalar_one_or_none()
     if user_exists:
         return jsonify({"msg": "El correo electrónico ya está registrado"}), 400
 
-    # Crear el usuario base usando los campos exactos del modelo 
+    # Crear el usuario base 
     hashed_password = generate_password_hash(password)
 
     new_user = User(
         email=email,
         password=hashed_password,
-        role=role,
+        role='owner',  # Por defecto, el usuario se registra como propietario
         is_active=True
     )
     db.session.add(new_user)
     db.session.flush() # Obtiene el new_user.id antes de hacer el commit
 
-    # Creación del perfil correspondiente según el rol
-    if role == 'owner':
-        new_profile = Owner(
+    # ==========================================
+    # ACTUALIZACIÓN DEL PERFIL DUEÑO (Owner)
+    # ==========================================
+
+
+    new_profile = Owner(
         user_id=new_user.id,
         name=name,
         phone=data.get('phone'),
@@ -60,21 +72,7 @@ def register():
         bio=data.get('bio', ""),
         profile_pic=data.get('profile_pic', ""),
         max_budget=data.get('max_budget')
-        )
-    else:
-        new_profile = Petsitter(
-        user_id=new_user.id,
-        name=name,
-        phone=data.get('phone'),
-        city=data.get('city'),
-        neighborhood=data.get('neighborhood'),
-        bio=data.get('bio', ""),
-        profile_pic=data.get('profile_pic', ""),
-        experience_years=data.get('experience_years', 0),
-        certifications=data.get('certifications', ""),
-        price_per_hour=data.get('price_per_hour', 0.0),
-        price_per_night=data.get('price_per_night', 0.0)
-        )
+    )
 
     db.session.add(new_profile)
     db.session.commit()
@@ -84,6 +82,52 @@ def register():
         "user": new_user.serialize()
     }), 201
 
+# ==========================================
+# CONVERTIRSE EN CUIDADOR (Petsitter)
+# ==========================================
+@user_bp.route('/bepetsitter', methods=['POST'])
+@token_required
+def bepetsitter(current_user_id):
+    user = db.session.get(User, current_user_id)
+    if not user:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+
+    if user.role != 'owner':
+        return jsonify({"msg": "Solo propietarios pueden convertirse en cuidadores"}), 400
+    
+    data = request.json
+    if not data:
+        return jsonify({"msg": "Faltan datos del perfil"}), 400
+    
+    # buscar y elimina el perfil de owner
+    old_owner_profile = db.session.execute(db.select(Owner).filter_by(user_id=user.id)).scalar_one_or_none()
+    name = data.get('name')
+    if not name and old_owner_profile:
+        name = old_owner_profile.name
+
+    if old_owner_profile:
+        db.session.delete(old_owner_profile)
+
+    # Actualizar el rol del usuario
+    user.role = 'petsitter'
+
+    # Crear el nuevo perfil de cuidador
+    new_profile = Petsitter(
+        user_id=user.id,
+        name=user.owner_profile.name if user.owner_profile else "",
+        phone=data.get('phone'),
+        city=data.get('city'),
+        neighborhood=data.get('neighborhood'),
+        bio=data.get('bio', ""),
+        profile_pic=data.get('profile_pic', ""),
+        experience_years=data.get('experience_years', 0),
+        # certifications=data.get('certifications', ""),
+        price_per_hour=data.get('price_per_hour', 0.0),
+        price_per_night=data.get('price_per_night', 0.0)
+    )
+    db.session.commit()
+
+    return jsonify({"msg": "Has sido convertido en cuidador"}), 200
 
 # ==========================================
 # INICIO DE SESIÓN
@@ -207,6 +251,8 @@ def update_profile(current_user_id):
         profile.bio = data.get('bio', profile.bio)
         profile.profile_pic = data.get('profile_pic', profile.profile_pic)
         profile.max_budget = data.get('max_budget', profile.max_budget)
+
+    
 
     elif user.role == 'petsitter':
         profile = user.petsitter_profile

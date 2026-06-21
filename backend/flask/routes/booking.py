@@ -5,7 +5,11 @@ from models.user import Owner, Petsitter
 from models.pets import Pet
 from datetime import datetime
 
+<<<<<<< HEAD
 bookings_bp = Blueprint('bookings_bp', __name__,)
+=======
+bookings_bp = Blueprint('bookings_bp', __name__)
+>>>>>>> 53bf570844ad0747945c035df70593904104f25f
 
 # ==========================================
 # CREAR NUEVA RESERVA
