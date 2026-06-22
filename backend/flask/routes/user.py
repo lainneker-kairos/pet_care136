@@ -27,8 +27,6 @@ def register():
     email = data.get('email')
     password = data.get('password')
     name = data.get('name')
-    phone = data.get('phone')
-    city = data.get('city')
 
     if not email or not password or not name:
         return jsonify({"msg": "Todos los campos obligatorios (email, password, name) son requeridos"}), 400

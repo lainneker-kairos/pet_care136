@@ -1,14 +1,15 @@
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
 import Image from 'next/image';
+import { registerUser } from "@/Services/api";
+import { useRouter } from "next/navigation";
 
 export default function Register() {
+  const router = useRouter()
 
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    username: "",
-    phone: "",
-    city: "",
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -23,8 +24,8 @@ export default function Register() {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.username.trim()) {
-      newErrors.username = "El nombre de usuario es requerido";
+    if (!formData.name.trim()) {
+      newErrors.name = "El nombre de usuario es requerido";
     }
     if (!formData.email.trim()) {
       newErrors.email = "El email es requerido";
@@ -55,26 +56,27 @@ export default function Register() {
 
     // lógica de registro real (API call)
 
-    await fetch('http://127.0.0.1:5000/api/register', {
-      method: 'POST',
-      body: JSON.stringify(formData),
-      headers: {
-        "Content-Type": "application/Json"
-      }
-    })
+    const data = await registerUser(formData)
+
+    if (data.msg && data.msg !== "Usuario y perfil creados exitosamente") {
+      setErrors({ general: data.msg }); backend
+      setIsLoading(false);
+      return;
+    }
 
     setIsLoading(false);
     alert("¡Registro exitoso!");
 
     setFormData({
-      username: "",
-      phone: "",
-      city: "",
+      name: "",
       email: "",
       password: "",
       confirmPassword: ""
     });
+
+    router.push("/auth/login")
   };
+
 
   // Manejador de cambios exacto
   const handleChange = (e) => {
@@ -102,8 +104,7 @@ export default function Register() {
             alt="Logo de PetCare" 
             width={150} 
             height={150} 
-            className="w-20 h-20" 
-          />
+            className="w-20 h-20"/>
         </div>
 
         {/* Tarjeta Glassmorphism */}
@@ -119,6 +120,10 @@ export default function Register() {
             </p>
           </div>
 
+          {errors.general && (
+            <p className="text-red-400 text-sm text-center mb-4 font-medium">{errors.general}</p>
+          )}
+
           {/* Formulario */}
           <form onSubmit={handleSubmit} className="space-y-5">
 
@@ -129,8 +134,8 @@ export default function Register() {
               </label>
               <input
                 type="text"
-                name="username"
-                value={formData.username}
+                name="name"
+                value={formData.name}
                 onChange={handleChange}
                 disabled={isLoading}
                 placeholder="Nombre"
@@ -139,52 +144,8 @@ export default function Register() {
                     : "border border-white focus:ring-green-500/70 focus:border-green-500/70"
                   }`}
               />
-              {errors.username && (
-                <p className="text-red-400 text-xs mt-1.5 ml-1 font-medium">{errors.username}</p>
-              )}
-            </div>
-
-            {/* Campo: Telefono */}
-            <div>
-              <label className="block text-gray-600 text-xs font-semibold uppercase tracking-wider mb-2">
-                Teléfono
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                disabled={isLoading}
-                placeholder="612-345-678"
-                className={`w-full px-4 py-3 rounded-xl bg-white/[0.03] text-black placeholder-gray-500 text-sm focus:outline-none focus:ring-2 transition-all duration-200 disabled:opacity-50 ${errors.username
-                    ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/90"
-                    : "border border-white focus:ring-green-500/70 focus:border-green-500/70"
-                  }`}
-              />
-              {errors.username && (
-                <p className="text-red-400 text-xs mt-1.5 ml-1 font-medium">{errors.phone}</p>
-              )}
-            </div>
-
-            {/* Campo: Ciudad */}
-            <div>
-              <label className="block text-gray-600 text-xs font-semibold uppercase tracking-wider mb-2">
-                Ciudad
-              </label>
-              <input
-                type="text"
-                name="city"
-                value={formData.city}
-                onChange={handleChange}
-                disabled={isLoading}
-                placeholder="Ciudad"
-                className={`w-full px-4 py-3 rounded-xl bg-white/[0.03] text-black placeholder-gray-500 text-sm focus:outline-none focus:ring-2 transition-all duration-200 disabled:opacity-50 ${errors.username
-                    ? "border border-red-500/50 focus:ring-red-500/30 focus:border-red-500/90"
-                    : "border border-white focus:ring-green-500/70 focus:border-green-500/70"
-                  }`}
-              />
-              {errors.username && (
-                <p className="text-red-400 text-xs mt-1.5 ml-1 font-medium">{errors.city}</p>
+              {errors.name && (
+                <p className="text-red-400 text-xs mt-1.5 ml-1 font-medium">{errors.name}</p>
               )}
             </div>
 
@@ -323,7 +284,7 @@ export default function Register() {
               ¿Ya tienes una cuenta?{" "}
               <a
                 href="/auth/login"
-                className="text-white hover:underline font-semibold ml-1 transition-all duration-150"
+                className="text-black hover:underline font-semibold ml-1 transition-all duration-150"
               >
                 Iniciar sesión
               </a>

@@ -31,7 +31,7 @@ export default function ServiceSection() {
                                 apasionados por los animales.
                             </p>
 
-                            <a href="#" className="font-bold text-teal-700">
+                            <a href="/DogWalkingPage" className="font-bold text-teal-700">
                                 Ver más →
                             </a>
                         </article>
@@ -50,7 +50,7 @@ export default function ServiceSection() {
                                 constante, cariño y compañía.
                             </p>
 
-                            <a href="#" className="font-bold text-teal-700">
+                            <a href="/daycare" className="font-bold text-teal-700">
                                 Ver más →
                             </a>
                         </article>
@@ -69,7 +69,7 @@ export default function ServiceSection() {
                                 cuidado personalizado.
                             </p>
 
-                            <a href="#" className="font-bold text-teal-700">
+                            <a href="/hotel" className="font-bold text-teal-700">
                                 Ver más →
                             </a>
                         </article>
