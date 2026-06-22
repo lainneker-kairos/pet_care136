@@ -7,7 +7,8 @@ import os
 from routes.user import user_bp
 from routes.pets import pets_bp  
 from routes.booking import bookings_bp
-
+from routes.calendar import calendar_bp
+from routes.maps import maps_bp
 # Importacion de modelos
 from models.user import User, Owner, Petsitter
 from models.pets import Pet
@@ -26,12 +27,14 @@ app.config['SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 
 db.init_app(app)
 migrate = Migrate(app, db)
+
 app.register_blueprint(user_bp, url_prefix='/api')
 app.register_blueprint(pets_bp, url_prefix='/api')
 app.register_blueprint(bookings_bp, url_prefix='/api')
+app.register_blueprint(calendar_bp, url_prefix='/api')
+app.register_blueprint(maps_bp)
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-
     app.run(debug=False)
