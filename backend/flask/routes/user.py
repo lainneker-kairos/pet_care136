@@ -54,7 +54,6 @@ def register():
     # ACTUALIZACIÓN DEL PERFIL DUEÑO (Owner)
     # ==========================================
 
-
     new_profile = Owner(
         user_id=new_user.id,
         name=name,
@@ -117,6 +116,7 @@ def bepetsitter(current_user_id):
         price_per_hour=data.get('price_per_hour', 0.0),
         price_per_night=data.get('price_per_night', 0.0)
     )
+    db.session.add(new_profile)
     db.session.commit()
 
     return jsonify({"msg": "Has sido convertido en cuidador"}), 200
