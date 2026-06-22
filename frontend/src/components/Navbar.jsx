@@ -3,36 +3,32 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
 
+    const router = useRouter();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [user, setUser] = useState(null)
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (!token) return;
+        const token = localStorage.getItem("TOKENJWT");
+        const userName = localStorage.getItem("userName");
 
-        setIsLoggedIn(true);
+        if (token && userName) {
+            setIsLoggedIn(true)
+            setUser({ name: userName })
+        }
 
-        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/profile`, {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-            .then((res) => {
-                if (!res.ok) throw new Error("Token inválido o expirado");
-                return res.json();
-            })
-            .then((data) => setUser(data))
-            .catch(() => {
-                localStorage.removeItem("token");
-                setIsLoggedIn(false);
-            });
     }, []);
 
     const handleLogout = () => {
-        localStorage.removeItem("token");
+        localStorage.removeItem("TOKENJWT");
+        localStorage.removeItem("userName");
         setIsLoggedIn(false);
         setUser(null);
+
+        router.push("/auth/login")
     };
 
     return (
@@ -66,15 +62,21 @@ export default function Navbar() {
 
                 <div className="flex items-center gap-4">
                     {isLoggedIn ? (
-
                         <>
-                        <span className="hidden text-sm font-semibold text-gray-700 sm:inline">
-                                Hola, {user?.username || "usuario"}
+
+                            <span className="hidden text-sm font-semibold text-gray-700 sm:inline">
+                                Hola, {user?.name || "usuario"}
                             </span>
+
+                            <span className="hidden text-gray-300 sm:inline">|</span>
+
+                            <a href="#" className="text-sm font-semibold text-gray-700 hover:text-purple-700 mr-2">
+                                Mi perfil
+                            </a>
+
                             <button
                                 onClick={handleLogout}
-                                className="rounded-full bg-purple-700 px-5 py-3 text-sm font-bold text-white hover:bg-purple-800"
-                            >
+                                className="rounded-full bg-purple-700 px-5 py-3 text-sm font-bold text-white hover:bg-purple-800">
                                 Cerrar sesión
                             </button>
                         </>
