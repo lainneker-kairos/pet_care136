@@ -1,11 +1,8 @@
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import Accordion from "@/components/Accordion";
 
 export default function GuarderiaPage() {
     return (
         <>
-            <Navbar />
             <main>
                 {/* 1. SECCIÓN HERO (Guardería y Cuidado Nocturno) */}
                 <section className="bg-[#f7f8ff] px-8 py-20">
@@ -142,8 +139,6 @@ export default function GuarderiaPage() {
                     </div>
                 </section>
             </main>
-
-            <Footer />
         </>
     );
 }

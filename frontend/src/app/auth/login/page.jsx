@@ -1,15 +1,19 @@
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
 import { loginUser } from "@/Services/api";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+
 
   const validateForm = () => {
     const newErrors = {};
@@ -39,14 +43,14 @@ export default function Login() {
       
       const data = await loginUser({ email: formData.email, password: formData.password });
 
-      
       localStorage.setItem("TOKENJWT", data.token);
       localStorage.setItem("userName", data.profile.name);
 
-      alert("¡Sesión activa!");
-
       setFormData({ email: "", password: "" });
+      
       window.location.href = "/";
+
+
     } catch (error) {
       console.error("Error en el login:", error);
       alert("Ocurrió un error en el inicio de sesión. Verifica tus credenciales.");

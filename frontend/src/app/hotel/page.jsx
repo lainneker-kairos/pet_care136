@@ -1,11 +1,8 @@
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import Accordion from "@/components/Accordion";
 
 export default function HotelPage() {
     return (
         <>
-            <Navbar />
             <main>
                 {/* 1. SECCIÓN HERO (Hotel) */}
                 <section className="bg-[#f7f8ff] px-8 py-20">
@@ -124,7 +121,7 @@ export default function HotelPage() {
                             faqs={[
                                 {
                                     pregunta: "¿Cómo funcionan las tarifas por noche?",
-                                    respuesta: "El cobro se realiza por noche (€25). Si recoges a tu mascota después de la hora de salida, se aplicará una tarifa adicional."
+                                    respuesta: "El cobro se realiza por noche (a partir de €25). Si recoges a tu mascota después de la hora de salida, se aplicará una tarifa adicional."
                                 },
                                 {
                                     pregunta: "¿Qué debo traer para la estancia?",
@@ -143,8 +140,6 @@ export default function HotelPage() {
                     </div>
                 </section>
             </main>
-
-            <Footer />
         </>
     );
 }

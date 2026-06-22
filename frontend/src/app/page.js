@@ -1,14 +1,11 @@
-import Navbar from "../components/Navbar"
 import HeroSection from "../components/HeroSection";
 import ServiceSection from "../components/ServicesSection";
 import TrustSection from "../components/TrustSection";
 import CallToAction from "../components/CallToAction";
-import Footer from "../components/Footer";
 
 export default function HomePage() {
   return (
     <>
-    <Navbar />
 
     <main>
 
@@ -25,8 +22,6 @@ export default function HomePage() {
       <CallToAction />
       
     </main >
-    
-    <Footer />
 
     </>
   );
