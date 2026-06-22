@@ -7,6 +7,7 @@ import os
 from routes.user import user_bp
 from routes.pets import pets_bp  
 from routes.booking import bookings_bp
+from routes.petsitter import petsitter_bp 
 
 
 
@@ -31,6 +32,7 @@ migrate = Migrate(app, db)
 app.register_blueprint(user_bp, url_prefix='/api')
 app.register_blueprint(pets_bp, url_prefix='/api')
 app.register_blueprint(bookings_bp, url_prefix='/api')
+app.register_blueprint(petsitter_bp, url_prefix='/api')
 
 if __name__ == '__main__':
     with app.app_context():
