@@ -127,7 +127,7 @@ export default function DogWalkingPage() {
                 </section>
 
                 {/* 3. SECCIÓN DE FAQ */}
-                <section className="bg-[#F0F7F7] px-8 py-16 border-t border-gray-100">
+                <section className="px-8 py-16 border-t border-gray-100">
                     <div className="mx-auto max-w-3xl border border-[#EADBCE] ">
 
                         <Accordion

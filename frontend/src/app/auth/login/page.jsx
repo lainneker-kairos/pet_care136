@@ -42,9 +42,11 @@ export default function Login() {
     try {
       
       const data = await loginUser({ email: formData.email, password: formData.password });
+      console.log("esto nos trae data", data);
+      
 
       localStorage.setItem("TOKENJWT", data.token);
-      localStorage.setItem("userName", data.profile.name);
+      localStorage.setItem("userName", data.user.name);
 
       setFormData({ email: "", password: "" });
       
