@@ -35,7 +35,7 @@ export default function DogWalkingPage() {
                             </p>
 
                             {/* El Widget Buscador que interactúa con el Back */}
-                            <div className="mt-2 rounded-2xl bg-white p-6 shadow-xl border border-gray-100">
+                            <div className="mt-2 rounded-2xl bg-[#FAF6F0] p-6 shadow-xl border border-[#EADBCE]">
                                 <h3 className="text-lg font-bold text-teal-700 mb-4">Encuentra al paseador ideal</h3>
 
                                 <form onSubmit={handleSearch} className="flex flex-col gap-4">
@@ -46,8 +46,7 @@ export default function DogWalkingPage() {
                                             <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">¿Cuánto tiempo?</label>
                                             <select
                                                 name="duration_hours"
-                                                className="rounded-lg border border-gray-300 p-3 text-sm text-gray-700 focus:border-purple-500 focus:outline-none bg-gray-50"
-                                            >
+                                                className="rounded-lg border border-gray-300 p-3 text-sm text-gray-700 focus:border-purple-500 focus:outline-none bg-gray-50">
                                                 <option value="0.5">Paseo de 30 minutos</option>
                                                 <option value="1">Paseo de 1 hora</option>
                                             </select>
@@ -59,7 +58,7 @@ export default function DogWalkingPage() {
                                             <input
                                                 type="date"
                                                 name="start_date"
-                                                className="rounded-lg border border-gray-300 p-3 text-sm text-gray-700 focus:border-purple-500 focus:outline-none bg-gray-50"/>
+                                                className="rounded-lg border border-gray-300 p-3 text-sm text-gray-700 focus:border-purple-500 focus:outline-none bg-gray-50" />
                                         </div>
 
                                     </div>
@@ -80,7 +79,7 @@ export default function DogWalkingPage() {
                             <img
                                 src="https://images.unsplash.com/photo-1560743173-567a3b5658b1?q=80&w=1469&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                                 alt="Perros corriendo"
-                                className="h-[460px] w-full rounded-[28px] object-cover shadow-lg"/>
+                                className="h-[460px] w-full rounded-[28px] object-cover shadow-lg" />
 
                             <div className="absolute bottom-[-16px] right-[-16px] rounded-xl bg-white p-4 shadow-xl border border-gray-50">
                                 <p className="text-2xl font-bold text-purple-700">500+</p>
@@ -96,8 +95,9 @@ export default function DogWalkingPage() {
                         <h2 className="text-3xl font-bold text-purple-700 mb-12">¿Por qué elegirnos?</h2>
 
                         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+
                             {/* Tarjeta 1 */}
-                            <div className="flex flex-col items-center p-6 rounded-2xl bg-white border border-gray-100">
+                            <div className="flex flex-col items-center p-6 rounded-2xl bg-[#FAF6F0] border border-[#EADBCE]">
                                 <div className="text-4xl mb-4">🛡️</div>
                                 <h3 className="text-xl font-bold text-purple-700 mb-2">Paseadores Verificados</h3>
                                 <p className="text-gray-600 text-sm leading-relaxed">
@@ -106,7 +106,7 @@ export default function DogWalkingPage() {
                             </div>
 
                             {/* Tarjeta 2 */}
-                            <div className="flex flex-col items-center p-6 rounded-2xl bg-white border border-gray-100">
+                            <div className="flex flex-col items-center p-6 rounded-2xl bg-[#FAF6F0] border border-[#EADBCE]">
                                 <div className="text-4xl mb-4">📍</div>
                                 <h3 className="text-xl font-bold text-purple-700 mb-2">Seguimiento por GPS</h3>
                                 <p className="text-gray-600 text-sm leading-relaxed">
@@ -115,7 +115,7 @@ export default function DogWalkingPage() {
                             </div>
 
                             {/* Tarjeta 3 */}
-                            <div className="flex flex-col items-center p-6 rounded-2xl bg-white border border-gray-100">
+                            <div className="flex flex-col items-center p-6 rounded-2xl bg-[#FAF6F0] border border-[#EADBCE]">
                                 <div className="text-4xl mb-4">📞</div>
                                 <h3 className="text-xl font-bold text-purple-700 mb-2">Soporte Continuo</h3>
                                 <p className="text-gray-600 text-sm leading-relaxed">
@@ -128,7 +128,7 @@ export default function DogWalkingPage() {
 
                 {/* 3. SECCIÓN DE FAQ */}
                 <section className="bg-[#F0F7F7] px-8 py-16 border-t border-gray-100">
-                    <div className="mx-auto max-w-3xl">
+                    <div className="mx-auto max-w-3xl border border-[#EADBCE] ">
 
                         <Accordion
                             faqs={[
