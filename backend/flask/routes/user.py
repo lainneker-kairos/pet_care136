@@ -40,6 +40,7 @@ def register():
     hashed_password = generate_password_hash(password)
 
     new_user = User(
+        name=name,
         email=email,
         password=hashed_password,
         role='owner',  # Por defecto, el usuario se registra como propietario
