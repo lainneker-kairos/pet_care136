@@ -54,6 +54,16 @@ export default function HotelPage() {
                                     {/* Service type para el hotel */}
                                     <input type="hidden" name="service_type" value="hotel" />
 
+                                    {/* Campo Ciudad */}
+                                        <div className="flex flex-col gap-1 w-1/2 mx-auto">
+                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wide text-center">¿En qué ciudad?</label>
+                                            <input
+                                                type="text"
+                                                name="city"
+                                                placeholder="Ej: Madrid"
+                                                className="w-full rounded-lg border border-gray-300 p-3 text-sm text-gray-700 focus:border-purple-500 focus:outline-none bg-gray-50 text-center"/>
+                                        </div>
+
                                     <button 
                                         type="submit" 
                                         className="w-full rounded-lg bg-purple-700 py-4 text-center font-bold text-white transition-colors hover:bg-purple-800 shadow-md shadow-purple-200 mt-2"

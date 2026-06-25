@@ -46,18 +46,18 @@ export default function Navbar() {
                 </Link>
 
                 <div className="hidden items-center gap-8 text-sm font-semibold text-gray-600 md:flex">
-                    <a href="/DogWalkingPage" className="hover:text-purple-700">
-                        Paseo de perros
-                    </a>
-                    <a href="daycare" className="hover:text-purple-700">
+                    <Link href="/DogWalkingPage" className="hover:text-purple-700">
+                        Paseo de mascotas
+                    </Link>
+                    <Link href="/daycare" className="hover:text-purple-700">
                         Guardería
-                    </a>
-                    <a href="hotel" className="hover:text-purple-700">
+                    </Link>
+                    <Link href="/hotel" className="hover:text-purple-700">
                         Hotel de mascotas
-                    </a>
-                    <a href="listacuidadores" className="hover:text-purple-700">
+                    </Link>
+                    <Link href="/cuidadores" className="hover:text-purple-700">
                         Cuidadores
-                    </a>
+                    </Link>
                 </div>
 
                 <div className="flex items-center gap-4">
@@ -70,9 +70,9 @@ export default function Navbar() {
 
                             <span className="hidden text-gray-300 sm:inline">|</span>
 
-                            <a href="#" className="text-sm font-semibold text-gray-700 hover:text-purple-700 mr-2">
+                            <Link href="perfildueno" className="text-sm font-semibold text-gray-700 hover:text-purple-700 mr-2">
                                 Mi perfil
-                            </a>
+                            </Link>
 
                             <button
                                 onClick={handleLogout}

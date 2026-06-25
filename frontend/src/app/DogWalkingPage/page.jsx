@@ -10,7 +10,7 @@ export default function DogWalkingPage() {
         e.preventDefault();
         const formData = new FormData(e.target);
         const params = new URLSearchParams(formData).toString();
-        router.push(`/listacuidadores?${params}`)
+        router.push(`/cuidadores?${params}`)
     }
 
     return (
@@ -40,7 +40,7 @@ export default function DogWalkingPage() {
 
                                 <form onSubmit={handleSearch} className="flex flex-col gap-4">
 
-                                    {/* Grid con duración y fecha - DEBAJO */}
+                                    {/* Grid con duración y fecha */}
                                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 
                                         {/* Selector de Tiempo/Duración */}
