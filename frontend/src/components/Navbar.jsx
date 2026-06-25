@@ -55,7 +55,7 @@ export default function Navbar() {
                     <a href="hotel" className="hover:text-purple-700">
                         Hotel de mascotas
                     </a>
-                    <a href="listacuidador" className="hover:text-purple-700">
+                    <a href="listacuidadores" className="hover:text-purple-700">
                         Cuidadores
                     </a>
                 </div>

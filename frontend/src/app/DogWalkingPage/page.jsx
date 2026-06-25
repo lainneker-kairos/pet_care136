@@ -10,14 +10,14 @@ export default function DogWalkingPage() {
         e.preventDefault();
         const formData = new FormData(e.target);
         const params = new URLSearchParams(formData).toString();
-        router.push(`/listacuidador?${params}`)
+        router.push(`/listacuidadores?${params}`)
     }
 
     return (
         <>
             <main>
                 {/* 1. SECCIÓN HERO (Con el buscador y SIN botones repetidos) */}
-                <section className="bg-[#F0F7F7] px-8 py-20">
+                <section className="bg-[#f7f8ff] px-8 py-20">
                     <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-16 md:grid-cols-2">
 
                         {/* Lado izquierdo - Texto y Buscador */}
@@ -39,6 +39,8 @@ export default function DogWalkingPage() {
                                 <h3 className="text-lg font-bold text-teal-700 mb-4">Encuentra al paseador ideal</h3>
 
                                 <form onSubmit={handleSearch} className="flex flex-col gap-4">
+
+                                    {/* Grid con duración y fecha - DEBAJO */}
                                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 
                                         {/* Selector de Tiempo/Duración */}
@@ -60,7 +62,17 @@ export default function DogWalkingPage() {
                                                 name="start_date"
                                                 className="rounded-lg border border-gray-300 p-3 text-sm text-gray-700 focus:border-purple-500 focus:outline-none bg-gray-50" />
                                         </div>
+                                    </div>
 
+                                     {/* Campo Ciudad */}
+                                    <div className="flex flex-col gap-1 w-1/2 mx-auto">
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wide text-center">¿En qué ciudad?</label>
+                                        <input
+                                            type="text"
+                                            name="city"
+                                            placeholder="Ej: Madrid"
+                                            className="w-full rounded-lg border border-gray-300 p-3 text-sm text-gray-700 focus:border-purple-500 focus:outline-none bg-gray-50 text-center"
+                                        />
                                     </div>
 
                                     <input type="hidden" name="service_type" value="paseo" />
@@ -90,7 +102,7 @@ export default function DogWalkingPage() {
                 </section>
 
                 {/* 2. NUEVA SECCIÓN INTERMEDIA: BENEFICIOS */}
-                <section className="bg-[#F0F7F7] px-8 py-16">
+                <section className="bg-white px-8 py-16">
                     <div className="mx-auto max-w-6xl text-center">
                         <h2 className="text-3xl font-bold text-purple-700 mb-12">¿Por qué elegirnos?</h2>
 
@@ -127,8 +139,8 @@ export default function DogWalkingPage() {
                 </section>
 
                 {/* 3. SECCIÓN DE FAQ */}
-                <section className="px-8 py-16 border-t border-gray-100">
-                    <div className="mx-auto max-w-3xl border border-[#EADBCE] ">
+                <section className="bg-[#f7f8ff] px-8 py-16 border-t border-gray-100">
+                    <div className="mx-auto max-w-3xl ">
 
                         <Accordion
                             faqs={[
