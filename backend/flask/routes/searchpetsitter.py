@@ -57,8 +57,8 @@ def get_searchpetsitters():
     # Filtro por disponibilidad de fechas
     if start_date_str and end_date_str:
         try:
-            start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
-            end_date = datetime.strptime(end_date_str, "%Y-%m-%d").date()
+            start_date = datetime.strptime(start_date_str, "%d/%m/%Y").date()
+            end_date = datetime.strptime(end_date_str, "%d/%m/%Y").date()
             
             # cambio del FOR, filtramos directamente en la consulta SQL.
             # "~" significa "NOT". Es decir: "Donde NO exista ninguna reserva que cumpla esto:"
@@ -73,7 +73,7 @@ def get_searchpetsitters():
             )
             
         except ValueError:
-            return jsonify({"msg": "Formato de fechas inválido. Use YYYY-MM-DD"}), 400
+            return jsonify({"msg": "Formato de fechas inválido. Use DD/MM/YYYY"}), 400
         
     # Ejecutamos LA ÚNICA consulta a la base de datos
     petsitters = db.session.execute(query).scalars().all()
@@ -83,7 +83,7 @@ def get_searchpetsitters():
         petsitter_data = petsitter.serialize()
         
         # Calculamos el precio estimado para la búsqueda del frontend
-        estimated_price = 0.0
+        estimated_price = 8.0
         
         if service in ['walk', 'paseo', 'daycare', 'guarderia']:
             base_price = float(petsitter.price_per_hour or 0.0)
