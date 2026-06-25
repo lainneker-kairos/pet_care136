@@ -23,7 +23,7 @@ export default function GuarderiaPage() {
                             </p>
 
                             {/* Widget Buscador sincronizado con el Back (daycare / nightcare) */}
-                            <div className="mt-2 rounded-2xl bg-white p-6 shadow-xl border border-gray-100">
+                            <div className="mt-2 rounded-2xl bg-[#FAF6F0] p-6 shadow-xl border border-gray-100">
                                 <h3 className="text-lg font-bold text-teal-700 mb-4">Reserva su lugar hoy</h3>
                                 
                                 <form action="/cuidadores" className="flex flex-col gap-4">
@@ -85,7 +85,7 @@ export default function GuarderiaPage() {
                         <h2 className="text-3xl font-bold text-purple-700 mb-12">Beneficios de nuestra Guardería</h2>
                         
                         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-                            <div className="flex flex-col items-center p-6 rounded-2xl bg-[#f7f8ff] border border-gray-100">
+                            <div className="flex flex-col items-center p-6 rounded-2xl bg-[#FAF6F0] border border-gray-100">
                                 <div className="text-4xl mb-4">🐾</div>
                                 <h3 className="text-xl font-bold text-purple-700 mb-2">Socialización Sana</h3>
                                 <p className="text-gray-600 text-sm leading-relaxed">
@@ -93,7 +93,7 @@ export default function GuarderiaPage() {
                                 </p>
                             </div>
 
-                            <div className="flex flex-col items-center p-6 rounded-2xl bg-[#f7f8ff] border border-gray-100">
+                            <div className="flex flex-col items-center p-6 rounded-2xl bg-[#FAF6F0] border border-gray-100">
                                 <div className="text-4xl mb-4">🏠</div>
                                 <h3 className="text-xl font-bold text-purple-700 mb-2">Espacios Adaptados</h3>
                                 <p className="text-gray-600 text-sm leading-relaxed">
@@ -101,7 +101,7 @@ export default function GuarderiaPage() {
                                 </p>
                             </div>
 
-                            <div className="flex flex-col items-center p-6 rounded-2xl bg-[#f7f8ff] border border-gray-100">
+                            <div className="flex flex-col items-center p-6 rounded-2xl bg-[#FAF6F0] border border-gray-100">
                                 <div className="text-4xl mb-4">📷</div>
                                 <h3 className="text-xl font-bold text-purple-700 mb-2">Reportes Diarios</h3>
                                 <p className="text-gray-600 text-sm leading-relaxed">
@@ -113,7 +113,7 @@ export default function GuarderiaPage() {
                 </section>
 
                 {/* 3. SECCIÓN DE FAQ (Cambiado el título a Preguntas Frecuentes) */}
-                <section className="bg-white px-8 py-16 border-t border-gray-100">
+                <section className="bg-[#f7f8ff] px-8 py-16 border-t border-gray-100">
                     <div className="mx-auto max-w-3xl">
                         
                         <Accordion

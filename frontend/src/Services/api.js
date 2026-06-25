@@ -40,7 +40,7 @@ export const getPetsitters = async (filters = {}) => {
     if (filters.min_price) params.append("min_price", filters.min_price);
     if (filters.max_price) params.append("max_price", filters.max_price);
 
-    const result = await fetch(`${API_URL}/petsitters?${params.toString()}`, {
+    const result = await fetch(`${API_URL}/searchpetsitters?${params.toString()}`, {
         method: 'GET',
         headers: {
             "Content-Type": "application/json"
