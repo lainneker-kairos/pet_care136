@@ -59,7 +59,7 @@ export default function Register() {
     const data = await registerUser(formData)
 
     if (data.msg && data.msg !== "Usuario y perfil creados exitosamente") {
-      setErrors({ general: data.msg }); backend
+      setErrors({ general: data.msg });
       setIsLoading(false);
       return;
     }
