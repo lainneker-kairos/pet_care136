@@ -9,7 +9,7 @@ export default function Accordion({ faqs }) {
   };
 
   return (
-    <section className="bg-white px-8 py-20">
+    <section className="bg-[#f7f8ff] px-8 py-20">
       <div className="mx-auto max-w-4xl">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-purple-700 mb-4">
@@ -24,11 +24,11 @@ export default function Accordion({ faqs }) {
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className="border border-gray-200 rounded-lg overflow-hidden hover:border-purple-300 transition-colors"
+              className="border border-[#EADBCE] rounded-lg overflow-hidden hover:border-purple-300 transition-colors"
             >
               <button
                 onClick={() => toggleAccordion(index)}
-                className="w-full px-6 py-4 flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors"
+                className="w-full px-6 py-4 flex items-center justify-between bg-[#FAF6F0] hover:bg-[#EFE9E2] transition-colors"
               >
                 <span className="text-left font-semibold text-gray-900">
                   {faq.pregunta}
@@ -43,7 +43,7 @@ export default function Accordion({ faqs }) {
               </button>
 
               {openIndex === index && (
-                <div className="px-6 py-4 bg-white border-t border-gray-200">
+                <div className="px-6 py-4 bg-white border-t border-[#EADBCE]">
                   <p className="text-gray-600 leading-relaxed">
                     {faq.respuesta}
                   </p>

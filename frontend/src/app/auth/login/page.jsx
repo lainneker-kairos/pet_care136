@@ -1,19 +1,26 @@
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
 import { loginUser } from "@/Services/api";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+
   const [errors, setErrors] = useState({});
 
   // Estados extra para el diseño (mostrar/ocultar contraseñas)
   const [showPassword, setShowPassword] = useState(false);
 
+<<<<<<< HEAD
   // función de validación exacta
+=======
+
+>>>>>>> 96e6ac6d500f4470bb7a3f0d6d26f0f60f57df69
   const validateForm = () => {
     const newErrors = {};
 
@@ -42,6 +49,7 @@ export default function Login() {
     try {
       // lógica de registro real (API call)
       
+<<<<<<< HEAD
       let data = await loginUser({ email: formData["email"], password: formData["password"] })
 
       // Si la respuesta trae el error que manejamos en api.js o el backend falló
@@ -67,6 +75,20 @@ export default function Login() {
 
       window.location.href = "/";
 
+=======
+      const data = await loginUser({ email: formData.email, password: formData.password });
+      console.log("esto nos trae data", data);
+      
+
+      localStorage.setItem("TOKENJWT", data.token);
+      localStorage.setItem("userName", data.user.name);
+
+      setFormData({ email: "", password: "" });
+      
+      window.location.href = "/";
+
+
+>>>>>>> 96e6ac6d500f4470bb7a3f0d6d26f0f60f57df69
     } catch (error) {
       console.error("Error en el login:", error);
       alert("Ocurrió un error inesperado. Por favor, vuelve a intentarlo.");

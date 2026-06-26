@@ -1,11 +1,8 @@
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import Accordion from "@/components/Accordion";
 
 export default function HotelPage() {
     return (
         <>
-            <Navbar />
             <main>
                 {/* 1. SECCIÓN HERO (Hotel) */}
                 <section className="bg-[#f7f8ff] px-8 py-20">
@@ -26,7 +23,7 @@ export default function HotelPage() {
                             </p>
 
                             {/* Widget Buscador sincronizado con 'offers_hotel' */}
-                            <div className="mt-2 rounded-2xl bg-white p-6 shadow-xl border border-gray-100">
+                            <div className="mt-2 rounded-2xl bg-[#FAF6F0] p-6 shadow-xl border border-gray-100">
                                 <h3 className="text-lg font-bold text-teal-700 mb-4">Reserva su estancia</h3>
                                 
                                 <form action="/cuidadores" className="flex flex-col gap-4">
@@ -89,7 +86,7 @@ export default function HotelPage() {
                         <h2 className="text-3xl font-bold text-purple-700 mb-12">Lo que incluye el Alojamiento</h2>
                         
                         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-                            <div className="flex flex-col items-center p-6 rounded-2xl bg-[#f7f8ff] border border-gray-100">
+                            <div className="flex flex-col items-center p-6 rounded-2xl bg-[#FAF6F0] border border-gray-100">
                                 <div className="text-4xl mb-4">🛏️</div>
                                 <h3 className="text-xl font-bold text-purple-700 mb-2">Confort Total</h3>
                                 <p className="text-gray-600 text-sm leading-relaxed">
@@ -97,7 +94,7 @@ export default function HotelPage() {
                                 </p>
                             </div>
 
-                            <div className="flex flex-col items-center p-6 rounded-2xl bg-[#f7f8ff] border border-gray-100">
+                            <div className="flex flex-col items-center p-6 rounded-2xl bg-[#FAF6F0] border border-gray-100">
                                 <div className="text-4xl mb-4">🌳</div>
                                 <h3 className="text-xl font-bold text-purple-700 mb-2">Paseos Diarios</h3>
                                 <p className="text-gray-600 text-sm leading-relaxed">
@@ -105,7 +102,7 @@ export default function HotelPage() {
                                 </p>
                             </div>
 
-                            <div className="flex flex-col items-center p-6 rounded-2xl bg-[#f7f8ff] border border-gray-100">
+                            <div className="flex flex-col items-center p-6 rounded-2xl bg-[#FAF6F0] border border-gray-100">
                                 <div className="text-4xl mb-4">🚨</div>
                                 <h3 className="text-xl font-bold text-purple-700 mb-2">Atención Médica</h3>
                                 <p className="text-gray-600 text-sm leading-relaxed">
@@ -117,14 +114,14 @@ export default function HotelPage() {
                 </section>
 
                 {/* 3. SECCIÓN DE FAQ */}
-                <section className="bg-white px-8 py-16 border-t border-gray-100">
+                <section className="bg-[#f7f8ff] px-8 py-16 border-t border-gray-100">
                     <div className="mx-auto max-w-3xl">
                        
                         <Accordion
                             faqs={[
                                 {
                                     pregunta: "¿Cómo funcionan las tarifas por noche?",
-                                    respuesta: "El cobro se realiza por noche (€25). Si recoges a tu mascota después de la hora de salida, se aplicará una tarifa adicional."
+                                    respuesta: "El cobro se realiza por noche (a partir de €25). Si recoges a tu mascota después de la hora de salida, se aplicará una tarifa adicional."
                                 },
                                 {
                                     pregunta: "¿Qué debo traer para la estancia?",
@@ -143,8 +140,6 @@ export default function HotelPage() {
                     </div>
                 </section>
             </main>
-
-            <Footer />
         </>
     );
 }

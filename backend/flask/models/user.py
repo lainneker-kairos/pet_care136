@@ -7,9 +7,6 @@ from typing import List, TYPE_CHECKING
 from decimal import Decimal
 from sqlalchemy import Numeric
 
-# Usamos TYPE_CHECKING para evitar importaciones circulares
-#comentario israel 
-
 if TYPE_CHECKING:
     from .pets import Pet
     from .booking import Booking
@@ -22,8 +19,11 @@ class User(db.Model):
     __tablename__ = "user"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(55), nullable=True)
     email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
+
+# REFACTORIZACION: para que el usuario pueda tener un rol: 'owner', 'petsitter' o 'both' (ambos)
     role: Mapped[str] = mapped_column(String(20), default="owner", nullable=True) # "owner" 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
@@ -43,13 +43,16 @@ class User(db.Model):
     def serialize(self):
         return {
             "id": self.id,
+            "name": self.name,
             "email": self.email,
             "role": self.role,
             "created_at": self.created_at.isoformat() if self.created_at else None,
+            "has_owner_profile": self.owner_profile is not None,
+            "has_petsitter_profile": self.petsitter_profile is not None
         }
 
 # ==========================================
-# PERFIL: DUEÑO
+# PERFIL: DUEÑO se crea al registrarse por default con datos minimos, luego puede completar su perfil
 # ==========================================
 class Owner(db.Model):
     __tablename__ = "owner"
@@ -86,7 +89,7 @@ class Owner(db.Model):
         }
 
 # ==========================================
-# PERFIL: PETSITTER (CUIDADOR)
+# PERFIL: PETSITTER (CUIDADOR) (se crea a posteriori)
 # ==========================================
 class Petsitter(db.Model):
     __tablename__ = "petsitter"
