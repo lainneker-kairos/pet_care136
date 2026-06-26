@@ -25,7 +25,9 @@ def get_my_pets(current_user_id):
     return jsonify([pet.serialize() for pet in pets]), 200
 
 
+# ==========================================
 # REGISTRAR UNA NUEVA MASCOTA
+# ==========================================
 @pets_bp.route('/pets', methods=['POST'])
 @token_required
 def create_pet(current_user_id):
@@ -62,3 +64,68 @@ def create_pet(current_user_id):
     db.session.commit()
 
     return jsonify({"msg": "Mascota creada con éxito", "pet": new_pet.serialize()}), 201
+
+# ==========================================
+# ACTUALIZAR UNA MASCOTA (PATCH)
+# ==========================================
+@pets_bp.route('/pets/<int:pet_id>', methods=['PATCH'])
+@token_required
+def update_pet(current_user_id, pet_id):
+    user = db.session.get(User, current_user_id)
+    
+    if not user or not user.owner_profile:
+        return jsonify({"msg": "Solo los dueños pueden editar mascotas."}), 403
+
+    # Buscar la mascota en la base de datos
+    pet = db.session.get(Pet, pet_id)
+    if not pet:
+        return jsonify({"msg": "Mascota no encontrada."}), 404
+
+    # Verificar que el usuario sea el dueño de esta mascota específica
+    if pet.owner_id != user.owner_profile.id:
+        return jsonify({"msg": "No tienes permiso para editar esta mascota."}), 403
+
+    body = request.get_json()
+    
+    # Campos permitidos para actualizar
+    allowed_fields = [
+        'name', 'species', 'breed', 'age', 'size', 'tags', 
+        'behavior', 'allergies', 'medications', 'special_notes', 'photo'
+    ]
+    
+    # Actualización dinámica
+    for key, value in body.items():
+        if key in allowed_fields:
+            setattr(pet, key, value)
+
+    db.session.commit()
+
+    return jsonify({
+        "msg": "Mascota actualizada con éxito", 
+        "pet": pet.serialize()
+    }), 200
+
+# ==========================================
+# ELIMINAR UNA MASCOTA (DELETE)
+# ==========================================
+@pets_bp.route('/pets/<int:pet_id>', methods=['DELETE'])
+@token_required
+def delete_pet(current_user_id, pet_id):
+    user = db.session.get(User, current_user_id)
+    
+    if not user or not user.owner_profile:
+        return jsonify({"msg": "Solo los dueños pueden eliminar mascotas."}), 403
+
+    # Buscar la mascota
+    pet = db.session.get(Pet, pet_id)
+    if not pet:
+        return jsonify({"msg": "Mascota no encontrada."}), 404
+
+    # Autorización
+    if pet.owner_id != user.owner_profile.id:
+        return jsonify({"msg": "No tienes permiso para eliminar esta mascota."}), 403
+
+    db.session.delete(pet)
+    db.session.commit()
+
+    return jsonify({"msg": "Mascota eliminada con éxito."}), 200

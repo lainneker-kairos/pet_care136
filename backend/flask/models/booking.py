@@ -52,5 +52,8 @@ class Booking(db.Model):
             "status": self.status,
             "total_price": float(self.total_price) if self.total_price is not None else 0.0,
             "comments": self.comments,
-            "created_at": self.created_at.isoformat() if self.created_at else None
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "pet_name": self.pet.name if self.pet else "Mascota desconocida",
+            "petsitter_name": self.petsitter.name if self.petsitter else "Cuidador",
+            "petsitter_photo": self.petsitter.profile_pic if self.petsitter else None
         }

@@ -1,5 +1,17 @@
 const API_URL = "http://127.0.0.1:5000/api"
 
+// Función de ayuda para obtener los headers con el token JWT
+const getAuthHeaders = () => {
+    const token = localStorage.getItem("TOKENJWT");
+    return {
+        "Content-Type": "application/json",
+        "Authorization": token ? `Bearer ${token}` : ""
+    };
+};
+
+// ==========================================
+// RUTAS DE AUTENTICACIÓN
+// ==========================================
 
 //-- Registro --//
 export const registerUser = async (data) => {
@@ -22,7 +34,7 @@ export const loginUser = async (data) => {
 };
 
 // ==========================================
-// by:lnkr OBTENER CUIDADORES CON FILTROS
+// OBTENER CUIDADORES CON FILTROS
 // ==========================================
 
 export const getPetsitters = async (filters = {}) => {
@@ -52,4 +64,100 @@ export const getPetsitters = async (filters = {}) => {
     }
 
     return await result.json();
+};
+
+// ==========================================
+// RUTAS PARA EL USUARIO Y PERFIL
+// ==========================================
+
+// Obtener el perfil completo del usuario logueado
+export const getUserProfile = async () => {
+    const response = await fetch(`${API_URL}/profile/me`, {
+        method: 'GET',
+        headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error("Error al obtener el perfil");
+    return await response.json();
+};
+
+// Actualizar el perfil del dueño (Owner)
+export const updateOwnerProfile = async (data) => {
+    const response = await fetch(`${API_URL}/profile/owner`, {
+        method: 'PATCH',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error("Error al actualizar el perfil");
+    return await response.json();
+};
+
+// ==========================================
+// RUTAS PARA MASCOTAS (PETS)
+// ==========================================
+
+//Obtener las mascotas del dueño
+export const getMyPets = async () => {
+    const response = await fetch(`${API_URL}/pets`, {
+        method: 'GET',
+        headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error("Error al obtener las mascotas");
+    return await response.json();
+};
+
+// Registrar una nueva mascota
+export const createPet = async (petData) => {
+    const response = await fetch(`${API_URL}/pets`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(petData)
+    });
+    if (!response.ok) throw new Error("Error al crear la mascota");
+    return await response.json();
+};
+
+// Actualizar una mascota existente (PATCH)
+export const updatePet = async (petId, petData) => {
+    const response = await fetch(`${API_URL}/pets/${petId}`, {
+        method: 'PATCH',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(petData)
+    });
+    if (!response.ok) throw new Error("Error al actualizar la mascota");
+    return await response.json();
+};
+
+// Eliminar una mascota (DELETE)
+export const deletePet = async (petId) => {
+    const response = await fetch(`${API_URL}/pets/${petId}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error("Error al eliminar la mascota");
+    return await response.json();
+};
+
+// ==========================================
+//RUTAS PARA RESERVAS (BOOKINGS)
+// ==========================================
+
+// Obtener las reservas de un usuario (role: 'owner' o 'petsitter')
+export const getUserBookings = async (role, profileId) => {
+    const response = await fetch(`${API_URL}/bookings/user/${role}/${profileId}`, {
+        method: 'GET',
+        headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error("Error al obtener las reservas");
+    return await response.json();
+};
+
+// Crear una nueva reserva
+export const createBooking = async (bookingData) => {
+    const response = await fetch(`${API_URL}/bookings`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(bookingData)
+    });
+    if (!response.ok) throw new Error("Error al crear la reserva");
+    return await response.json();
 };
