@@ -7,6 +7,20 @@ from sqlalchemy import and_
 
 searchpetsitter_bp = Blueprint('searchpetsitter_bp', __name__)
 
+#funcion para parsear fechas en formato DD/MM/YYYY 
+def parse_date(date_str):
+    if not date_str:
+        return None
+    try:
+        return datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        pass
+    # formato alternativo (DD/MM/YYYY)
+    try:
+        return datetime.strptime(date_str, "%d/%m/%Y").date()
+    except ValueError:
+        raise ValueError(f"Formato de fecha inválido: {date_str}. Use YYYY-MM-DD o DD/MM/YYYY")
+
 # ==========================================
 # OBTENER LISTA DE CUIDADORES CON FILTROS
 # ==========================================
@@ -55,10 +69,12 @@ def get_searchpetsitters():
                 query = query.filter(Petsitter.price_per_night <= max_price)
 
     # Filtro por disponibilidad de fechas
+    start_date = None
+    end_date = None
     if start_date_str and end_date_str:
         try:
-            start_date = datetime.strptime(start_date_str, "%d/%m/%Y").date()
-            end_date = datetime.strptime(end_date_str, "%d/%m/%Y").date()
+            start_date = parse_date(start_date_str)
+            end_date = parse_date(end_date_str)
             
             # cambio del FOR, filtramos directamente en la consulta SQL.
             # "~" significa "NOT". Es decir: "Donde NO exista ninguna reserva que cumpla esto:"
@@ -72,8 +88,8 @@ def get_searchpetsitters():
                 )
             )
             
-        except ValueError:
-            return jsonify({"msg": "Formato de fechas inválido. Use DD/MM/YYYY"}), 400
+        except ValueError as e:
+            return jsonify({"msg": str(e)}), 400
         
     # Ejecutamos LA ÚNICA consulta a la base de datos
     petsitters = db.session.execute(query).scalars().all()
@@ -93,15 +109,10 @@ def get_searchpetsitters():
                 
         elif service in ['hotel', 'nightcare']:
             base_price = float(petsitter.price_per_night or 0.0)
-            if start_date_str and end_date_str:
-                try:
-                    d1 = datetime.strptime(start_date_str, "%Y-%m-%d").date()
-                    d2 = datetime.strptime(end_date_str, "%Y-%m-%d").date()
-                    nights = (d2 - d1).days
-                    nights = 1 if nights <= 0 else nights
-                    estimated_price = base_price * nights
-                except ValueError:
-                    estimated_price = float(base_price)
+            if start_date and end_date:
+                nights = (end_date - start_date).days
+                nights = 1 if nights <= 0 else nights
+                estimated_price = base_price * nights
             else:
                 estimated_price = float(base_price)
     
