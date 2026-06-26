@@ -1,6 +1,5 @@
 const API_URL = "http://127.0.0.1:5000/api"
 
-
 //-- Registro --//
 export const registerUser = async (data) => {
     const result = await fetch(`${API_URL}/register`, {
@@ -21,14 +20,10 @@ export const loginUser = async (data) => {
     return await result.json() 
 };
 
-<<<<<<< HEAD
-=======
 // ==========================================
-// by:lnkr OBTENER CUIDADORES CON FILTROS
+// OBTENER CUIDADORES CON FILTROS
 // ==========================================
-
 export const getPetsitters = async (filters = {}) => {
-    // query parametrs dinámicamente
     const params = new URLSearchParams();
 
     if (filters.city) params.append("city", filters.city);
@@ -55,4 +50,3 @@ export const getPetsitters = async (filters = {}) => {
 
     return await result.json();
 };
->>>>>>> 96e6ac6d500f4470bb7a3f0d6d26f0f60f57df69
