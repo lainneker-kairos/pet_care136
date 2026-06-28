@@ -92,6 +92,19 @@ export const updateOwnerProfile = async (data) => {
 };
 
 // ==========================================
+// Obtener perfil público de un cuidador
+// ==========================================
+
+export const getPublicProfile = async (userId) => {
+    const response = await fetch(`${API_URL}/profile/${userId}`, {
+        method: 'GET',
+        headers: { "Content-Type": "application/json" }
+    });
+    if (!response.ok) throw new Error("Error al obtener el perfil");
+    return await response.json();
+};
+
+// ==========================================
 // RUTAS PARA MASCOTAS (PETS)
 // ==========================================
 

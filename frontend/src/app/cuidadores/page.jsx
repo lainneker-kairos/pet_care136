@@ -22,9 +22,9 @@ export default function ListaCuidadores() {
                 service_type: serviceType,
                 start_date: startDate,
                 duration_hours: durationHours
-            });  
+            });
             console.log("Datos del backend:", data);
-            setListaCuidadores(data); 
+            setListaCuidadores(data);
         }
         fetchCuidadores();
     }, [])
@@ -33,13 +33,15 @@ export default function ListaCuidadores() {
         <div className="min-h-screen bg-[#F0F7F7] font-sans antialiased text-[#2D3748]">
 
             {/* Barra superior */}
-            <div className="bg-[#FAF6F0] border-b border-[#EADBCE] py-4 px-10 sticky top-0 z-10 shadow-sm flex items-center justify-between">
-                <h1 className="text-xl font-bold text-purple-700">
-                    🐾 Cuidadores disponibles en <span className="text-teal-700">{city || "tu zona"}</span>
-                </h1>
-                <span className="text-xs bg-[#7FE3D8] text-[#004D44] font-bold px-3 py-1.5 rounded-full">
-                    {listaCuidadores.length} cuidadores encontrados
-                </span>
+            <div className="py-6 px-4">
+                <div className="max-w-7xl mx-auto bg-[#FAF6F0] border border-[#EADBCE] py-4 px-10 rounded-2xl shadow-sm flex items-center justify-between">
+                    <h1 className="text-xl font-bold text-purple-700">
+                        🐾 Cuidadores disponibles en <span className="text-teal-700">{city || "tu zona"}</span>
+                    </h1>
+                    <span className="text-xs bg-[#7FE3D8] text-[#004D44] font-bold px-3 py-1.5 rounded-full">
+                        {listaCuidadores.length} cuidadores encontrados
+                    </span>
+                </div>
             </div>
 
             {/* Contenedor principal */}
