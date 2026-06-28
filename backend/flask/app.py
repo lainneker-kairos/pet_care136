@@ -9,6 +9,7 @@ from routes.pets import pets_bp
 from routes.booking import bookings_bp
 from routes.calendar import calendar_bp
 from routes.maps import maps_bp
+from routes.searchpetsitter import searchpetsitter_bp
 # Importacion de modelos
 from models.user import User, Owner, Petsitter
 from models.pets import Pet
@@ -31,8 +32,9 @@ migrate = Migrate(app, db)
 app.register_blueprint(user_bp, url_prefix='/api')
 app.register_blueprint(pets_bp, url_prefix='/api')
 app.register_blueprint(bookings_bp, url_prefix='/api')
-app.register_blueprint(calendar_bp, url_prefix='/api')
+app.register_blueprint(calendar_bp)
 app.register_blueprint(maps_bp)
+app.register_blueprint(searchpetsitter_bp, url_prefix='/api')
 
 if __name__ == '__main__':
     with app.app_context():
