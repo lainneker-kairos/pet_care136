@@ -51,6 +51,27 @@ export default function GuarderiaPage() {
 
                                     </div>
 
+                                    {/* Horas de entrada y salida */}
+                                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Hora de entrada</label>
+                                            <input
+                                                type="time"
+                                                name="start_time"
+                                                className="rounded-lg border border-gray-300 p-3 text-sm text-gray-700 focus:border-purple-500 focus:outline-none bg-gray-50"
+                                            />
+                                        </div>
+
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Hora de salida</label>
+                                            <input
+                                                type="time"
+                                                name="end_time"
+                                                className="rounded-lg border border-gray-300 p-3 text-sm text-gray-700 focus:border-purple-500 focus:outline-none bg-gray-50"
+                                            />
+                                        </div>
+                                    </div>
+
                                     {/* Campo Ciudad */}
                                     <div className="flex flex-col gap-1 w-1/2 mx-auto">
                                         <label className="text-xs font-bold text-gray-500 uppercase tracking-wide text-center">¿En qué ciudad?</label>

@@ -7,7 +7,7 @@ import { getUserProfile, getUserBookings } from "../../Services/api";
 export default function MisReservas() {
   // Estado para filtrar por el "estado" de la reserva de tu BD (Pendiente, Confirmada, Completada)
   const [filtroEstado, setFiltroEstado] = useState("todas");
-  const [booking, setBooking] = useState([]);
+  const [reservas, setReservas] = useState([]);
   const [cargando, setCargando] = useState(true);
 
   // --- OBTENER RESERVAS REALES ---

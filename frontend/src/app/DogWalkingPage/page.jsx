@@ -43,6 +43,15 @@ export default function DogWalkingPage() {
                                     {/* Grid con duración y fecha */}
                                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 
+                                        {/* Hora del paseo */}
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">¿A qué hora quieres el paseo?</label>
+                                            <input
+                                                type="time"
+                                                name="start_time"
+                                                className="rounded-lg border border-gray-300 p-3 text-sm text-gray-700 focus:border-purple-500 focus:outline-none bg-gray-50" />
+                                        </div>
+
                                         {/* Selector de Tiempo/Duración */}
                                         <div className="flex flex-col gap-1">
                                             <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">¿Cuánto tiempo?</label>
@@ -64,7 +73,7 @@ export default function DogWalkingPage() {
                                         </div>
                                     </div>
 
-                                     {/* Campo Ciudad */}
+                                    {/* Campo Ciudad */}
                                     <div className="flex flex-col gap-1 w-1/2 mx-auto">
                                         <label className="text-xs font-bold text-gray-500 uppercase tracking-wide text-center">¿En qué ciudad?</label>
                                         <input

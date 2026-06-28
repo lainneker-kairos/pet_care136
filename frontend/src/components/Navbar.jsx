@@ -70,7 +70,7 @@ export default function Navbar() {
 
                             <span className="hidden text-gray-300 sm:inline">|</span>
 
-                            <Link href="perfildueno" className="text-sm font-semibold text-gray-700 hover:text-purple-700 mr-2">
+                            <Link href="/perfildueno" className="text-sm font-semibold text-gray-700 hover:text-purple-700 mr-2">
                                 Mi perfil
                             </Link>
 
