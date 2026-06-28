@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 
-import { getUserProfile, updateOwnerProfile, getMyPets, createPet, updatePet } from "../../Services/api";
+import { getUserProfile, updateOwnerProfile, getMyPets, createPet, updatePet, deletePet} from "@/Services/api";
 
 export default function PerfilDueno() {
   // ---  ESTADOS PARA DATOS REALES ---
@@ -12,23 +12,27 @@ export default function PerfilDueno() {
 
     // ---ESTADOS DEL FORMULARIO DE MASCOTAS ---
   const [nombre, setNombre] = useState("");
-  const [tipo, setTipo] = useState(""); 
+  const [tipo, setTipo] = useState("perro"); 
   const [raza, setRaza] = useState("");
   const [edad, setEdad] = useState("");
   const [notas, setNotas] = useState("");
+  const [tamano, setTamano] = useState("");
+  const [etiquetas, setEtiquetas] = useState("");
+  const [comportamiento, setComportamiento] = useState("");
+  const [alergias, setAlergias] = useState("");
+  const [medicacion, setMedicacion] = useState("");
+  const [foto, setFoto] = useState("");
 
     //  edición (METODO PATCH DESDE EL BACKEND)
   const [editandoId, setEditandoId] = useState(null);
 
-  useEffect(() => {
-    const fetchDatos = async () => {
+  const fetchDatos = async () => {
       try {
         setCargando(true);
-        // 1. Obtenemos el perfil
+
         const profileData = await getUserProfile();
         setPerfilUsuario(profileData);
         
-        // 2. Obtenemos las mascotas
         const petsData = await getMyPets();
         setMascotas(petsData);
       } catch (error) {
@@ -38,6 +42,7 @@ export default function PerfilDueno() {
       }
     };
 
+  useEffect(() => {    
     fetchDatos();
   }, []);
 
@@ -45,6 +50,20 @@ export default function PerfilDueno() {
    const handleGuardarMascota = async (e) => {
     e.preventDefault();
     if (!nombre.trim()) return alert("El nombre es obligatorio");
+
+    const petData = {
+      name: nombre,
+      species: tipo,
+      breed: raza,
+      age: parseInt(edad) || null, 
+      size: tamano,
+      tags: etiquetas,
+      behavior: comportamiento,
+      allergies: alergias,
+      medications: medicacion,
+      special_notes: notas,
+      photo: foto
+    };
 
     if (editandoId !== null) {
       try{
@@ -96,6 +115,12 @@ export default function PerfilDueno() {
     setRaza(mascota.breed || "");
     setEdad(mascota.age ? mascota.age.toString() : "");
     setNotas(mascota.special_notes || "");
+    setTamano(mascota.size || "");
+    setEtiquetas(mascota.tags || "");
+    setComportamiento(mascota.behavior || "");
+    setAlergias(mascota.allergies || "");
+    setMedicacion(mascota.medications || "");
+    setFoto(mascota.photo || "");
   };
 
   const limpiarFormulario = () => {
@@ -105,6 +130,12 @@ export default function PerfilDueno() {
     setRaza("");
     setEdad("");
     setNotas("");
+    setTamano("");
+    setEtiquetas("");
+    setComportamiento("");
+    setAlergias("");
+    setMedicacion("");
+    setFoto("");
   };
 
   // Pantalla de carga mientras trae datos
@@ -117,7 +148,7 @@ export default function PerfilDueno() {
 
   const owner = perfilUsuario.owner_profile;
 
-   return (
+  return (
     <div className="min-h-screen bg-[#F0F7F7] font-sans antialiased text-[#2D3748] py-8 px-4">
       <div className="max-w-6xl mx-auto space-y-6">
         
@@ -153,7 +184,6 @@ export default function PerfilDueno() {
                 <p className="flex items-center gap-2">🏠 <span className="text-gray-900">{owner.city || "No registrado"}</span></p>
               </div>
             </div>
-            {/* Aquí podrías añadir un botón que abra un modal y llame a updateOwnerProfile */}
           </div>
 
           {/* COLUMNA DERECHA: Gestión de Mascotas REAL */}
@@ -211,12 +241,23 @@ export default function PerfilDueno() {
                   <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} required className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]" />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-gray-700 uppercase tracking-wider block">Tipo de Mascota</label>
-                  <select value={tipo} onChange={(e) => setTipo(e.target.value)} className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]">
-                     <option value="perro">🐶 Perro</option>
-                     <option value="gato">🐱 Gato</option>
-                  </select>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-700 uppercase tracking-wider block">Tipo de Mascota</label>
+                    <select value={tipo} onChange={(e) => setTipo(e.target.value)} className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]">
+                       <option value="perro">🐶 Perro</option>
+                       <option value="gato">🐱 Gato</option>
+                    </select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-700 uppercase tracking-wider block">Tamaño</label>
+                    <select value={tamano} onChange={(e) => setTamano(e.target.value)} className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]">
+                       <option value="">Seleccionar...</option>
+                       <option value="pequeño">Pequeño (0-10kg)</option>
+                       <option value="mediano">Mediano (10-25kg)</option>
+                       <option value="grande">Grande (+25kg)</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -231,8 +272,35 @@ export default function PerfilDueno() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Notas especiales</label>
-                  <textarea rows="3" value={notas} onChange={(e) => setNotas(e.target.value)} className="w-full bg-white border border-[#EADBCE] rounded-xl p-3 text-sm focus:outline-none focus:border-[#6338CC] resize-none"></textarea>
+                  <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Etiquetas (Ej. tranquilo, activo)</label>
+                  <input type="text" value={etiquetas} onChange={(e) => setEtiquetas(e.target.value)} className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]" />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Foto URL (opcional)</label>
+                  <input type="text" value={foto} onChange={(e) => setFoto(e.target.value)} placeholder="https://..." className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]" />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Comportamiento</label>
+                    <textarea rows="2" value={comportamiento} onChange={(e) => setComportamiento(e.target.value)} className="w-full bg-white border border-[#EADBCE] rounded-xl p-3 text-sm focus:outline-none focus:border-[#6338CC] resize-none"></textarea>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Alergias</label>
+                    <textarea rows="2" value={alergias} onChange={(e) => setAlergias(e.target.value)} className="w-full bg-white border border-[#EADBCE] rounded-xl p-3 text-sm focus:outline-none focus:border-[#6338CC] resize-none"></textarea>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Medicación</label>
+                    <textarea rows="2" value={medicacion} onChange={(e) => setMedicacion(e.target.value)} className="w-full bg-white border border-[#EADBCE] rounded-xl p-3 text-sm focus:outline-none focus:border-[#6338CC] resize-none"></textarea>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Notas especiales</label>
+                    <textarea rows="2" value={notas} onChange={(e) => setNotas(e.target.value)} className="w-full bg-white border border-[#EADBCE] rounded-xl p-3 text-sm focus:outline-none focus:border-[#6338CC] resize-none"></textarea>
+                  </div>
                 </div>
 
                 <div className="flex gap-2 pt-2">
