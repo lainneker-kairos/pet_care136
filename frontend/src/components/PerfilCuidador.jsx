@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { getMyProfile } from "@/Services/api";
 
 export default function PerfilCuidador() {
-<<<<<<< HEAD:frontend/src/components/PerfilCuidador.jsx
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -34,11 +33,9 @@ export default function PerfilCuidador() {
   const experienceYears = petsitterProfile?.experience_years ?? 6;
 
   // Datos simulados basados en la imagen (Días de la semana traducidos)
-=======
   const [calendarLoading, setCalendarLoading] = useState(false);
   const [calendarConnected, setCalendarConnected] = useState(false);
 
->>>>>>> israel:frontend/src/app/perfilcuidador/page.jsx
   const availabilityDays = [
     { day: 'D', num: 1, type: 'disabled' },
     { day: 'L', num: 2, type: 'disabled' },
@@ -56,7 +53,6 @@ export default function PerfilCuidador() {
     { day: 'S', num: 14, type: 'available' },
   ];
 
-<<<<<<< HEAD:frontend/src/components/PerfilCuidador.jsx
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F0F7F7] flex items-center justify-center text-[#2D3748]">
@@ -64,7 +60,6 @@ export default function PerfilCuidador() {
       </div>
     );
   }
-=======
   const handleConnectCalendar = async () => {
     setCalendarLoading(true);
     try {
@@ -90,7 +85,6 @@ export default function PerfilCuidador() {
       setCalendarLoading(false);
     }
   };
->>>>>>> israel:frontend/src/app/perfilcuidador/page.jsx
 
   return (
     <div className="min-h-screen bg-[#F0F7F7] font-sans antialiased text-[#2D3748]">
@@ -103,15 +97,9 @@ export default function PerfilCuidador() {
             {/* Tarjeta de Perfil Principal */}
             <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE] flex flex-col md:flex-row gap-6 items-center md:items-start">
               <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden flex-shrink-0 bg-amber-200">
-<<<<<<< HEAD:frontend/src/components/PerfilCuidador.jsx
                 <img 
                   src={displayProfilePic} 
                   alt={displayName} 
-=======
-                <img
-                  src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&auto=format&fit=crop&q=80"
-                  alt="Elena Rodriguez"
->>>>>>> israel:frontend/src/app/perfilcuidador/page.jsx
                   className="w-full h-full object-cover"
                 />
                 <span className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-[#00A896] text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1 shadow-md whitespace-nowrap">
@@ -150,14 +138,10 @@ export default function PerfilCuidador() {
             <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE] space-y-4">
               <h2 className="text-xl font-bold text-[#1A202C]">Sobre Mí</h2>
               <p className="text-gray-700 leading-relaxed text-sm">
-<<<<<<< HEAD:frontend/src/components/PerfilCuidador.jsx
                 {displayBio}
               </p>
               <p className="text-gray-700 leading-relaxed text-sm">
                 {displayName} ofrece un cuidado cercano, profesional y adaptado a las necesidades de cada mascota.
-=======
-                ¡Hola! Soy Elena, una amante de los animales con más de 6 años de experiencia profesional en el cuidado de mascotas. Trato a cada amigo peludo como si fuera mío, brindando un equilibrio entre juego de alta energía y una atención tranquila y afectuosa.
->>>>>>> israel:frontend/src/app/perfilcuidador/page.jsx
               </p>
               <div className="flex flex-wrap gap-2 pt-2">
                 <span className="bg-[#7FE3D8] text-[#004D44] text-xs font-semibold px-3 py-1.5 rounded-full">Certificación RCP</span>
