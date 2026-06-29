@@ -1,8 +1,8 @@
-"""actualizando modelos
+"""migrate
 
-Revision ID: b887c8c2c3a7
+Revision ID: 27c5e50611f4
 Revises: 
-Create Date: 2026-06-29 19:23:21.425231
+Create Date: 2026-06-29 20:10:58.185245
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'b887c8c2c3a7'
+revision = '27c5e50611f4'
 down_revision = None
 branch_labels = None
 depends_on = None
