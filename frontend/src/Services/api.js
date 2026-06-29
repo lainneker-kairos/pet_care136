@@ -1,4 +1,39 @@
+"use client"
+
 const API_URL = "http://127.0.0.1:5000/api"
+
+//-- Función para detectar el rol del Usuario desde el Token --//
+export const getUserRoleFromToken = () => {
+    try {
+        if (typeof window === "undefined") {
+            return null;
+        }
+
+        const storedRole = localStorage.getItem("userRole");
+        if (storedRole) {
+            return storedRole;
+        }
+
+        const token = localStorage.getItem("TOKENJWT");
+        if (!token) {
+            return null;
+        }
+
+        const payloadBase64 = token.split(".")[1];
+        if (!payloadBase64) {
+            return null;
+        }
+
+        const normalizedBase64 = payloadBase64.replace(/-/g, "+").replace(/_/g, "/");
+        const paddedBase64 = normalizedBase64.padEnd(Math.ceil(normalizedBase64.length / 4) * 4, "=");
+        const payload = JSON.parse(atob(paddedBase64));
+
+        return payload?.role ?? null;
+    } catch (error) {
+        console.error("Error al decodificar el token:", error);
+        return null;
+    }
+}
 
 
 //-- Registro --//
@@ -19,6 +54,23 @@ export const loginUser = async (data) => {
         body: JSON.stringify(data),
     })
     return await result.json() 
+};
+
+export const getMyProfile = async () => {
+    const token = localStorage.getItem("TOKENJWT");
+    const result = await fetch(`${API_URL}/profile/me`, {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+    });
+
+    if (!result.ok) {
+        throw new Error("Error al obtener el perfil del usuario");
+    }
+
+    return await result.json();
 };
 
 // ==========================================

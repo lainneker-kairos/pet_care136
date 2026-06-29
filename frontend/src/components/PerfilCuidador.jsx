@@ -1,8 +1,37 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { getMyProfile } from "@/Services/api";
 
 export default function PerfilCuidador() {
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const data = await getMyProfile();
+        setProfile(data);
+      } catch (error) {
+        console.error("No se pudo cargar el perfil de cuidador", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProfile();
+  }, []);
+
+  const petsitterProfile = profile?.petsitter_profile;
+  const user = profile?.user;
+  const displayName = petsitterProfile?.name || user?.name || "Elena Rodriguez";
+  const displayCity = petsitterProfile?.city || "Madrid, España";
+  const displayBio = petsitterProfile?.bio || "Soy un cuidador apasionado por las mascotas y ofrezco atención responsable, cariñosa y profesional.";
+  const displayProfilePic = petsitterProfile?.profile_pic || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&auto=format&fit=crop&q=80";
+  const displayRating = petsitterProfile?.rating ?? 4.9;
+  const bookingCount = petsitterProfile?.booking_count ?? 124;
+  const experienceYears = petsitterProfile?.experience_years ?? 6;
+
   // Datos simulados basados en la imagen (Días de la semana traducidos)
   const availabilityDays = [
     { day: 'D', num: 1, type: 'disabled' },
@@ -21,6 +50,14 @@ export default function PerfilCuidador() {
     { day: 'S', num: 14, type: 'available' },
   ];
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F0F7F7] flex items-center justify-center text-[#2D3748]">
+        <p className="text-lg font-semibold">Cargando perfil...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#F0F7F7] font-sans antialiased text-[#2D3748]">
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -34,8 +71,8 @@ export default function PerfilCuidador() {
             <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE] flex flex-col md:flex-row gap-6 items-center md:items-start">
               <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden flex-shrink-0 bg-amber-200">
                 <img 
-                  src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&auto=format&fit=crop&q=80" 
-                  alt="Elena Rodriguez" 
+                  src={displayProfilePic} 
+                  alt={displayName} 
                   className="w-full h-full object-cover"
                 />
                 <span className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-[#00A896] text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1 shadow-md whitespace-nowrap">
@@ -45,23 +82,23 @@ export default function PerfilCuidador() {
 
               <div className="flex-1 text-center md:text-left space-y-4 w-full">
                 <div>
-                  <h1 className="text-3xl font-bold text-[#1A202C]">Elena Rodriguez</h1>
+                  <h1 className="text-3xl font-bold text-[#1A202C]">{displayName}</h1>
                   <div className="flex flex-wrap justify-center md:justify-start items-center gap-4 mt-1 text-sm text-gray-600">
                     <span className="flex items-center text-[#00A896] font-medium">
-                      ★ 4.9 <span className="text-gray-500 font-normal ml-1">(124 reseñas)</span>
+                      ★ {displayRating} <span className="text-gray-500 font-normal ml-1">({bookingCount} reseñas)</span>
                     </span>
                     <span className="text-gray-300">|</span>
-                    <span className="flex items-center gap-1">📍 Madrid, España</span>
+                    <span className="flex items-center gap-1">📍 {displayCity}</span>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2 bg-[#EFE9E2] p-3 rounded-xl text-center">
                   <div>
-                    <p className="text-xl font-bold text-[#6338CC]">250+</p>
+                    <p className="text-xl font-bold text-[#6338CC]">{bookingCount}+</p>
                     <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">Reservas</p>
                   </div>
                   <div className="border-x border-gray-300">
-                    <p className="text-xl font-bold text-[#6338CC]">6 años</p>
+                    <p className="text-xl font-bold text-[#6338CC]">{experienceYears} años</p>
                     <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">Exp.</p>
                   </div>
                   <div>
@@ -76,10 +113,10 @@ export default function PerfilCuidador() {
             <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE] space-y-4">
               <h2 className="text-xl font-bold text-[#1A202C]">Sobre Mí</h2>
               <p className="text-gray-700 leading-relaxed text-sm">
-                ¡Hola! Soy Elena, una amante de los animales de toda la vida con más de 6 años de experiencia profesional en el cuidado de mascotas. Mi viaje comenzó como voluntaria en refugios locales, donde aprendí a manejar diversos temperamentos y necesidades especiales. Trato a cada amigo peludo como si fuera mío, brindando un equilibrio entre juego de alta energía y una atención tranquila y afectuosa.
+                {displayBio}
               </p>
               <p className="text-gray-700 leading-relaxed text-sm">
-                Vivo en un apartamento amplio y seguro para mascotas cerca de Prospect Park, ideal para largas caminatas por la tarde. Ya sea una visita rápida al mediodía o un alojamiento de una semana entera, mi objetivo es brindarle a tu mascota "calidez profesional" y a ti una total tranquilidad.
+                {displayName} ofrece un cuidado cercano, profesional y adaptado a las necesidades de cada mascota.
               </p>
               <div className="flex flex-wrap gap-2 pt-2">
                 <span className="bg-[#7FE3D8] text-[#004D44] text-xs font-semibold px-3 py-1.5 rounded-full">Certificación RCP</span>
