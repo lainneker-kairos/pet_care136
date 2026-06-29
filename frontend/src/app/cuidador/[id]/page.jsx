@@ -1,135 +1,349 @@
 "use client";
-import { use, useState, useEffect } from "react";
-import { getPublicProfile } from "@/Services/api";
-import Link from "next/link";
 
-export default function PerfilCuidador({ params }) {
-    const { id } = use(params);
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+
+export default function PerfilCuidadorDinamico() {
+    const { id } = useParams();
+    const router = useRouter();
+
     const [cuidador, setCuidador] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
+    // Estados del formulario de reserva
+    const [formData, setFormData] = useState({
+        service_type: "",
+        start_date: "",
+        end_date: "",
+        start_time: "",
+        end_time: "",
+        comments: "",
+        pet_id: ""
+    });
+    const [mascotas, setMascotas] = useState([]);
+    const [bookingLoading, setBookingLoading] = useState(false);
+    const [bookingSuccess, setBookingSuccess] = useState(false);
+    const [bookingError, setBookingError] = useState(null);
+
+    // Cargar datos del cuidador
     useEffect(() => {
         const fetchCuidador = async () => {
-            const data = await getPublicProfile(id);
-            setCuidador(data);
-        }
+            try {
+                const res = await fetch(`http://localhost:5000/api/profile/${id}`);
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.msg || "Error al cargar cuidador");
+                setCuidador(data.profile);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
         fetchCuidador();
-    }, [])
+    }, [id]);
+
+    // Cargar mascotas del usuario autenticado
+    useEffect(() => {
+        const fetchMascotas = async () => {
+            const token = localStorage.getItem("token");
+            if (!token) return;
+            try {
+                const res = await fetch("http://localhost:5000/api/pets", {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (res.ok) setMascotas(data);
+            } catch (err) {
+                console.error("Error cargando mascotas:", err);
+            }
+        };
+        fetchMascotas();
+    }, []);
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleReserva = async () => {
+        setBookingLoading(true);
+        setBookingError(null);
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            setBookingError("Debes iniciar sesión para hacer una reserva");
+            setBookingLoading(false);
+            return;
+        }
+
+        if (!formData.service_type || !formData.start_date || !formData.end_date || !formData.pet_id) {
+            setBookingError("Por favor completa todos los campos obligatorios");
+            setBookingLoading(false);
+            return;
+        }
+
+        try {
+            // Obtener perfil del usuario para sacar owner_id
+            const profileRes = await fetch("http://localhost:5000/api/profile/me", {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const profileData = await profileRes.json();
+            const owner_id = profileData.profile?.id;
+
+            const res = await fetch("http://localhost:5000/api/bookings", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    owner_id: owner_id,
+                    petsitter_id: parseInt(id),
+                    pet_id: parseInt(formData.pet_id),
+                    service_type: formData.service_type,
+                    start_date: formData.start_date,
+                    end_date: formData.end_date,
+                    start_time: formData.start_time || null,
+                    end_time: formData.end_time || null,
+                    comments: formData.comments
+                })
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.msg || "Error al crear la reserva");
+            setBookingSuccess(true);
+        } catch (err) {
+            setBookingError(err.message);
+        } finally {
+            setBookingLoading(false);
+        }
+    };
+
+    if (loading) return (
+        <div className="min-h-screen bg-[#F0F7F7] flex items-center justify-center">
+            <p className="text-gray-500 text-sm">Cargando perfil...</p>
+        </div>
+    );
+
+    if (error) return (
+        <div className="min-h-screen bg-[#F0F7F7] flex items-center justify-center">
+            <p className="text-red-500 text-sm">{error}</p>
+        </div>
+    );
 
     return (
-        <div className="min-h-screen bg-[#F0F7F7]">
-            {cuidador ? (
-                <div className="max-w-5xl mx-auto px-4 py-10 space-y-6">
+        <div className="min-h-screen bg-[#F0F7F7] font-sans antialiased text-[#2D3748]">
+            <div className="max-w-6xl mx-auto px-4 py-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                    {/* Tarjeta principal */}
-                    <div className="bg-[#FAF6F0] rounded-2xl border border-[#EADBCE] shadow-sm overflow-hidden">
+                    {/* COLUMNA IZQUIERDA — Perfil */}
+                    <div className="lg:col-span-2 space-y-6">
 
-                        {/* Header con foto y datos básicos */}
-                        <div className="p-8 flex flex-col sm:flex-row gap-6 items-start">
-
-                            {/* Foto */}
-                            <div className="w-32 h-32 rounded-2xl overflow-hidden border-2 border-[#EADBCE] flex-shrink-0">
+                        {/* Tarjeta principal */}
+                        <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE] flex flex-col md:flex-row gap-6 items-center md:items-start">
+                            <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden flex-shrink-0 bg-amber-100">
                                 <img
-                                    src={cuidador.profile.profile_pic ? cuidador.profile.profile_pic : "https://placehold.co/128x128"}
-                                    alt={cuidador.profile.name}
+                                    src={cuidador?.profile_pic || "https://placehold.co/400x400"}
+                                    alt={cuidador?.name}
                                     className="w-full h-full object-cover"
                                 />
                             </div>
-
-                            {/* Info básica */}
-                            <div className="flex-1 space-y-3">
-                                <div className="flex flex-wrap items-center gap-3">
-                                    <h1 className="text-3xl font-bold text-purple-700">{cuidador.profile.name}</h1>
-                                    <span className="text-xs bg-[#7FE3D8]/40 text-[#004D44] font-bold px-3 py-1 rounded-full border border-[#7FE3D8]/60">
-                                        ✓ Verificado
-                                    </span>
+                            <div className="flex-1 text-center md:text-left space-y-4 w-full">
+                                <div>
+                                    <h1 className="text-3xl font-bold text-[#1A202C]">{cuidador?.name}</h1>
+                                    <div className="flex flex-wrap justify-center md:justify-start items-center gap-4 mt-1 text-sm text-gray-600">
+                                        <span className="text-amber-500 font-medium">⭐ {cuidador?.rating || "Nuevo"}</span>
+                                        <span>|</span>
+                                        <span>📍 {cuidador?.city}</span>
+                                        {cuidador?.neighborhood && <span>· {cuidador.neighborhood}</span>}
+                                    </div>
                                 </div>
-
-                                <p className="text-gray-500 text-sm">📍 {cuidador.profile.city}{cuidador.profile.neighborhood ? `, ${cuidador.profile.neighborhood}` : ""}</p>
-
-                                <div className="flex flex-wrap gap-4 text-sm">
-                                    <span className="text-amber-500 font-bold">⭐ {cuidador.profile.rating || "Nuevo"}</span>
-                                    <span className="text-gray-500">🔄 {cuidador.profile.booking_count} reservas</span>
-                                    <span className="text-gray-500">🏆 {cuidador.profile.experience_years} años de experiencia</span>
+                                <div className="grid grid-cols-3 gap-2 bg-[#EFE9E2] p-3 rounded-xl text-center">
+                                    <div>
+                                        <p className="text-xl font-bold text-[#6338CC]">{cuidador?.booking_count || 0}</p>
+                                        <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">Reservas</p>
+                                    </div>
+                                    <div className="border-x border-gray-300">
+                                        <p className="text-xl font-bold text-[#6338CC]">{cuidador?.experience_years || 0}</p>
+                                        <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">Años exp.</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xl font-bold text-[#6338CC]">&lt;1hr</p>
+                                        <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">Respuesta</p>
+                                    </div>
                                 </div>
+                            </div>
+                        </div>
 
-                                <p className="text-gray-600 text-sm leading-relaxed">{cuidador.profile.bio}</p>
+                        {/* Sobre mí */}
+                        {cuidador?.bio && (
+                            <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE]">
+                                <h2 className="text-xl font-bold text-[#1A202C] mb-3">Sobre mí</h2>
+                                <p className="text-gray-700 leading-relaxed text-sm">{cuidador.bio}</p>
+                            </div>
+                        )}
+
+                        {/* Servicios */}
+                        <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE]">
+                            <h2 className="text-xl font-bold text-[#1A202C] mb-3">Servicios disponibles</h2>
+                            <div className="flex flex-wrap gap-2">
+                                {cuidador?.offers_walk && <span className="bg-[#7FE3D8]/40 text-[#004D44] text-xs font-semibold px-3 py-1.5 rounded-full border border-[#7FE3D8]/60">🚶 Paseos</span>}
+                                {cuidador?.offers_hotel && <span className="bg-[#7FE3D8]/40 text-[#004D44] text-xs font-semibold px-3 py-1.5 rounded-full border border-[#7FE3D8]/60">🏠 Hotel</span>}
+                                {cuidador?.offers_daycare && <span className="bg-[#7FE3D8]/40 text-[#004D44] text-xs font-semibold px-3 py-1.5 rounded-full border border-[#7FE3D8]/60">🐾 Guardería</span>}
+                                {cuidador?.offers_nightcare && <span className="bg-[#7FE3D8]/40 text-[#004D44] text-xs font-semibold px-3 py-1.5 rounded-full border border-[#7FE3D8]/60">🌙 Cuidado nocturno</span>}
                             </div>
                         </div>
                     </div>
 
-                    {/* Servicios y precios */}
-                    <div className="bg-[#FAF6F0] rounded-2xl border border-[#EADBCE] shadow-sm p-6 space-y-4">
-                        <h2 className="text-xl font-bold text-purple-700">Servicios y Precios</h2>
+                    {/* COLUMNA DERECHA — Formulario de reserva */}
+                    <div className="space-y-6">
+                        <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE] space-y-4">
+                            <h2 className="text-lg font-bold text-[#1A202C]">Solicitar reserva</h2>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {cuidador.profile.offers_walk && (
-                                <div className="bg-white rounded-xl border border-[#EADBCE] p-4 flex justify-between items-center">
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-2xl">🚶</span>
-                                        <span className="font-semibold text-gray-800">Paseos</span>
+                            {/* Precios */}
+                            <div className="space-y-2">
+                                {cuidador?.price_per_hour && (
+                                    <div className="flex justify-between bg-[#EFE9E2] p-3 rounded-xl">
+                                        <span className="text-sm font-medium">Precio/hora</span>
+                                        <span className="font-bold text-[#6338CC]">{cuidador.price_per_hour}€</span>
                                     </div>
-                                    <span className="text-purple-700 font-bold">{cuidador.profile.price_per_hour}€/hora</span>
+                                )}
+                                {cuidador?.price_per_night && (
+                                    <div className="flex justify-between bg-[#EFE9E2] p-3 rounded-xl">
+                                        <span className="text-sm font-medium">Precio/noche</span>
+                                        <span className="font-bold text-[#6338CC]">{cuidador.price_per_night}€</span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {bookingSuccess ? (
+                                <div className="bg-green-50 border border-green-300 rounded-xl p-4 text-center space-y-2">
+                                    <p className="text-2xl">✅</p>
+                                    <p className="text-green-700 font-bold text-sm">¡Reserva enviada con éxito!</p>
+                                    <p className="text-green-600 text-xs">El cuidador revisará tu solicitud pronto.</p>
+                                    <button
+                                        onClick={() => router.push("/misreservas")}
+                                        className="w-full bg-[#6338CC] text-white text-xs font-bold py-2 rounded-xl mt-2"
+                                    >
+                                        Ver mis reservas
+                                    </button>
                                 </div>
-                            )}
-                            {cuidador.profile.offers_daycare && (
-                                <div className="bg-white rounded-xl border border-[#EADBCE] p-4 flex justify-between items-center">
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-2xl">☀️</span>
-                                        <span className="font-semibold text-gray-800">Guardería</span>
+                            ) : (
+                                <div className="space-y-3">
+                                    {/* Servicio */}
+                                    <div>
+                                        <label className="text-xs font-bold text-gray-600 block mb-1">Tipo de servicio *</label>
+                                        <select
+                                            name="service_type"
+                                            value={formData.service_type}
+                                            onChange={handleChange}
+                                            className="w-full border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-purple-400"
+                                        >
+                                            <option value="">Selecciona un servicio</option>
+                                            {cuidador?.offers_walk && <option value="paseo">🚶 Paseo</option>}
+                                            {cuidador?.offers_hotel && <option value="hotel">🏠 Hotel</option>}
+                                            {cuidador?.offers_daycare && <option value="guarderia">🐾 Guardería</option>}
+                                            {cuidador?.offers_nightcare && <option value="nightcare">🌙 Cuidado nocturno</option>}
+                                        </select>
                                     </div>
-                                    <span className="text-purple-700 font-bold">{cuidador.profile.price_per_hour}€/hora</span>
-                                </div>
-                            )}
-                            {cuidador.profile.offers_hotel && (
-                                <div className="bg-white rounded-xl border border-[#EADBCE] p-4 flex justify-between items-center">
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-2xl">🏠</span>
-                                        <span className="font-semibold text-gray-800">Hotel</span>
+
+                                    {/* Mascota */}
+                                    <div>
+                                        <label className="text-xs font-bold text-gray-600 block mb-1">Mascota *</label>
+                                        <select
+                                            name="pet_id"
+                                            value={formData.pet_id}
+                                            onChange={handleChange}
+                                            className="w-full border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-purple-400"
+                                        >
+                                            <option value="">Selecciona tu mascota</option>
+                                            {mascotas.map(pet => (
+                                                <option key={pet.id} value={pet.id}>{pet.name} ({pet.species})</option>
+                                            ))}
+                                        </select>
+                                        {mascotas.length === 0 && (
+                                            <p className="text-xs text-amber-600 mt-1">⚠️ No tienes mascotas registradas. <a href="/gestionmascotas" className="underline">Agregar mascota</a></p>
+                                        )}
                                     </div>
-                                    <span className="text-purple-700 font-bold">{cuidador.profile.price_per_night}€/noche</span>
-                                </div>
-                            )}
-                            {cuidador.profile.offers_nightcare && (
-                                <div className="bg-white rounded-xl border border-[#EADBCE] p-4 flex justify-between items-center">
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-2xl">🌙</span>
-                                        <span className="font-semibold text-gray-800">Cuidado nocturno</span>
+
+                                    {/* Fechas */}
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label className="text-xs font-bold text-gray-600 block mb-1">Fecha inicio *</label>
+                                            <input
+                                                type="date"
+                                                name="start_date"
+                                                value={formData.start_date}
+                                                onChange={handleChange}
+                                                className="w-full border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-purple-400"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-bold text-gray-600 block mb-1">Fecha fin *</label>
+                                            <input
+                                                type="date"
+                                                name="end_date"
+                                                value={formData.end_date}
+                                                onChange={handleChange}
+                                                className="w-full border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-purple-400"
+                                            />
+                                        </div>
                                     </div>
-                                    <span className="text-purple-700 font-bold">{cuidador.profile.price_per_night}€/noche</span>
+
+                                    {/* Horas */}
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label className="text-xs font-bold text-gray-600 block mb-1">Hora inicio</label>
+                                            <input
+                                                type="time"
+                                                name="start_time"
+                                                value={formData.start_time}
+                                                onChange={handleChange}
+                                                className="w-full border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-purple-400"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-bold text-gray-600 block mb-1">Hora fin</label>
+                                            <input
+                                                type="time"
+                                                name="end_time"
+                                                value={formData.end_time}
+                                                onChange={handleChange}
+                                                className="w-full border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-purple-400"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Comentarios */}
+                                    <div>
+                                        <label className="text-xs font-bold text-gray-600 block mb-1">Comentarios</label>
+                                        <textarea
+                                            name="comments"
+                                            value={formData.comments}
+                                            onChange={handleChange}
+                                            rows={3}
+                                            placeholder="Instrucciones especiales, medicación, etc."
+                                            className="w-full border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-purple-400 resize-none"
+                                        />
+                                    </div>
+
+                                    {bookingError && (
+                                        <p className="text-red-500 text-xs bg-red-50 p-2 rounded-xl">{bookingError}</p>
+                                    )}
+
+                                    <button
+                                        onClick={handleReserva}
+                                        disabled={bookingLoading}
+                                        className="w-full bg-[#6338CC] hover:bg-[#522cb3] text-white font-bold py-3 rounded-xl transition text-sm disabled:opacity-60"
+                                    >
+                                        {bookingLoading ? "Enviando reserva..." : "Solicitar reserva →"}
+                                    </button>
                                 </div>
                             )}
                         </div>
                     </div>
-
-                    {/* Disponibilidad */}
-                    {cuidador.profile.available_days && (
-                        <div className="bg-[#FAF6F0] rounded-2xl border border-[#EADBCE] shadow-sm p-6 space-y-4">
-                            <h2 className="text-xl font-bold text-purple-700">Disponibilidad</h2>
-                            <p className="text-gray-600 text-sm">{cuidador.profile.available_days}</p>
-                        </div>
-                    )}
-
-                    {/* Botón reservar */}
-                    <div className="bg-[#FAF6F0] rounded-2xl border border-[#EADBCE] shadow-sm p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-                        <div>
-                            <p className="text-gray-500 text-sm">Precio desde</p>
-                            <p className="text-3xl font-bold text-purple-700">
-                                {cuidador.profile.price_per_hour || cuidador.profile.price_per_night}€
-                            </p>
-                        </div>
-                        <Link
-                            href="/misreservas"
-                            className="w-full sm:w-auto bg-purple-700 hover:bg-purple-800 text-white font-bold py-3 px-8 rounded-xl transition text-center">
-                            Solicitar reserva
-                        </Link>
-                    </div>
-
                 </div>
-            ) : (
-                <div className="flex items-center justify-center min-h-screen">
-                    <p className="text-gray-500">Cargando perfil...</p>
-                </div>
-            )}
+            </div>
         </div>
-    )
+    );
 }

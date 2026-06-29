@@ -12,9 +12,15 @@ export default function Login() {
   });
 
   const [errors, setErrors] = useState({});
+
+  // Estados extra para el diseño (mostrar/ocultar contraseñas)
   const [showPassword, setShowPassword] = useState(false);
 
+<<<<<<< HEAD
+  // función de validación exacta
+=======
 
+>>>>>>> 96e6ac6d500f4470bb7a3f0d6d26f0f60f57df69
   const validateForm = () => {
     const newErrors = {};
 
@@ -33,6 +39,7 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
+  // función de envío de formulario exactarte a JSON
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -40,7 +47,35 @@ export default function Login() {
     setIsLoading(true);
 
     try {
+      // lógica de registro real (API call)
       
+<<<<<<< HEAD
+      let data = await loginUser({ email: formData["email"], password: formData["password"] })
+
+      // Si la respuesta trae el error que manejamos en api.js o el backend falló
+      if (data.error || !data.token) {
+        alert(data.message || "Credenciales incorrectas. Inténtalo de nuevo.");
+        setIsLoading(false);
+        return; // Detenemos la ejecución aquí
+      }
+
+      // Guardamos el token 
+      localStorage.setItem("TOKENJWT", data.token);
+      
+      // Guardamos el nombre tal y como viene directamente del backend
+      localStorage.setItem("userName", data.profile.name);
+
+      setIsLoading(false);
+      alert("¡Sesión activa!");
+
+      setFormData({
+        email: "",
+        password: "",
+      });
+
+      window.location.href = "/";
+
+=======
       const data = await loginUser({ email: formData.email, password: formData.password });
       console.log("esto nos trae data", data);
       
@@ -54,18 +89,21 @@ export default function Login() {
       window.location.href = "/";
 
 
+>>>>>>> 96e6ac6d500f4470bb7a3f0d6d26f0f60f57df69
     } catch (error) {
       console.error("Error en el login:", error);
-      alert("Ocurrió un error en el inicio de sesión. Verifica tus credenciales.");
-    } finally {
+      alert("Ocurrió un error inesperado. Por favor, vuelve a intentarlo.");
       setIsLoading(false);
     }
   };
 
+
+  // Manejador de cambios exacto
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
+    // Limpiar error al empezar a escribir
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }

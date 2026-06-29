@@ -2,6 +2,7 @@
 
 const API_URL = "http://127.0.0.1:5000/api"
 
+<<<<<<< HEAD
 //-- Función para detectar el rol del Usuario desde el Token --//
 export const getUserRoleFromToken = () => {
     try {
@@ -36,6 +37,8 @@ export const getUserRoleFromToken = () => {
 }
 
 
+=======
+>>>>>>> israel
 //-- Registro --//
 export const registerUser = async (data) => {
     const result = await fetch(`${API_URL}/register`, {
@@ -59,9 +62,7 @@ export const loginUser = async (data) => {
 // ==========================================
 // OBTENER CUIDADORES CON FILTROS
 // ==========================================
-
 export const getPetsitters = async (filters = {}) => {
-    // query parametrs dinámicamente
     const params = new URLSearchParams();
 
     if (filters.city) params.append("city", filters.city);
@@ -88,6 +89,7 @@ export const getPetsitters = async (filters = {}) => {
 
     return await result.json();
 };
+<<<<<<< HEAD
 
 // ==========================================
 // RUTAS PARA EL USUARIO Y PERFIL
@@ -197,3 +199,5 @@ export const createBooking = async (bookingData) => {
     if (!response.ok) throw new Error("Error al crear la reserva");
     return await response.json();
 };
+=======
+>>>>>>> israel
