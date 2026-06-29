@@ -56,23 +56,6 @@ export const loginUser = async (data) => {
     return await result.json() 
 };
 
-export const getMyProfile = async () => {
-    const token = localStorage.getItem("TOKENJWT");
-    const result = await fetch(`${API_URL}/profile/me`, {
-        method: 'GET',
-        headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {})
-        },
-    });
-
-    if (!result.ok) {
-        throw new Error("Error al obtener el perfil del usuario");
-    }
-
-    return await result.json();
-};
-
 // ==========================================
 // by:lnkr OBTENER CUIDADORES CON FILTROS
 // ==========================================
