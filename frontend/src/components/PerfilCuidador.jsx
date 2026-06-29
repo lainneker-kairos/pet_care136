@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { getMyProfile } from "@/Services/api";
+import { getUserProfile } from "@/Services/api";
 
 export default function PerfilCuidador() {
   const [profile, setProfile] = useState(null);
@@ -10,7 +10,7 @@ export default function PerfilCuidador() {
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        const data = await getMyProfile();
+        const data = await getUserProfile();
         setProfile(data);
       } catch (error) {
         console.error("No se pudo cargar el perfil de cuidador", error);
