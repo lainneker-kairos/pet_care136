@@ -1,8 +1,8 @@
-"""init
+"""actualizando modelos
 
-Revision ID: 44310c082479
+Revision ID: b887c8c2c3a7
 Revises: 
-Create Date: 2026-06-24 20:10:50.360983
+Create Date: 2026-06-29 19:23:21.425231
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '44310c082479'
+revision = 'b887c8c2c3a7'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -26,6 +26,8 @@ def upgrade():
     sa.Column('role', sa.String(length=20), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('is_active', sa.Boolean(), nullable=False),
+    sa.Column('google_access_token', sa.String(length=512), nullable=True),
+    sa.Column('google_refresh_token', sa.String(length=512), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
     )

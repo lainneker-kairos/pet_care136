@@ -35,6 +35,13 @@ export const getUserRoleFromToken = () => {
     }
 }
 
+const getAuthHeaders = () => {
+    const token = localStorage.getItem("TOKENJWT")
+    return {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+    }
+}
 
 //-- Registro --//
 export const registerUser = async (data) => {
