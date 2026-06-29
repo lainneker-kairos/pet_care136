@@ -19,6 +19,7 @@ export default function HeroSection() {
   return (
     <section className="bg-[#f7f8ff] px-8 py-20">
       <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-16 md:grid-cols-2">
+
         {/* Lado izquierdo */}
         <div className="flex flex-col gap-6">
           <span className="w-fit rounded-full bg-teal-100 px-4 py-2 text-sm font-semibold text-teal-700">
@@ -30,14 +31,17 @@ export default function HeroSection() {
           <p className="text-lg leading-7 text-gray-600">
             Encuentra paseadores y cuidadores de confianza cerca de ti, listos para tratar a tu mascota como parte de su familia.
           </p>
+
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/cuidadores" className="rounded-lg bg-purple-700 px-8 py-4 text-center font-bold text-white">
+            <Link href="/cuidadores" className="rounded-lg bg-purple-700 px-8 py-4 text-center font-bold text-white hover:bg-purple-800 transition">
               Encontrar un cuidador
             </Link>
+
             <Link href="/perfil" className="rounded-lg border-2 border-purple-700 px-8 py-4 text-center font-bold text-purple-700">
               Convertirse en cuidador
             </Link>
           </div>
+
           {/* Barra de búsqueda */}
           <div className="flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-md sm:flex-row">
             <div className="flex flex-1 items-center gap-2 rounded-lg border border-gray-200 px-4 py-3">
