@@ -35,6 +35,13 @@ export const getUserRoleFromToken = () => {
     }
 }
 
+const getAuthHeaders = () => {
+    const token = localStorage.getItem("TOKENJWT")
+    return {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+    }
+}
 
 //-- Registro --//
 export const registerUser = async (data) => {
@@ -59,9 +66,7 @@ export const loginUser = async (data) => {
 // ==========================================
 // OBTENER CUIDADORES CON FILTROS
 // ==========================================
-
 export const getPetsitters = async (filters = {}) => {
-    // query parametrs dinámicamente
     const params = new URLSearchParams();
 
     if (filters.city) params.append("city", filters.city);
