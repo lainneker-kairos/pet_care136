@@ -1,4 +1,5 @@
 import { Footprints, Home, Hotel } from "lucide-react";
+import Link from "next/link";
 
 export default function ServiceSection() {
     return (
@@ -31,9 +32,9 @@ export default function ServiceSection() {
                                 apasionados por los animales.
                             </p>
 
-                            <a href="/DogWalkingPage" className="font-bold text-teal-700">
+                            <Link href="/DogWalkingPage" className="font-bold text-teal-700">
                                 Ver más →
-                            </a>
+                            </Link>
                         </article>
 
                         <article className="rounded-[28px] bg-white px-8 py-14 text-center shadow-sm">
@@ -50,9 +51,9 @@ export default function ServiceSection() {
                                 constante, cariño y compañía.
                             </p>
 
-                            <a href="/daycare" className="font-bold text-teal-700">
+                            <Link href="/daycare" className="font-bold text-teal-700">
                                 Ver más →
-                            </a>
+                            </Link>
                         </article>
 
                         <article className="rounded-[28px] bg-white px-8 py-14 text-center shadow-sm">
@@ -69,9 +70,9 @@ export default function ServiceSection() {
                                 cuidado personalizado.
                             </p>
 
-                            <a href="/hotel" className="font-bold text-teal-700">
+                            <Link href="/hotel" className="font-bold text-teal-700">
                                 Ver más →
-                            </a>
+                            </Link>
                         </article>
                     </div>
                 </div>

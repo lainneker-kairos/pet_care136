@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function HeroSection() {
   const router = useRouter();
@@ -12,7 +13,7 @@ export default function HeroSection() {
     const params = new URLSearchParams();
     if (city) params.append("city", city);
     params.append("service_type", serviceType);
-    router.push(`/listacuidador?${params.toString()}`);
+    router.push(`/cuidadores?${params.toString()}`);
   };
 
   return (
@@ -30,12 +31,12 @@ export default function HeroSection() {
             Encuentra paseadores y cuidadores de confianza cerca de ti, listos para tratar a tu mascota como parte de su familia.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <a href="#services" className="rounded-lg bg-purple-700 px-8 py-4 text-center font-bold text-white">
+            <Link href="/cuidadores" className="rounded-lg bg-purple-700 px-8 py-4 text-center font-bold text-white">
               Encontrar un cuidador
-            </a>
-            <a href="/auth/register" className="rounded-lg border-2 border-purple-700 px-8 py-4 text-center font-bold text-purple-700">
+            </Link>
+            <Link href="/perfil" className="rounded-lg border-2 border-purple-700 px-8 py-4 text-center font-bold text-purple-700">
               Convertirse en cuidador
-            </a>
+            </Link>
           </div>
           {/* Barra de búsqueda */}
           <div className="flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-md sm:flex-row">
@@ -47,14 +48,12 @@ export default function HeroSection() {
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleBuscar()}
-                className="w-full text-sm outline-none"
-              />
+                className="w-full text-sm outline-none"/>
             </div>
             <select
               className="flex-1 rounded-lg border border-gray-200 px-4 py-3 text-sm outline-none"
               value={serviceType}
-              onChange={(e) => setServiceType(e.target.value)}
-            >
+              onChange={(e) => setServiceType(e.target.value)}>
               <option value="paseo">Paseos</option>
               <option value="guarderia">Guardería</option>
               <option value="hotel">Hotel</option>
@@ -62,8 +61,7 @@ export default function HeroSection() {
             </select>
             <button
               onClick={handleBuscar}
-              className="rounded-lg bg-teal-600 px-6 py-3 font-bold text-white hover:bg-teal-700 transition"
-            >
+              className="rounded-lg bg-teal-600 px-6 py-3 font-bold text-white hover:bg-teal-700 transition">
               🔍 Buscar
             </button>
           </div>
