@@ -3,18 +3,18 @@ import Link from "next/link";
 export default function CuidadorCard({ cuidador }) {
     return (
         <div className="bg-[#FAF6F0] rounded-2xl shadow-sm border border-[#EADBCE] overflow-hidden flex flex-col justify-between transition-all hover:shadow-md">
-            
+
             {/* Foto del cuidador */}
             <div className="w-full h-48 overflow-hidden">
                 <img 
-                    src={cuidador.profile_pic || "https://via.placeholder.com/300"} 
-                    alt={cuidador.name} 
-                    className="w-full h-full object-cover"/>
+                    src={cuidador.profile_pic ? cuidador.profile_pic :  "https://placehold.co/300x200"}
+                    alt={cuidador.name}
+                    className="w-full h-48 object-cover" />
             </div>
 
             {/* Contenido */}
             <div className="p-5 space-y-3">
-                
+
                 {/* Nombre y ciudad */}
                 <div>
                     <h2 className="text-lg font-bold text-[#1A202C]">{cuidador.name}</h2>
@@ -64,8 +64,8 @@ export default function CuidadorCard({ cuidador }) {
 
             {/* Botón Ver perfil */}
             <div className="px-5 pb-5">
-                <Link 
-                    href={`/cuidador/${cuidador.id}`}
+                <Link
+                    href={`/cuidador/${cuidador.user_id}`}
                     className="block w-full text-center bg-[#6338CC] hover:bg-[#522cb3] text-white font-bold text-sm py-2.5 rounded-xl transition">
                     Ver perfil
                 </Link>

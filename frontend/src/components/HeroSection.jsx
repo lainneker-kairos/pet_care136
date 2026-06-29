@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function HeroSection() {
   return (
       <section className="bg-[#f7f8ff] px-8 py-20">
@@ -18,12 +20,12 @@ export default function HeroSection() {
             </p>
 
             <div className="flex flex-col gap-4 sm:flex-row">
-              <a href="#services" className="rounded-lg bg-purple-700 px-8 py-4 text-center font-bold text-white">
+              <Link href="/cuidadores" className="rounded-lg bg-purple-700 px-8 py-4 text-center font-bold text-white">
                 Encontrar un cuidador
-              </a>
-              <a href="/auth/register" className="rounded-lg border-2 border-purple-700 px-8 py-4 text-center font-bold text-purple-700">
+              </Link>
+              <Link href="/perfildueno" className="rounded-lg border-2 border-purple-700 px-8 py-4 text-center font-bold text-purple-700">
                 Convertirse en cuidador
-              </a>
+              </Link>
             </div>
 
             {/* Barra de búsqueda */}

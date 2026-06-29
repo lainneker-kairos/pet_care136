@@ -25,17 +25,16 @@ export default function GuarderiaPage() {
                             {/* Widget Buscador sincronizado con el Back (daycare / nightcare) */}
                             <div className="mt-2 rounded-2xl bg-[#FAF6F0] p-6 shadow-xl border border-gray-100">
                                 <h3 className="text-lg font-bold text-teal-700 mb-4">Reserva su lugar hoy</h3>
-                                
+
                                 <form action="/cuidadores" className="flex flex-col gap-4">
                                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                        
+
                                         {/* Selector de Tipo de Cuidado (Modifica el service_type dinámicamente) */}
                                         <div className="flex flex-col gap-1">
                                             <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">¿Qué servicio necesitas?</label>
-                                            <select 
+                                            <select
                                                 name="service_type" // Hace match directo con service_type en el modelo Booking
-                                                className="rounded-lg border border-gray-300 p-3 text-sm text-gray-700 focus:border-purple-500 focus:outline-none bg-gray-50"
-                                            >
+                                                className="rounded-lg border border-gray-300 p-3 text-sm text-gray-700 focus:border-purple-500 focus:outline-none bg-gray-50">
                                                 <option value="daycare">Guardería de día (Por hora)</option>
                                                 <option value="nightcare">Cuidado nocturno (Por noche)</option>
                                             </select>
@@ -44,19 +43,48 @@ export default function GuarderiaPage() {
                                         {/* Selector de Fecha */}
                                         <div className="flex flex-col gap-1">
                                             <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">¿Qué día?</label>
-                                            <input 
-                                                type="date" 
+                                            <input
+                                                type="date"
                                                 name="start_date"
-                                                className="rounded-lg border border-gray-300 p-3 text-sm text-gray-700 focus:border-purple-500 focus:outline-none bg-gray-50"
-                                            />
+                                                className="rounded-lg border border-gray-300 p-3 text-sm text-gray-700 focus:border-purple-500 focus:outline-none bg-gray-50" />
                                         </div>
 
                                     </div>
 
-                                    <button 
-                                        type="submit" 
-                                        className="w-full rounded-lg bg-purple-700 py-4 text-center font-bold text-white transition-colors hover:bg-purple-800 shadow-md shadow-purple-200 mt-2"
-                                    >
+                                    {/* Horas de entrada y salida */}
+                                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Hora de entrada</label>
+                                            <input
+                                                type="time"
+                                                name="start_time"
+                                                className="rounded-lg border border-gray-300 p-3 text-sm text-gray-700 focus:border-purple-500 focus:outline-none bg-gray-50"
+                                            />
+                                        </div>
+
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Hora de salida</label>
+                                            <input
+                                                type="time"
+                                                name="end_time"
+                                                className="rounded-lg border border-gray-300 p-3 text-sm text-gray-700 focus:border-purple-500 focus:outline-none bg-gray-50"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Campo Ciudad */}
+                                    <div className="flex flex-col gap-1 w-1/2 mx-auto">
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wide text-center">¿En qué ciudad?</label>
+                                        <input
+                                            type="text"
+                                            name="city"
+                                            placeholder="Ej: Madrid"
+                                            className="w-full rounded-lg border border-gray-300 p-3 text-sm text-gray-700 focus:border-purple-500 focus:outline-none bg-gray-50 text-center" />
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        className="w-full rounded-lg bg-purple-700 py-4 text-center font-bold text-white transition-colors hover:bg-purple-800 shadow-md shadow-purple-200 mt-2">
                                         Buscar Cuidador
                                     </button>
                                 </form>
@@ -68,8 +96,7 @@ export default function GuarderiaPage() {
                             <img
                                 src="https://images.unsplash.com/photo-1558788353-f76d92427f16"
                                 alt="Perro golden"
-                                className="h-[460px] w-full rounded-[28px] object-cover shadow-lg"
-                            />
+                                className="h-[460px] w-full rounded-[28px] object-cover shadow-lg" />
 
                             <div className="absolute bottom-[-16px] right-[-16px] rounded-xl bg-white p-4 shadow-xl border border-gray-50">
                                 <p className="text-2xl font-bold text-purple-700">100%</p>
@@ -83,7 +110,7 @@ export default function GuarderiaPage() {
                 <section className="bg-white px-8 py-16">
                     <div className="mx-auto max-w-6xl text-center">
                         <h2 className="text-3xl font-bold text-purple-700 mb-12">Beneficios de nuestra Guardería</h2>
-                        
+
                         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
                             <div className="flex flex-col items-center p-6 rounded-2xl bg-[#FAF6F0] border border-gray-100">
                                 <div className="text-4xl mb-4">🐾</div>
@@ -115,7 +142,7 @@ export default function GuarderiaPage() {
                 {/* 3. SECCIÓN DE FAQ (Cambiado el título a Preguntas Frecuentes) */}
                 <section className="bg-[#f7f8ff] px-8 py-16 border-t border-gray-100">
                     <div className="mx-auto max-w-3xl">
-                        
+
                         <Accordion
                             faqs={[
                                 {
