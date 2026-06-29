@@ -1,17 +1,40 @@
+"use client"
+
 const API_URL = "http://127.0.0.1:5000/api"
 
-// Función de ayuda para obtener los headers con el token JWT
-const getAuthHeaders = () => {
-    const token = localStorage.getItem("TOKENJWT");
-    return {
-        "Content-Type": "application/json",
-        "Authorization": token ? `Bearer ${token}` : ""
-    };
-};
+//-- Función para detectar el rol del Usuario desde el Token --//
+export const getUserRoleFromToken = () => {
+    try {
+        if (typeof window === "undefined") {
+            return null;
+        }
 
-// ==========================================
-// RUTAS DE AUTENTICACIÓN
-// ==========================================
+        const storedRole = localStorage.getItem("userRole");
+        if (storedRole) {
+            return storedRole;
+        }
+
+        const token = localStorage.getItem("TOKENJWT");
+        if (!token) {
+            return null;
+        }
+
+        const payloadBase64 = token.split(".")[1];
+        if (!payloadBase64) {
+            return null;
+        }
+
+        const normalizedBase64 = payloadBase64.replace(/-/g, "+").replace(/_/g, "/");
+        const paddedBase64 = normalizedBase64.padEnd(Math.ceil(normalizedBase64.length / 4) * 4, "=");
+        const payload = JSON.parse(atob(paddedBase64));
+
+        return payload?.role ?? null;
+    } catch (error) {
+        console.error("Error al decodificar el token:", error);
+        return null;
+    }
+}
+
 
 //-- Registro --//
 export const registerUser = async (data) => {

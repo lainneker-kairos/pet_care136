@@ -47,6 +47,7 @@ export default function Login() {
 
       localStorage.setItem("TOKENJWT", data.token);
       localStorage.setItem("userName", data.user.name);
+      localStorage.setItem("userRole", data.user.role);
 
       setFormData({ email: "", password: "" });
       
