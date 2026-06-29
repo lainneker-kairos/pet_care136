@@ -27,6 +27,10 @@ class User(db.Model):
     role: Mapped[str] = mapped_column(String(20), default="owner", nullable=True) # "owner" 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    
+    # Integracion de Google Calendar
+    google_access_token: Mapped[str] = mapped_column(String(512), nullable=True)    
+    google_refresh_token: Mapped[str] = mapped_column(String(512), nullable=True)
 
     # Relaciones 1 a 1
     owner_profile: Mapped[Owner] = relationship(back_populates="user", uselist=False, cascade="all, delete-orphan")

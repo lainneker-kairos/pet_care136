@@ -12,8 +12,11 @@ export default function Login() {
   });
 
   const [errors, setErrors] = useState({});
+
+  // Estados extra para el diseño (mostrar/ocultar contraseñas)
   const [showPassword, setShowPassword] = useState(false);
 
+  // función de validación exacta
 
   const validateForm = () => {
     const newErrors = {};
@@ -33,6 +36,7 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
+  // función de envío de formulario exactarte a JSON
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -40,6 +44,7 @@ export default function Login() {
     setIsLoading(true);
 
     try {
+      // lógica de registro real (API call)
       
       const data = await loginUser({ email: formData.email, password: formData.password });
       console.log("esto nos trae data", data);
@@ -56,16 +61,18 @@ export default function Login() {
 
     } catch (error) {
       console.error("Error en el login:", error);
-      alert("Ocurrió un error en el inicio de sesión. Verifica tus credenciales.");
-    } finally {
+      alert("Ocurrió un error inesperado. Por favor, vuelve a intentarlo.");
       setIsLoading(false);
     }
   };
 
+
+  // Manejador de cambios exacto
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
+    // Limpiar error al empezar a escribir
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
