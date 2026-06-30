@@ -158,7 +158,7 @@ def bepetsitter(current_user_id):
     city = data.get('city') or (user.owner_profile.city if user.owner_profile else "")
 
     # Actualizar el rol del usuario
-    user.role = 'petsitter',  # Ahora el usuario puede ser dueño y cuidador
+    user.role = 'petsitter'  # Ahora el usuario puede ser dueño y cuidador
 
     # Crear el nuevo perfil de cuidador
     new_profile = Petsitter(
