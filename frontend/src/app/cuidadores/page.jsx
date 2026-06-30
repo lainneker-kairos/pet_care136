@@ -64,7 +64,7 @@ export default function ListaCuidadores() {
 
                 {/* COLUMNA DEL MAPA */}
                 <div className="hidden lg:block lg:col-span-5">
-                    <div className="sticky top-24 w-full h-[400px] bg-[#FAF6F0] rounded-2xl border border-[#EADBCE] shadow-sm overflow-hidden flex flex-col items-center justify-center gap-4">
+                    <div className="sticky top-24 w-full h-[600px] bg-[#FAF6F0] rounded-2xl border border-[#EADBCE] shadow-sm overflow-hidden flex flex-col items-center justify-center gap-4">
                         <p className="text-4xl">🗺️</p>
                         <p className="text-sm font-bold text-gray-500">Mapa próximamente</p>
                         <p className="text-xs text-gray-400 text-center px-8">

@@ -208,7 +208,7 @@ const petData = {
         
         {/* Encabezado Principal */}
         <div className="bg-[#FAF6F0] p-6 rounded-2xl border border-[#EADBCE] shadow-sm">
-          <h1 className="text-2xl font-extrabold text-[#1A202C]">Mi Perfil de Dueño</h1>
+          <h1 className="text-2xl font-extrabold text-[#6338CC]">Mi Perfil de Dueño</h1>
           <p className="text-sm text-gray-500">
             Administra tus datos de contacto personales y los perfiles de tus mascotas vinculadas.
           </p>

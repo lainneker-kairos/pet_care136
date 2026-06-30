@@ -56,7 +56,7 @@ export default function TrustSection() {
                                 <div>
                                     <h3 className="font-bold text-gray-900"> Sistema de valoraciones</h3>
                                     <p className="text-sm text-gray-600">
-                                        Puedes ver las reseñas de otros dueños antes de elegir
+                                        Puedes ver las reseñas de otros dueños antes de elegir.
                                     </p>
                                 </div>
                             </div>
