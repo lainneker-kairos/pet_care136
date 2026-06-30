@@ -18,6 +18,22 @@ export default function Navbar() {
         if (token && userName) {
             setIsLoggedIn(true)
             setUser({ name: userName })
+
+            fetch('http://127.0.0.1:5000/api/profile/me', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                setUser({
+                    name: userName,
+                    ownerProfile: data.owner_profile,
+                    petsitterProfile: data.petsitter_profile
+                });
+            })
+            .catch(error => console.error('Error al obtener perfil:', error));
         }
 
     }, []);
@@ -31,64 +47,80 @@ export default function Navbar() {
         router.push("/auth/login")
     };
 
-    return (
+return (
         <div className="sticky top-0 z-50 border-b border-purple-100 bg-white/90 backdrop-blur">
-            <nav className="mx-auto flex max-w-6xl items-center justify-between px-8 py-5">
-                {/* contenido del navbar */}
-                <Link href="/" className="text-2xl font-bold text-purple-700">
+            {/* Aumentamos max-w a 7xl para dar más margen lateral y bajamos el py-5 a py-3.5 para estilizar la altura */}
+            <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3.5">
+                
+                {/* LOGO */}
+                <Link href="/" className="flex items-center">
                     <Image
                         src="/logo_petcare.svg"
                         alt="Logo de PetCare"
-                        width={150}
-                        height={150}
-                        className="w-18 h-18"
+                        width={130} 
+                        height={40}
+                        className="h-9 w-auto" 
                     />
                 </Link>
 
-                <div className="hidden items-center gap-8 text-sm font-semibold text-gray-600 md:flex">
-                    <Link href="/DogWalkingPage" className="hover:text-purple-700">
+                {/* MENÚ CENTRAL - Reducido gap-8 a gap-6 para optimizar espacio horizontal */}
+                <div className="hidden items-center gap-6 text-sm font-medium text-gray-600 md:flex">
+                    <Link href="/DogWalkingPage" className="transition-colors hover:text-purple-700">
                         Paseo de mascotas
                     </Link>
-                    <Link href="/daycare" className="hover:text-purple-700">
+                    <Link href="/daycare" className="transition-colors hover:text-purple-700">
                         Guardería
                     </Link>
-                    <Link href="/hotel" className="hover:text-purple-700">
+                    <Link href="/hotel" className="transition-colors hover:text-purple-700">
                         Hotel de mascotas
                     </Link>
-                    <Link href="/cuidadores" className="hover:text-purple-700">
+                    <Link href="/cuidadores" className="transition-colors hover:text-purple-700">
                         Cuidadores
                     </Link>
                 </div>
 
-                <div className="flex items-center gap-4">
+                {/* BLOQUE DE AUTENTICACIÓN Y ROLES INTEGRADO */}
+                <div className="flex items-center gap-3">
                     {isLoggedIn ? (
                         <>
-
-                            <span className="hidden text-sm font-semibold text-gray-700 sm:inline">
-                                Hola, {user?.name || "usuario"}
+                            <span className="hidden text-sm text-gray-600 sm:inline">
+                                Hola, <span className="font-semibold text-gray-800">{user?.name || "usuario"}</span>
                             </span>
 
-                            <span className="hidden text-gray-300 sm:inline">|</span>
+                            <span className="hidden text-gray-200 sm:inline">|</span>
 
-                            <Link href="/perfil" className="text-sm font-semibold text-gray-700 hover:text-purple-700 mr-2">
+                            <Link href="/perfil" className="text-sm font-medium text-gray-600 transition-colors hover:text-purple-700">
                                 Mi perfil
                             </Link>
 
+                            {/* BOTONES DE ROLES INTERNOS: Integrados en el flujo, con diseño sutil y coherente */}
+                            {user && user.ownerProfile && (
+                                <Link href="/perfil-owner" className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 transition-all hover:bg-emerald-100">
+                                    Perfil Dueño
+                                </Link>
+                            )}
+
+                            {user && user.petsitterProfile && (
+                                <Link href="/perfil-cuidador" className="rounded-full border border-purple-200 bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700 transition-all hover:bg-purple-100">
+                                    Perfil Cuidador
+                                </Link>
+                            )}
+
                             <button
                                 onClick={handleLogout}
-                                className="rounded-full bg-purple-700 px-5 py-3 text-sm font-bold text-white hover:bg-purple-800">
+                                className="rounded-full bg-purple-600 px-3.5 py-1 text-xs font-medium text-white transition-colors hover:bg-red-600">
                                 Cerrar sesión
                             </button>
                         </>
                     ) : (
                         <>
                             <Link href="/auth/login"
-                                className="hidden text-sm font-semibold text-gray-700 hover:text-purple-700 sm:inline">
+                                className="hidden text-sm font-semibold text-gray-700 transition-colors hover:text-purple-700 sm:inline">
                                 Iniciar sesión
                             </Link>
 
                             <Link href="/auth/register"
-                                className="rounded-full bg-purple-700 px-5 py-3 text-sm font-bold text-white hover:bg-purple-800">
+                                className="rounded-full bg-purple-700 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-purple-800">
                                 Registrarse
                             </Link>
                         </>

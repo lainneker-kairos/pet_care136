@@ -48,6 +48,11 @@ export default function Login() {
       
       const data = await loginUser({ email: formData.email, password: formData.password });
       console.log("esto nos trae data", data);
+      if (!data.user) {
+        //esta validacion para mostrar el mensaje de error del backend o uno genérico y detener la ejecución
+        alert(data.msg || data.error || data.message || "Credenciales inválidas. Verifica tu correo y contraseña.");
+        return;
+      }
       
 
       localStorage.setItem("TOKENJWT", data.token);
