@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  getUserProfile, 
-  createPetsitterProfile, 
-  updatePetsitterProfile 
+import {
+  getUserProfile,
+  createPetsitterProfile,
+  updatePetsitterProfile
 } from "../Services/api";
 
 export default function PerfilCuidador() {
@@ -63,10 +63,10 @@ export default function PerfilCuidador() {
 
   useEffect(() => {
     fetchProfile();
-     setIsMounted(true);
+    setIsMounted(true);
   }, []);
 
-    if (!isMounted) return null; // No renderizar nada en el servidor o durante el primer render
+  if (!isMounted) return null; // No renderizar nada en el servidor o durante el primer render
 
   if (loading) {
     return (
@@ -136,7 +136,7 @@ export default function PerfilCuidador() {
     return (
       <div className="min-h-screen bg-[#F0F7F7] font-sans antialiased text-[#2D3748] py-12 px-4">
         <div className="max-w-2xl mx-auto bg-[#FAF6F0] rounded-3xl p-8 border border-[#EADBCE] shadow-lg space-y-6">
-          
+
           <div className="text-center space-y-2">
             <span className="text-4xl">🐾</span>
             <h1 className="text-3xl font-extrabold text-purple-700">¡Conviértete en Cuidador!</h1>
@@ -146,29 +146,29 @@ export default function PerfilCuidador() {
           </div>
 
           <form onSubmit={handleRegisterPetsitter} className="space-y-4">
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Nombre Profesional</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   name="name"
-                  value={formData.name || profile.owner_profile?.name || ""} 
+                  value={formData.name || profile.owner_profile?.name || ""}
                   onChange={handleChange}
                   required
-                  className="w-full bg-white border border-[#EADBCE] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#6338CC]" 
+                  className="w-full bg-white border border-[#EADBCE] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#6338CC]"
                 />
               </div>
 
               <div className="space-y-1">
                 <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Teléfono de contacto</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   name="phone"
-                  value={formData.phone || profile.owner_profile?.phone || ""} 
+                  value={formData.phone || profile.owner_profile?.phone || ""}
                   onChange={handleChange}
                   required
-                  className="w-full bg-white border border-[#EADBCE] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#6338CC]" 
+                  className="w-full bg-white border border-[#EADBCE] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#6338CC]"
                 />
               </div>
             </div>
@@ -176,24 +176,24 @@ export default function PerfilCuidador() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Ciudad</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   name="city"
-                  value={formData.city || profile.owner_profile?.city || ""} 
+                  value={formData.city || profile.owner_profile?.city || ""}
                   onChange={handleChange}
                   required
-                  className="w-full bg-white border border-[#EADBCE] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#6338CC]" 
+                  className="w-full bg-white border border-[#EADBCE] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#6338CC]"
                 />
               </div>
 
               <div className="space-y-1">
                 <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Barrio</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   name="neighborhood"
-                  value={formData.neighborhood || profile.owner_profile?.neighborhood || ""} 
+                  value={formData.neighborhood || profile.owner_profile?.neighborhood || ""}
                   onChange={handleChange}
-                  className="w-full bg-white border border-[#EADBCE] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#6338CC]" 
+                  className="w-full bg-white border border-[#EADBCE] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#6338CC]"
                 />
               </div>
             </div>
@@ -201,44 +201,44 @@ export default function PerfilCuidador() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Precio paseo por Hora (€)</label>
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   name="price_per_hour"
-                  value={formData.price_per_hour} 
+                  value={formData.price_per_hour}
                   onChange={handleChange}
-                  className="w-full bg-white border border-[#EADBCE] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#6338CC]" 
+                  className="w-full bg-white border border-[#EADBCE] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#6338CC]"
                 />
               </div>
 
               <div className="space-y-1">
                 <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Precio hotel por Noche (€)</label>
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   name="price_per_night"
-                  value={formData.price_per_night} 
+                  value={formData.price_per_night}
                   onChange={handleChange}
-                  className="w-full bg-white border border-[#EADBCE] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#6338CC]" 
+                  className="w-full bg-white border border-[#EADBCE] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#6338CC]"
                 />
               </div>
             </div>
 
             <div className="space-y-1">
               <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Años de experiencia</label>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 name="experience_years"
-                value={formData.experience_years} 
+                value={formData.experience_years}
                 onChange={handleChange}
-                className="w-full bg-white border border-[#EADBCE] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#6338CC]" 
+                className="w-full bg-white border border-[#EADBCE] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#6338CC]"
               />
             </div>
 
             <div className="space-y-1">
               <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Preséntate a la comunidad (Biografía profesional)</label>
-              <textarea 
-                rows="4" 
+              <textarea
+                rows="4"
                 name="bio"
-                value={formData.bio} 
+                value={formData.bio}
                 onChange={handleChange}
                 required
                 className="w-full bg-white border border-[#EADBCE] rounded-xl p-4 text-sm focus:outline-none focus:border-[#6338CC] resize-none"
@@ -246,13 +246,13 @@ export default function PerfilCuidador() {
               />
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="w-full bg-[#6338CC] hover:bg-[#522cb3] text-white font-bold py-4 rounded-xl transition duration-200 shadow-md"
             >
               🚀 Crear mi perfil de Cuidador
             </button>
-            
+
           </form>
         </div>
       </div>
@@ -265,19 +265,27 @@ export default function PerfilCuidador() {
   return (
     <div className="min-h-screen bg-[#F0F7F7] font-sans antialiased text-[#2D3748]">
       <div className="max-w-6xl mx-auto px-4 py-8">
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
+
+        {/* Encabezado Principal */}
+          <div className="bg-[#FAF6F0] p-6 rounded-2xl border border-[#EADBCE] shadow-sm">
+            <h1 className="text-2xl font-extrabold text-[#6338CC]">Mi Perfil de Cuidador</h1>
+            <p className="text-sm text-gray-500">
+              Administra tus datos de contacto personales.
+            </p>
+          </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
+
           {/* COLUMNA IZQUIERDA: Información del Cuidador */}
           <div className="lg:col-span-2 space-y-6">
-            
+
             {/* Tarjeta de Perfil Principal */}
             <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE] flex flex-col md:flex-row gap-6 items-center md:items-start">
-              
+
               <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden flex-shrink-0 bg-amber-200">
-                <img 
-                  src={caregiver.profile_pic || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&auto=format&fit=crop&q=80"} 
-                  alt={caregiver.name} 
+                <img
+                  src={caregiver.profile_pic || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&auto=format&fit=crop&q=80"}
+                  alt={caregiver.name}
                   className="w-full h-full object-cover"
                 />
                 <span className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-[#00A896] text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1 shadow-md whitespace-nowrap">
@@ -312,7 +320,7 @@ export default function PerfilCuidador() {
                   </div>
                 </div>
               </div>
-              
+
             </div>
 
             {/* Formulario de Edición o Sección Sobre Mí */}
@@ -320,18 +328,18 @@ export default function PerfilCuidador() {
               <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE] space-y-4">
                 <div className="flex justify-between items-center">
                   <h2 className="text-xl font-bold text-[#1A202C]">Mi Biografía Profesional</h2>
-                  <button 
+                  <button
                     onClick={() => setIsEditing(true)}
                     className="text-sm font-semibold text-purple-700 hover:underline"
                   >
                     ✏️ Editar Perfil Cuidador
                   </button>
                 </div>
-                
+
                 <p className="text-gray-700 leading-relaxed text-sm">
                   {caregiver.bio || "No has agregado una descripción todavía. Haz clic en 'Editar Perfil' para añadir detalles sobre tus cuidados de mascotas."}
                 </p>
-                
+
                 <div className="border-t border-[#EADBCE]/50 pt-4 space-y-3">
                   <h3 className="text-xs font-bold text-gray-500 uppercase">Habilidades y Preferencias</h3>
                   <div className="flex flex-wrap gap-2">
@@ -351,26 +359,26 @@ export default function PerfilCuidador() {
             ) : (
               <form onSubmit={handleUpdatePetsitter} className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE] space-y-4">
                 <h2 className="text-xl font-bold text-[#1A202C]">Editar Información de Cuidador</h2>
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-gray-500 uppercase">Nombre Profesional</label>
-                    <input 
-                      type="text" 
-                      name="name" 
-                      value={formData.name} 
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
                       onChange={handleChange}
-                      className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]" 
+                      className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]"
                     />
                   </div>
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-gray-500 uppercase">Teléfono</label>
-                    <input 
-                      type="text" 
-                      name="phone" 
-                      value={formData.phone} 
+                    <input
+                      type="text"
+                      name="phone"
+                      value={formData.phone}
                       onChange={handleChange}
-                      className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]" 
+                      className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]"
                     />
                   </div>
                 </div>
@@ -378,22 +386,22 @@ export default function PerfilCuidador() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-gray-500 uppercase">Ciudad</label>
-                    <input 
-                      type="text" 
-                      name="city" 
-                      value={formData.city} 
+                    <input
+                      type="text"
+                      name="city"
+                      value={formData.city}
                       onChange={handleChange}
-                      className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]" 
+                      className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]"
                     />
                   </div>
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-gray-500 uppercase">Barrio</label>
-                    <input 
-                      type="text" 
-                      name="neighborhood" 
-                      value={formData.neighborhood} 
+                    <input
+                      type="text"
+                      name="neighborhood"
+                      value={formData.neighborhood}
                       onChange={handleChange}
-                      className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]" 
+                      className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]"
                     />
                   </div>
                 </div>
@@ -401,115 +409,115 @@ export default function PerfilCuidador() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-gray-500 uppercase">Tarifa Paseo / Hora (€)</label>
-                    <input 
-                      type="number" 
-                      name="price_per_hour" 
-                      value={formData.price_per_hour} 
+                    <input
+                      type="number"
+                      name="price_per_hour"
+                      value={formData.price_per_hour}
                       onChange={handleChange}
-                      className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]" 
+                      className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]"
                     />
                   </div>
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-gray-500 uppercase">Tarifa Hotel / Noche (€)</label>
-                    <input 
-                      type="number" 
-                      name="price_per_night" 
-                      value={formData.price_per_night} 
+                    <input
+                      type="number"
+                      name="price_per_night"
+                      value={formData.price_per_night}
                       onChange={handleChange}
-                      className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]" 
+                      className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-gray-500 uppercase">Años de Experiencia</label>
-                  <input 
-                    type="number" 
-                    name="experience_years" 
-                    value={formData.experience_years} 
+                  <input
+                    type="number"
+                    name="experience_years"
+                    value={formData.experience_years}
                     onChange={handleChange}
-                    className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]" 
+                    className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]"
                   />
                 </div>
 
                 <div className="space-y-2 border-t border-[#EADBCE]/50 pt-3">
                   <span className="text-xs font-bold text-gray-500 uppercase block">Servicios Ofrecidos</span>
                   <div className="grid grid-cols-2 gap-2">
-                    
+
                     <label className="flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        name="offers_walk" 
-                        checked={formData.offers_walk} 
-                        onChange={handleChange} 
-                        className="rounded text-[#6338CC] focus:ring-[#6338CC]" 
+                      <input
+                        type="checkbox"
+                        name="offers_walk"
+                        checked={formData.offers_walk}
+                        onChange={handleChange}
+                        className="rounded text-[#6338CC] focus:ring-[#6338CC]"
                       />
                       🚶 Ofrecer Paseos
                     </label>
-                    
+
                     <label className="flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        name="offers_hotel" 
-                        checked={formData.offers_hotel} 
-                        onChange={handleChange} 
-                        className="rounded text-[#6338CC] focus:ring-[#6338CC]" 
+                      <input
+                        type="checkbox"
+                        name="offers_hotel"
+                        checked={formData.offers_hotel}
+                        onChange={handleChange}
+                        className="rounded text-[#6338CC] focus:ring-[#6338CC]"
                       />
                       🏠 Ofrecer Hotel / Alojamiento
                     </label>
-                    
+
                     <label className="flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        name="offers_daycare" 
-                        checked={formData.offers_daycare} 
-                        onChange={handleChange} 
-                        className="rounded text-[#6338CC] focus:ring-[#6338CC]" 
+                      <input
+                        type="checkbox"
+                        name="offers_daycare"
+                        checked={formData.offers_daycare}
+                        onChange={handleChange}
+                        className="rounded text-[#6338CC] focus:ring-[#6338CC]"
                       />
                       🐾 Ofrecer Guardería Diurna
                     </label>
-                    
+
                     <label className="flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        name="offers_nightcare" 
-                        checked={formData.offers_nightcare} 
-                        onChange={handleChange} 
-                        className="rounded text-[#6338CC] focus:ring-[#6338CC]" 
+                      <input
+                        type="checkbox"
+                        name="offers_nightcare"
+                        checked={formData.offers_nightcare}
+                        onChange={handleChange}
+                        className="rounded text-[#6338CC] focus:ring-[#6338CC]"
                       />
                       🌙 Ofrecer Cuidado Nocturno
                     </label>
-                    
+
                   </div>
                 </div>
 
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-gray-500 uppercase">Biografía profesional</label>
-                  <textarea 
-                    rows="3" 
+                  <textarea
+                    rows="3"
                     name="bio"
-                    value={formData.bio} 
+                    value={formData.bio}
                     onChange={handleChange}
-                    className="w-full bg-white border border-[#EADBCE] rounded-xl p-3 text-sm focus:outline-none focus:border-[#6338CC] resize-none" 
+                    className="w-full bg-white border border-[#EADBCE] rounded-xl p-3 text-sm focus:outline-none focus:border-[#6338CC] resize-none"
                   />
                 </div>
 
                 <div className="flex gap-2">
-                  <button 
-                    type="button" 
-                    onClick={() => setIsEditing(false)} 
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(false)}
                     className="w-1/2 bg-white text-gray-700 py-2 rounded-xl border border-[#EADBCE] text-xs font-bold"
                   >
                     Cancelar
                   </button>
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="w-1/2 bg-[#6338CC] text-white py-2 rounded-xl text-xs font-bold shadow-sm"
                   >
                     Guardar Cambios
                   </button>
                 </div>
-                
+
               </form>
             )}
 
@@ -543,7 +551,7 @@ export default function PerfilCuidador() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                
+
                 <div className="bg-[#FAF6F0] p-4 rounded-xl border border-[#EADBCE] flex gap-4 items-start opacity-70">
                   <div className="w-16 h-16 rounded-lg bg-[#EFE9E2] flex items-center justify-center text-xl flex-shrink-0">🐶</div>
                   <div className="space-y-1">
@@ -561,7 +569,7 @@ export default function PerfilCuidador() {
                     <p className="text-xs font-bold text-gray-900">— James K.</p>
                   </div>
                 </div>
-                
+
               </div>
             </div>
 
@@ -569,11 +577,11 @@ export default function PerfilCuidador() {
 
           {/* COLUMNA DERECHA: Servicios, Precios y Disponibilidad */}
           <div className="space-y-6">
-            
+
             {/* Servicios y Precios Dinámicos */}
             <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE] space-y-4">
               <h2 className="text-lg font-bold text-[#1A202C]">Mis Servicios y Tarifas</h2>
-              
+
               <div className="space-y-3">
                 {caregiver.offers_walk && (
                   <div className="flex justify-between items-center bg-[#EFE9E2] p-3 rounded-xl">
@@ -615,7 +623,7 @@ export default function PerfilCuidador() {
                 )}
               </div>
 
-              <button 
+              <button
                 onClick={() => setIsEditing(true)}
                 className="w-full bg-[#6338CC] hover:bg-[#522cb3] text-white font-semibold py-3 px-4 rounded-xl transition duration-200 flex items-center justify-center gap-2 shadow-md"
               >
@@ -628,7 +636,7 @@ export default function PerfilCuidador() {
               <div className="flex justify-between items-center">
                 <h2 className="text-md font-bold text-[#1A202C]">Disponibilidad Semanal</h2>
               </div>
-              
+
               <div className="text-xs text-gray-700 space-y-1">
                 <p>🗓️ <span className="font-bold text-[#6338CC]">Días disponibles:</span></p>
                 <p className="bg-[#EFE9E2] p-2.5 rounded-lg border border-[#EADBCE]/40 font-semibold">
@@ -638,7 +646,7 @@ export default function PerfilCuidador() {
             </div>
 
           </div>
-          
+
         </div>
       </div>
     </div>

@@ -177,7 +177,7 @@ export default function PerfilCuidadorDinamico() {
 
                         {/* Servicios */}
                         <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE]">
-                            <h2 className="text-xl font-bold text-[#1A202C] mb-3">Servicios disponibles</h2>
+                            <h2 className="text-xl font-bold text-[#6338CC] mb-3">Servicios disponibles</h2>
                             <div className="flex flex-wrap gap-2">
                                 {cuidador?.offers_walk && <span className="bg-[#7FE3D8]/40 text-[#004D44] text-xs font-semibold px-3 py-1.5 rounded-full border border-[#7FE3D8]/60">🚶 Paseos</span>}
                                 {cuidador?.offers_hotel && <span className="bg-[#7FE3D8]/40 text-[#004D44] text-xs font-semibold px-3 py-1.5 rounded-full border border-[#7FE3D8]/60">🏠 Hotel</span>}
