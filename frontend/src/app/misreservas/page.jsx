@@ -1,11 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-
 import { getUserProfile, getUserBookings } from "../../Services/api";
 
 export default function MisReservas() {
-  // Estado para filtrar por el "estado" de la reserva de tu BD (Pendiente, Confirmada, Completada)
   const [filtroEstado, setFiltroEstado] = useState("todas");
   const [reservas, setReservas] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -15,13 +13,13 @@ export default function MisReservas() {
     const fetchReservas = async () => {
       try {
         setCargando(true);
-        // 1. Necesitamos el perfil del usuario para saber su owner_id
+        // 1. Obtenemos el perfil del usuario autenticado de forma limpia
         const profileData = await getUserProfile();
         
         if (profileData && profileData.owner_profile) {
           const ownerId = profileData.owner_profile.id;
           
-          // 2. Con el ownerId, buscamos sus reservas
+          // 2. Traemos las reservas de ese dueño
           const bookingsData = await getUserBookings("owner", ownerId);
           setReservas(bookingsData);
         }
@@ -35,34 +33,73 @@ export default function MisReservas() {
     fetchReservas();
   }, []);
 
-  // Filtrado lógico de los datos
-  const reservasFiltradas = filtroEstado === "todas" 
-    ? reservas 
-    : reservas.filter(r => r.status === filtroEstado);
-
-  // Helper para pintar badges de estado con estilo profesional
-  const getBadgeEstado = (estado) => {
-    switch (estado) {
-      case "pendiente":
-        return <span className="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full border border-amber-300">⏳ Pendiente</span>;
-      case "confirmada":
-        return <span className="bg-[#7FE3D8]/40 text-[#004D44] text-xs font-bold px-3 py-1 rounded-full border border-[#7FE3D8]">✓ Confirmada</span>;
-      case "completada":
-        return <span className="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full border border-blue-300">✨ Completada</span>;
-      default:
-        return <span className="bg-gray-100 text-gray-800 text-xs font-bold px-3 py-1 rounded-full">{estado}</span>;
+  // Mapear filtros lógicos defendiéndonos de posibles estados en español e inglés
+  const reservasFiltradas = reservas.filter(r => {
+    if (filtroEstado === "todas") return true;
+    
+    const statusLower = r.status?.toLowerCase();
+    
+    if (filtroEstado === "pendiente") {
+      return statusLower === "pendiente" || statusLower === "pending";
     }
+    if (filtroEstado === "confirmada") {
+      return statusLower === "confirmada" || statusLower === "aceptado" || statusLower === "confirmado";
+    }
+    if (filtroEstado === "completada") {
+      return statusLower === "completada" || statusLower === "completado";
+    }
+    
+    return statusLower === filtroEstado;
+  });
+
+  // Helper para pintar badges de estado con flexibilidad multilenguaje
+  const getBadgeEstado = (estado) => {
+    const est = estado?.toLowerCase();
+    if (est === "pendiente" || est === "pending") {
+      return (
+        <span className="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full border border-amber-300">
+          ⏳ Pendiente
+        </span>
+      );
+    }
+    if (est === "confirmada" || est === "confirmado" || est === "aceptado") {
+      return (
+        <span className="bg-[#7FE3D8]/40 text-[#004D44] text-xs font-bold px-3 py-1 rounded-full border border-[#7FE3D8]">
+          ✓ Confirmada
+        </span>
+      );
+    }
+    if (est === "completada" || est === "completado") {
+      return (
+        <span className="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full border border-blue-300">
+          ✨ Completada
+        </span>
+      );
+    }
+    return (
+      <span className="bg-gray-100 text-gray-800 text-xs font-bold px-3 py-1 rounded-full capitalize">
+        {estado}
+      </span>
+    );
   };
 
   // Helper para formatear el tipo de servicio estéticamente
   const getIconServicio = (tipo) => {
-    if (tipo === "paseo") return "🚶 Paseo de Perros";
-    if (tipo === "hotel") return "🏠 Alojamiento Completo";
-    if (tipo === "cuidado_diurno") return "🐾 Guardería de Mascotas";
-    return "🐕 Servicio Mascota";
+    const t = tipo?.toLowerCase();
+    if (t === "paseo") return "🚶 Paseo de Perros";
+    if (t === "hotel") return "🏠 Alojamiento Completo";
+    if (t === "guarderia" || t === "daycare") return "🐾 Guardería de Mascotas";
+    if (t === "nightcare") return "🌙 Cuidado Nocturno";
+    return "🐕 Servicio Especial";
   };
 
-if (cargando) return <div className="min-h-screen flex items-center justify-center">Cargando reservas...</div>;
+  if (cargando) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F0F7F7]">
+        <p className="text-gray-500 text-sm">Cargando tus reservas...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F0F7F7] font-sans antialiased text-[#2D3748] py-8 px-4">
@@ -79,7 +116,7 @@ if (cargando) return <div className="min-h-screen flex items-center justify-cent
           </span>
         </div>
 
-        {/* Filtros / Pestañas de Navegación */}
+        {/* Filtros de Navegación */}
         <div className="flex bg-[#EFE9E2] p-1.5 rounded-xl border border-[#EADBCE] overflow-x-auto gap-1">
           {["todas", "pendiente", "confirmada", "completada"].map((tab) => (
             <button
@@ -121,13 +158,13 @@ if (cargando) return <div className="min-h-screen flex items-center justify-cent
                     {/* Bloque Cuidador */}
                     <div className="flex items-center gap-3">
                       <img 
-                        src={res.cuidador_foto} 
-                        alt={res.cuidador_nombre} 
+                        src={res.cuidador_foto || "https://placehold.co/150x150"} 
+                        alt={res.cuidador_nombre || "Cuidador"} 
                         className="w-12 h-12 rounded-xl object-cover border border-[#EADBCE]"
                       />
                       <div>
-                        <span className="text-[10px] uppercase text-gray-400 font-bold block">Servicio para Mascota ID: {res.pet_id}</span>
-                        <h3 className="text-sm font-bold text-[#1A202C]">Cuidador ID: {res.petsitter_id}</h3>
+                        <span className="text-[10px] uppercase text-gray-400 font-bold block">Reserva ID: #{res.id}</span>
+                        <h3 className="text-sm font-bold text-[#1A202C]">{res.cuidador_nombre || "Profesional"}</h3>
                         <p className="text-xs text-[#6338CC] font-medium">{getIconServicio(res.service_type)}</p>
                       </div>
                     </div>
@@ -153,11 +190,11 @@ if (cargando) return <div className="min-h-screen flex items-center justify-cent
                   {/* Mascota y Comentarios Adicionales */}
                   <div className="text-xs space-y-1 pt-1">
                     <p className="text-gray-700">
-                      🐾 <span className="font-bold text-gray-900">Mascota protegida:</span> {res.mascota_nombre}
+                      🐾 <span className="font-bold text-gray-900">Mascota protegida:</span> {res.mascota_nombre || "Mascota"}
                     </p>
-                    {res.comentarios && (
+                    {res.comments && (
                       <p className="text-gray-600 bg-white/60 p-2.5 rounded-lg border border-[#EADBCE]/40 italic">
-                        " {res.comentarios} "
+                        " {res.comments} "
                       </p>
                     )}
                   </div>
@@ -174,17 +211,17 @@ if (cargando) return <div className="min-h-screen flex items-center justify-cent
 
                   {/* Acciones contextuales según el estado */}
                   <div className="flex gap-2 w-full sm:w-auto">
-                    {res.status === "pending" && (
+                    {(res.status === "pending" || res.status === "pendiente") && (
                       <button className="w-full sm:w-auto bg-white hover:bg-red-50 text-red-600 border border-red-200 text-xs font-bold py-2 px-4 rounded-xl transition">
                         Cancelar Solicitud
                       </button>
                     )}
-                    {res.estado === "confirmada" && (
+                    {(res.status === "confirmada" || res.status === "aceptado" || res.status === "confirmado") && (
                       <button className="w-full sm:w-auto bg-[#6338CC] hover:bg-[#522cb3] text-white text-xs font-bold py-2 px-4 rounded-xl transition">
                         💬 Chat con Cuidador
                       </button>
                     )}
-                    {res.estado === "completada" && (
+                    {(res.status === "completada" || res.status === "completado") && (
                       <button className="w-full sm:w-auto bg-[#7FE3D8] hover:bg-[#68cfc4] text-[#004D44] text-xs font-bold py-2 px-4 rounded-xl transition">
                         ⭐ Dejar una Reseña
                       </button>
@@ -195,7 +232,7 @@ if (cargando) return <div className="min-h-screen flex items-center justify-cent
               </div>
             ))
           ) : (
-            /* Estado vacío por si no hay reservas con ese filtro */
+            /* Estado vacío */
             <div className="bg-[#FAF6F0] rounded-2xl border border-[#EADBCE] p-12 text-center space-y-3 shadow-sm">
               <span className="text-4xl">📭</span>
               <h3 className="text-md font-bold text-gray-700">No tienes reservas en este estado</h3>

@@ -4,6 +4,7 @@ from models.booking import Booking
 from models.user import Owner, Petsitter
 from models.pets import Pet
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 bookings_bp = Blueprint('bookings_bp', __name__)
 
@@ -40,7 +41,7 @@ def create_booking():
     if not end_date:
         end_date = start_date
 
-    total_price = 8.0
+    total_price = Decimal('8.0')
     
     try:
         # REFACTORIZACIÓN:  (días y horas)
@@ -84,28 +85,33 @@ def create_booking():
             # Si el servicio cruza la medianoche, ajustamos la fecha de fin
             if dt_end.date() > d1:
                 d2 = dt_end.date()
+        
+        # Cálculo de precio usando Decimal
+        days_dec = Decimal(str(days))
+        hours_dec = Decimal(str(hours_calculated))    
+
 
         if service_type == "hotel":
             if not petsitter.offers_hotel:
                  return jsonify({"msg": "Este cuidador no ofrece servicio de hotel"}), 400
-            total_price = days * (petsitter.price_per_night or 0.0)
+            total_price = days_dec * (petsitter.price_per_night or Decimal (0.0))
 
         elif service_type == "nightcare":
             if not petsitter.offers_nightcare:
                  return jsonify({"msg": "Este cuidador no ofrece servicio de cuidado nocturno"}), 400
-            total_price = days * (petsitter.price_per_night or 0.0)
+            total_price = days_dec * (petsitter.price_per_night or Decimal (0.0))
 
         elif service_type == "paseo":
             if not petsitter.offers_walk:
                  return jsonify({"msg": "Este cuidador no ofrece servicio de paseo"}), 400
             
-            total_price = days * hours_calculated* (petsitter.price_per_hour or 0.0)
+            total_price = days_dec * hours_dec * (petsitter.price_per_hour or Decimal (0.0))
 
         elif service_type == "guarderia":
             if not petsitter.offers_daycare:
                   return jsonify({"msg": "Este cuidador no ofrece servicio de guardería"}), 400
             
-            total_price = days * hours_calculated * (petsitter.price_per_hour or 0.0)
+            total_price = days_dec * hours_dec * (petsitter.price_per_hour or Decimal (0.0))
         else:
             return jsonify({"msg": "Tipo de servicio no válido"}), 400
 
