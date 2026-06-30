@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { getPublicProfile, getMyPets, getUserProfile, createBooking } from "@/Services/api";
 
 export default function PerfilCuidadorDinamico() {
     const { id } = useParams();
@@ -30,12 +31,10 @@ export default function PerfilCuidadorDinamico() {
     useEffect(() => {
         const fetchCuidador = async () => {
             try {
-                const res = await fetch(`http://localhost:5000/api/profile/${id}`);
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.msg || "Error al cargar cuidador");
+                const data = await getPublicProfile(id);
                 setCuidador(data.profile);
             } catch (err) {
-                setError(err.message);
+                setError(err.message || "Error al cargar cuidador");
             } finally {
                 setLoading(false);
             }
@@ -43,17 +42,13 @@ export default function PerfilCuidadorDinamico() {
         fetchCuidador();
     }, [id]);
 
-    // Cargar mascotas del usuario autenticado
     useEffect(() => {
         const fetchMascotas = async () => {
-            const token = localStorage.getItem("token");
+            const token = localStorage.getItem("TOKENJWT"); 
             if (!token) return;
             try {
-                const res = await fetch("http://localhost:5000/api/pets", {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                const data = await res.json();
-                if (res.ok) setMascotas(data);
+                const data = await getMyPets();
+                setMascotas(data);
             } catch (err) {
                 console.error("Error cargando mascotas:", err);
             }
@@ -68,7 +63,8 @@ export default function PerfilCuidadorDinamico() {
     const handleReserva = async () => {
         setBookingLoading(true);
         setBookingError(null);
-        const token = localStorage.getItem("token");
+        
+        const token = localStorage.getItem("TOKENJWT");
 
         if (!token) {
             setBookingError("Debes iniciar sesión para hacer una reserva");
@@ -83,37 +79,33 @@ export default function PerfilCuidadorDinamico() {
         }
 
         try {
-            // Obtener perfil del usuario para sacar owner_id
-            const profileRes = await fetch("http://localhost:5000/api/profile/me", {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const profileData = await profileRes.json();
-            const owner_id = profileData.profile?.id;
+            const profileData = await getUserProfile();
+            
+            const owner_id = profileData.owner_profile?.id;
 
-            const res = await fetch("http://localhost:5000/api/bookings", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    owner_id: owner_id,
-                    petsitter_id: parseInt(id),
-                    pet_id: parseInt(formData.pet_id),
-                    service_type: formData.service_type,
-                    start_date: formData.start_date,
-                    end_date: formData.end_date,
-                    start_time: formData.start_time || null,
-                    end_time: formData.end_time || null,
-                    comments: formData.comments
-                })
+            if (!owner_id) {
+                throw new Error("No se encontró tu perfil de dueño. Asegúrate de tenerlo configurado.");
+            }
+
+            if (!cuidador?.id) {
+                throw new Error("No se pudo obtener el identificador único del cuidador.");
+            }
+
+            await createBooking({
+                owner_id: owner_id,
+                petsitter_id: cuidador.id, 
+                pet_id: parseInt(formData.pet_id),
+                service_type: formData.service_type,
+                start_date: formData.start_date,
+                end_date: formData.end_date,
+                start_time: formData.start_time || null,
+                end_time: formData.end_time || null,
+                comments: formData.comments
             });
 
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.msg || "Error al crear la reserva");
             setBookingSuccess(true);
         } catch (err) {
-            setBookingError(err.message);
+            setBookingError(err.message || "Error al crear la reserva");
         } finally {
             setBookingLoading(false);
         }
@@ -262,7 +254,7 @@ export default function PerfilCuidadorDinamico() {
                                             ))}
                                         </select>
                                         {mascotas.length === 0 && (
-                                            <p className="text-xs text-amber-600 mt-1">⚠️ No tienes mascotas registradas. <a href="/gestionmascotas" className="underline">Agregar mascota</a></p>
+                                            <p className="text-xs text-amber-600 mt-1">⚠️ No tienes mascotas registradas. <a href="/perfil-owner" className="underline">Agregar mascota</a></p>
                                         )}
                                     </div>
 

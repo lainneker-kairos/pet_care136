@@ -69,21 +69,19 @@ def create_pet(current_user_id):
 def update_pet(pet_id):
     try:
         # 1. Buscar la mascota en la base de datos por su ID
-        pet = Pet.query.get(pet_id)
+        pet = db.session.get(Pet, pet_id)
         if not pet:
             return jsonify({"error": "Mascota no encontrada"}), 404
 
         # 2. Obtener los datos enviados desde el frontend (PerfilOwner.jsx)
         data = request.get_json()
 
-        # 3. Actualizar únicamente los campos que se hayan recibido en el JSON
+        # Actualizar campos dinámicamente si vienen en el body
         pet.name = data.get('name', pet.name)
         pet.species = data.get('species', pet.species)
         pet.breed = data.get('breed', pet.breed)
         pet.age = data.get('age', pet.age)
         pet.size = data.get('size', pet.size)
-        
-        # Campos de comportamiento, salud y adicionales
         pet.tags = data.get('tags', pet.tags)
         pet.behavior = data.get('behavior', pet.behavior)
         pet.allergies = data.get('allergies', pet.allergies)
@@ -91,34 +89,21 @@ def update_pet(pet_id):
         pet.special_notes = data.get('special_notes', pet.special_notes)
         pet.photo = data.get('photo', pet.photo)
 
-        # 4. Confirmar los cambios en la base de datos
         db.session.commit()
 
         # 5. Responder con los datos actualizados de la mascota
         return jsonify({
-            "message": "Mascota actualizada correctamente",
-            "pet": {
-                "id": pet.id,
-                "name": pet.name,
-                "species": pet.species,
-                "breed": pet.breed,
-                "age": pet.age,
-                "size": pet.size,
-                "tags": pet.tags,
-                "behavior": pet.behavior,
-                "allergies": pet.allergies,
-                "medications": pet.medications,
-                "special_notes": pet.special_notes,
-                "photo": pet.photo
-            }
+        "message": "Mascota actualizada correctamente",
+        "pet": pet.serialize()
         }), 200
+
     except Exception as e:
         db.session.rollback() # Revierte la transacción en caso de error de base de datos
         return jsonify({"error": str(e)}), 500
 
 
 # Metodo para eliminar una mascota
-@pets_bp.route('/api/pets/<int:pet_id>', methods=['DELETE'])
+@pets_bp.route('/pets/<int:pet_id>', methods=['DELETE'])
 @token_required
 def delete_pet(current_user_id, pet_id):
     # Buscamos la mascota por su ID
