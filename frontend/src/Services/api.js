@@ -127,7 +127,7 @@ export const updateOwnerProfile = async (data) => {
 // crear el perfil de cuidador (Petsitter)
 export const createPetsitterProfile = async (data) => {
     const response = await fetch(`${API_URL}/profile/petsitter`, {
-        method: '',
+        method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify(data)
     });
