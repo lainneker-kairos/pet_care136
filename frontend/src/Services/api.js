@@ -43,7 +43,12 @@ const getAuthHeaders = () => {
     }
 }
 
-//-- Registro --//
+// ==========================================
+// RUTAS DE AUTENTICACIÓN
+// ==========================================
+
+// Registrar nuevo usuario base (con rol 'owner')
+
 export const registerUser = async (data) => {
     const result = await fetch(`${API_URL}/register`, {
         method: 'POST',
@@ -53,7 +58,7 @@ export const registerUser = async (data) => {
     return await result.json()
 };
 
-//-- Auth ---- //
+// Autenticar e iniciar sesión
 export const loginUser = async (data) => {
     const result = await fetch(`${API_URL}/login`, {
         method: 'POST',
@@ -116,6 +121,28 @@ export const updateOwnerProfile = async (data) => {
         body: JSON.stringify(data)
     });
     if (!response.ok) throw new Error("Error al actualizar el perfil");
+    return await response.json();
+};
+
+// crear el perfil de cuidador (Petsitter)
+export const createPetsitterProfile = async (data) => {
+    const response = await fetch(`${API_URL}/profile/petsitter`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error("Error al crear el perfil");
+    return await response.json();
+};
+
+// Actualizar el perfil del cuidador (Petsitter)
+export const updatePetsitterProfile = async (data) => {
+    const response = await fetch(`${API_URL}/profile/petsitter`, {
+        method: 'PATCH',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error("Error al actualizar el perfil de cuidador");
     return await response.json();
 };
 

@@ -12,6 +12,9 @@ user_bp = Blueprint('user_bp', __name__)
 def get_users():
     return jsonify({"msg": "Todo bien"})
 
+# ==========================================
+# REGISTRO DE USUARIOS
+# ==========================================
 @user_bp.route('/register', methods=['POST'])
 def register():
     data = request.json
@@ -20,7 +23,6 @@ def register():
 
     email = data.get('email')
     password = data.get('password')
-    role = data.get('role', 'owner')
     name = data.get('name')
 
     if not email or not password or not name:
@@ -35,16 +37,21 @@ def register():
         name=name,
         email=email,
         password=hashed_password,
-        role='owner',
+        role='owner', # Por defecto, el usuario se registra como propietario
         is_active=True
     )
     db.session.add(new_user)
     db.session.flush()
 
+    # ==========================================
+    # ACTUALIZACIÓN DEL PERFIL DUEÑO (Owner)
+    # ==========================================
+
     new_profile = Owner(
         user_id=new_user.id,
         name=name,        
     )
+
     db.session.add(new_profile)
     db.session.commit()
 
@@ -52,54 +59,6 @@ def register():
         "msg": "Usuario y perfil creados exitosamente",
         "user": new_user.serialize()
     }), 201
-
-# ==========================================
-# CONVERTIRSE EN CUIDADOR (Petsitter)
-# ==========================================
-@user_bp.route('/bepetsitter', methods=['POST'])
-@token_required
-def bepetsitter(current_user_id):
-    user = db.session.get(User, current_user_id)
-    if not user:
-        return jsonify({"msg": "Usuario no encontrado"}), 404
-
-    if user.role != 'owner':
-        return jsonify({"msg": "Solo propietarios pueden convertirse en cuidadores"}), 400
-    
-    data = request.json
-    if not data:
-        return jsonify({"msg": "Faltan datos del perfil"}), 400
-    
-    # buscar y elimina el perfil de owner
-    old_owner_profile = db.session.execute(db.select(Owner).filter_by(user_id=user.id)).scalar_one_or_none()
-    name = data.get('name')
-    if not name and old_owner_profile:
-        name = old_owner_profile.name
-
-    if old_owner_profile:
-        db.session.delete(old_owner_profile)
-
-    # Actualizar el rol del usuario
-    user.role = 'petsitter'
-
-    # Crear el nuevo perfil de cuidador
-    new_profile = Petsitter(
-        user_id=user.id,
-        name=user.owner_profile.name if user.owner_profile else "",
-        phone=data.get('phone'),
-        city=data.get('city'),
-        neighborhood=data.get('neighborhood'),
-        bio=data.get('bio', ""),
-        profile_pic=data.get('profile_pic', ""),
-        experience_years=data.get('experience_years', 0),
-        # certifications=data.get('certifications', ""),
-        price_per_hour=data.get('price_per_hour', 0.0),
-        price_per_night=data.get('price_per_night', 0.0)
-    )
-    db.session.add(new_profile)
-    db.session.commit()
-
-    return jsonify({"msg": "Has sido convertido en cuidador"}), 200
 
 # ==========================================
 # INICIO DE SESIÓN
@@ -120,34 +79,21 @@ def login():
     if not user.is_active:
         return jsonify({"msg": "Cuenta de usuario desactivada"}), 403
 
-    # Obtener información básica de perfil para el frontend
-    profile_id = None
-    profile_name = ""
-    if user.role == 'owner' and user.owner_profile:
-        profile_id = user.owner_profile.id
-        profile_name = user.owner_profile.name
-    elif user.role == 'petsitter' and user.petsitter_profile:
-        profile_id = user.petsitter_profile.id
-        profile_name = user.petsitter_profile.name
-
-    # Generación de token JWT con expiración de 24 horas (idéntico a tu lógica original)
     expiration_time = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
     jwt_token = jwt.encode(
-        {"sub": str(user.id), "exp": expiration_time},
-        current_app.config['SECRET_KEY'],
+        {
+            "sub": str(user.id),  
+            "exp": expiration_time
+        },
+        current_app.config['SECRET_KEY'],  
         algorithm="HS256"
     )
-
+    
     return jsonify({
         "msg": "Sesión iniciada correctamente",
         "user": user.serialize(),
-        "profile": {
-            "profile_id": profile_id,
-            "name": profile_name
-        },
         "token": jwt_token
     }), 200
-
 
 # ==========================================
 # OBTENER PERFIL PROPIO 
@@ -158,19 +104,119 @@ def get_my_profile(current_user_id):
     user = db.session.get(User, current_user_id)
     if not user:
         return jsonify({"msg": "Usuario no encontrado"}), 404
-
-    # Serializar el perfil completo basado en el rol del usuario
-    profile_data = None
-    if user.role == 'owner' and user.owner_profile:
-        profile_data = user.owner_profile.serialize()
-    elif user.role == 'petsitter' and user.petsitter_profile:
-        profile_data = user.petsitter_profile.serialize()
-
+    
     return jsonify({
         "user": user.serialize(),
-        "profile": profile_data
+        "owner_profile": user.owner_profile.serialize() if user.owner_profile else None,
+        "petsitter_profile": user.petsitter_profile.serialize() if user.petsitter_profile else None
     }), 200
 
+# ==========================================
+# ACTUALIZACIÓN PERFIL DUEÑO (PATCH)
+# ==========================================
+@user_bp.route('/profile/owner', methods=['PATCH'])
+@token_required
+def update_owner_profile(current_user_id):
+    data = request.json
+    user = db.session.get(User, current_user_id)
+    
+    if not user or not user.owner_profile:
+        return jsonify({"msg": "Perfil de dueño no encontrado"}), 404
+
+    profile = user.owner_profile
+    
+    #  Lista de los campos permitidos para actualizar dinámicamente
+    allowed_fields = ['name', 'phone', 'city', 'neighborhood', 'bio', 'profile_pic', 'max_budget']
+    
+    for key, value in data.items():
+        if key in allowed_fields:
+            setattr(profile, key, value) # para actualizar dinámicamente solo lo que se envió
+
+    db.session.commit()
+    return jsonify({
+        "msg": "Perfil de dueño actualizado exitosamente",
+        "owner_profile": profile.serialize()
+    }), 200
+
+# ==========================================
+# CONVERTIRSE EN CUIDADOR (crear perfil de Petsitter)
+# ==========================================
+@user_bp.route('/profile/petsitter', methods=['POST'])
+@token_required
+def bepetsitter(current_user_id):
+    user = db.session.get(User, current_user_id)
+    if not user:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+
+    if user.petsitter_profile:
+        return jsonify({"msg": "Este usuario ya tiene un perfil de cuidador"}), 400
+    
+    data = request.json or {}
+    
+    name = data.get('name') or (user.owner_profile.name if user.owner_profile else "Cuidador")
+    phone = data.get('phone') or (user.owner_profile.phone if user.owner_profile else "")
+    city = data.get('city') or (user.owner_profile.city if user.owner_profile else "")
+
+    # Actualizar el rol del usuario
+    user.role = 'petsitter'  # Ahora el usuario puede ser dueño y cuidador
+
+    # Crear el nuevo perfil de cuidador
+    new_profile = Petsitter(
+        user_id=user.id,
+        name=name,
+        phone=phone,
+        city=city,
+        neighborhood=data.get('neighborhood', ""),
+        bio=data.get('bio', ""),
+        profile_pic=data.get('profile_pic', ""),
+        experience_years=data.get('experience_years', 0),
+        price_per_hour=data.get('price_per_hour', 0.0),
+        price_per_night=data.get('price_per_night', 0.0)
+    )
+    db.session.add(new_profile)
+    db.session.commit()
+
+    return jsonify({
+        "msg": "¡Felicidades! Ahora tienes un perfil de cuidador.",
+        "petsitter_profile": new_profile.serialize()
+    }), 201
+
+# ==========================================
+# ACTUALIZACIÓN PARCIAL: PERFIL CUIDADOR (PATCH)
+# ==========================================
+@user_bp.route('/profile/petsitter', methods=['PATCH'])
+@token_required
+def update_petsitter_profile(current_user_id):
+    data = request.json
+    user = db.session.get(User, current_user_id)
+    
+    if not user or not user.petsitter_profile:
+        return jsonify({"msg": "Perfil de cuidador no encontrado. Regístrate como cuidador primero."}), 404
+
+    profile = user.petsitter_profile
+    
+    # Campos permitidos para Petsitter
+    allowed_fields = [
+        'name', 'phone', 'city', 'neighborhood', 'bio', 'profile_pic', 
+        'experience_years', 'certifications', 'available_days', 'accepted_dog_sizes',
+        'offers_walk', 'offers_hotel', 'offers_daycare', 'offers_nightcare',
+        'price_per_hour', 'price_per_night', 'google_calendar_id'
+    ]
+    
+    for key, value in data.items():
+        if key in allowed_fields:
+            setattr(profile, key, value) # setattr asigna el valor dinámicamente
+
+    db.session.commit()
+    return jsonify({
+        "msg": "Perfil de cuidador actualizado exitosamente",
+        "petsitter_profile": profile.serialize()
+    }), 200
+
+
+# ==========================================
+# OBTENER PERFIL DE OTRO USUARIO (Público)
+# ==========================================
 @user_bp.route('/profile/<int:user_id>', methods=['GET'])
 def get_public_profile(user_id):
     user = db.session.get(User, user_id)
@@ -184,67 +230,4 @@ def get_public_profile(user_id):
         "email": user.email,
         "role": user.role,
         "profile": profile_data
-    }), 200
-
-
-# ==========================================
-# ACTUALIZACIÓN DE PERFIL PROPIO 
-# ==========================================
-@user_bp.route('/profile/update', methods=['PUT'])
-@token_required
-def update_profile(current_user_id):
-    data = request.json
-    user = db.session.get(User, current_user_id)
-    if not user:
-        return jsonify({"msg": "Usuario no encontrado"}), 404
-
-    profile = None
-    if user.role == 'owner':
-        profile = user.owner_profile
-        if not profile:
-            return jsonify({"msg": "Perfil de dueño no encontrado"}), 404
-        
-        # Actualización de campos permitidos para Owner
-        profile.name = data.get('name', profile.name)
-        profile.phone = data.get('phone', profile.phone)
-        profile.city = data.get('city', profile.city)
-        profile.neighborhood = data.get('neighborhood', profile.neighborhood)
-        profile.bio = data.get('bio', profile.bio)
-        profile.profile_pic = data.get('profile_pic', profile.profile_pic)
-        profile.max_budget = data.get('max_budget', profile.max_budget)
-
-    
-
-    elif user.role == 'petsitter':
-        profile = user.petsitter_profile
-        if not profile:
-            return jsonify({"msg": "Perfil de cuidador no encontrado"}), 404
-        
-        # Actualización de campos permitidos para Petsitter
-        profile.name = data.get('name', profile.name)
-        profile.phone = data.get('phone', profile.phone)
-        profile.city = data.get('city', profile.city)
-        profile.neighborhood = data.get('neighborhood', profile.neighborhood)
-        profile.bio = data.get('bio', profile.bio)
-        profile.profile_pic = data.get('profile_pic', profile.profile_pic)
-        profile.experience_years = data.get('experience_years', profile.experience_years)
-        profile.certifications = data.get('certifications', profile.certifications)
-        profile.available_days = data.get('available_days', profile.available_days)
-        profile.accepted_dog_sizes = data.get('accepted_dog_sizes', profile.accepted_dog_sizes)
-        
-        # Servicios (booleanos)
-        profile.offers_walk = data.get('offers_walk', profile.offers_walk)
-        profile.offers_hotel = data.get('offers_hotel', profile.offers_hotel)
-        profile.offers_daycare = data.get('offers_daycare', profile.offers_daycare)
-        profile.offers_nightcare = data.get('offers_nightcare', profile.offers_nightcare)
-        
-        # Precios
-        profile.price_per_hour = data.get('price_per_hour', profile.price_per_hour)
-        profile.price_per_night = data.get('price_per_night', profile.price_per_night)
-        profile.google_calendar_id = data.get('google_calendar_id', profile.google_calendar_id)
-
-    db.session.commit()
-    return jsonify({
-        "msg": "Perfil actualizado exitosamente",
-        "profile": profile.serialize()
     }), 200
