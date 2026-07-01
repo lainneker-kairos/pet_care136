@@ -22,9 +22,9 @@ export default function ListaCuidadores() {
                 service_type: serviceType,
                 start_date: startDate,
                 duration_hours: durationHours
-            });  
+            });
             console.log("Datos del backend:", data);
-            setListaCuidadores(data); 
+            setListaCuidadores(data);
         }
         fetchCuidadores();
     }, [])
@@ -33,13 +33,15 @@ export default function ListaCuidadores() {
         <div className="min-h-screen bg-[#F0F7F7] font-sans antialiased text-[#2D3748]">
 
             {/* Barra superior */}
-            <div className="bg-[#FAF6F0] border-b border-[#EADBCE] py-4 px-10 sticky top-0 z-10 shadow-sm flex items-center justify-between">
-                <h1 className="text-xl font-bold text-purple-700">
-                    🐾 Cuidadores disponibles en <span className="text-teal-700">{city || "tu zona"}</span>
-                </h1>
-                <span className="text-xs bg-[#7FE3D8] text-[#004D44] font-bold px-3 py-1.5 rounded-full">
-                    {listaCuidadores.length} cuidadores encontrados
-                </span>
+            <div className="py-6 px-4">
+                <div className="max-w-7xl mx-auto bg-[#FAF6F0] border border-[#EADBCE] py-4 px-10 rounded-2xl shadow-sm flex items-center justify-between">
+                    <h1 className="text-xl font-bold text-purple-700">
+                        🐾 Cuidadores disponibles en <span className="text-teal-700">{city || "tu zona"}</span>
+                    </h1>
+                    <span className="text-xs bg-[#7FE3D8] text-[#004D44] font-bold px-3 py-1.5 rounded-full">
+                        {listaCuidadores.length} cuidadores encontrados
+                    </span>
+                </div>
             </div>
 
             {/* Contenedor principal */}
@@ -62,7 +64,7 @@ export default function ListaCuidadores() {
 
                 {/* COLUMNA DEL MAPA */}
                 <div className="hidden lg:block lg:col-span-5">
-                    <div className="sticky top-24 w-full h-[400px] bg-[#FAF6F0] rounded-2xl border border-[#EADBCE] shadow-sm overflow-hidden flex flex-col items-center justify-center gap-4">
+                    <div className="sticky top-24 w-full h-[600px] bg-[#FAF6F0] rounded-2xl border border-[#EADBCE] shadow-sm overflow-hidden flex flex-col items-center justify-center gap-4">
                         <p className="text-4xl">🗺️</p>
                         <p className="text-sm font-bold text-gray-500">Mapa próximamente</p>
                         <p className="text-xs text-gray-400 text-center px-8">

@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 from dotenv import load_dotenv
 from database import db
 import os
+# Importacion de routes
 from routes.user import user_bp
 from routes.pets import pets_bp  
 from routes.booking import bookings_bp

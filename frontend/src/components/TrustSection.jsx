@@ -1,4 +1,4 @@
-import {ShieldCheck, Headphones, BriefcaseMedical} from "lucide-react";
+import {ShieldCheck, Headphones, Star} from "lucide-react";
 
 export default function TrustSection() {
     return (
@@ -51,12 +51,12 @@ export default function TrustSection() {
 
                             <div className="flex gap-4">
                                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-200">
-                                    <BriefcaseMedical size={20} />
+                                    <Star size={20} />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-gray-900">Seguro Veterinario</h3>
+                                    <h3 className="font-bold text-gray-900"> Sistema de valoraciones</h3>
                                     <p className="text-sm text-gray-600">
-                                        Todas las reservas incluyen cobertura médica básica.
+                                        Puedes ver las reseñas de otros dueños antes de elegir.
                                     </p>
                                 </div>
                             </div>

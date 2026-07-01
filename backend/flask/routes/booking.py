@@ -3,7 +3,8 @@ from database import db
 from models.booking import Booking
 from models.user import Owner, Petsitter
 from models.pets import Pet
-from datetime import datetime
+from datetime import datetime, timedelta
+from decimal import Decimal
 
 bookings_bp = Blueprint('bookings_bp', __name__)
 
@@ -21,10 +22,10 @@ def create_booking():
     end_date = data.get('end_date')  
 
     start_time = data.get('start_time')
-    end_time = data.get('end_time')
+    duration_hours = data.get('duration_hours')
     comments = data.get('comments')
 
-    if not all([owner_id, petsitter_id, pet_id, service_type, start_date, end_date]):
+    if not all([owner_id, petsitter_id, pet_id, service_type, start_date]):
          return jsonify({"msg": "Faltan campos requeridos para la reserva"}), 400
 
     owner = db.session.get(Owner, owner_id)
@@ -36,8 +37,11 @@ def create_booking():
 
     if pet.owner_id != owner.id:
         return jsonify({"msg": "La mascota seleccionada no pertenece al dueño"}), 403
+    
+    if not end_date:
+        end_date = start_date
 
-    total_price = 0.0
+    total_price = Decimal('8.0')
     
     try:
         # REFACTORIZACIÓN:  (días y horas)
@@ -50,48 +54,69 @@ def create_booking():
         if days == 0:
             days = 1 
 
-        t1_obj = datetime.strptime(start_time, "%H:%M").time() if start_time else None
-        t2_obj = datetime.strptime(end_time, "%H:%M").time() if end_time else None
+        t1_obj = None
+        if start_time:
+            time_str = start_time.replace("p. m.", "PM").replace("a. m.", "AM").strip()
+            formats_to_try = ["%H:%M", "%I:%M %p", "%H:%M:%S"]
+            for fmt in formats_to_try:
+                try:
+                    t1_obj = datetime.strptime(time_str, fmt).time()
+                    break
+                except ValueError:
+                    continue
+            if not t1_obj:
+                return jsonify({"msg": "Formato de hora de inicio inválido. Use HH:MM"}), 400
+
+        t2_obj = None
+        hours_calculated = 1.0 
+        
+        if duration_hours is not None:
+            try:
+                hours_calculated = float(duration_hours)
+            except ValueError:
+                return jsonify({"msg": "La duración en horas debe ser un número válido"}), 400
+
+        if t1_obj and (service_type in ["paseo", "guarderia"]):
+
+            dt_start = datetime.combine(d1, t1_obj)
+            dt_end = dt_start + timedelta (hours=hours_calculated)
+            t2_obj = dt_end.time()
             
-        # Calcular horas si se proporcionaron  
-        hours = 0.0
-        if t1_obj and t2_obj:
-            dt1 = datetime.combine(d1, t1_obj)
-            dt2 = datetime.combine(d1, t2_obj)
-            hours = (dt2 - dt1).total_seconds() / 3600.0             
-            if hours < 0:
-                hours += 24.0  # Cruce de medianoche
-            elif hours == 0:
-                hours = 1.0
-        else:
-            hours = 4.0
+            # Si el servicio cruza la medianoche, ajustamos la fecha de fin
+            if dt_end.date() > d1:
+                d2 = dt_end.date()
+        
+        # Cálculo de precio usando Decimal
+        days_dec = Decimal(str(days))
+        hours_dec = Decimal(str(hours_calculated))    
+
 
         if service_type == "hotel":
             if not petsitter.offers_hotel:
                  return jsonify({"msg": "Este cuidador no ofrece servicio de hotel"}), 400
-            total_price = days * (petsitter.price_per_night or 0.0)
+            total_price = days_dec * (petsitter.price_per_night or Decimal (0.0))
 
         elif service_type == "nightcare":
             if not petsitter.offers_nightcare:
                  return jsonify({"msg": "Este cuidador no ofrece servicio de cuidado nocturno"}), 400
-            total_price = days * (petsitter.price_per_night or 0.0)
+            total_price = days_dec * (petsitter.price_per_night or Decimal (0.0))
 
         elif service_type == "paseo":
             if not petsitter.offers_walk:
                  return jsonify({"msg": "Este cuidador no ofrece servicio de paseo"}), 400
             
-            total_price = days * hours * (petsitter.price_per_hour or 0.0)
+            total_price = days_dec * hours_dec * (petsitter.price_per_hour or Decimal (0.0))
 
         elif service_type == "guarderia":
             if not petsitter.offers_daycare:
                   return jsonify({"msg": "Este cuidador no ofrece servicio de guardería"}), 400
             
-            total_price = days * hours * (petsitter.price_per_hour or 0.0)
+            total_price = days_dec * hours_dec * (petsitter.price_per_hour or Decimal (0.0))
         else:
             return jsonify({"msg": "Tipo de servicio no válido"}), 400
 
-    except ValueError:
-        return jsonify({"msg": "Formato de fechas u horas inválido"}), 400
+    except ValueError as e:
+        return jsonify({"msg": f"Formato de fechas o datos inválidos {str(e)}"}), 400
 
     # Crear la Reserva
     new_booking = Booking(

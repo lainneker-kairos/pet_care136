@@ -16,11 +16,8 @@ export default function Login() {
   // Estados extra para el diseño (mostrar/ocultar contraseñas)
   const [showPassword, setShowPassword] = useState(false);
 
-<<<<<<< HEAD
   // función de validación exacta
-=======
 
->>>>>>> 96e6ac6d500f4470bb7a3f0d6d26f0f60f57df69
   const validateForm = () => {
     const newErrors = {};
 
@@ -49,46 +46,24 @@ export default function Login() {
     try {
       // lógica de registro real (API call)
       
-<<<<<<< HEAD
-      let data = await loginUser({ email: formData["email"], password: formData["password"] })
-
-      // Si la respuesta trae el error que manejamos en api.js o el backend falló
-      if (data.error || !data.token) {
-        alert(data.message || "Credenciales incorrectas. Inténtalo de nuevo.");
-        setIsLoading(false);
-        return; // Detenemos la ejecución aquí
-      }
-
-      // Guardamos el token 
-      localStorage.setItem("TOKENJWT", data.token);
-      
-      // Guardamos el nombre tal y como viene directamente del backend
-      localStorage.setItem("userName", data.profile.name);
-
-      setIsLoading(false);
-      alert("¡Sesión activa!");
-
-      setFormData({
-        email: "",
-        password: "",
-      });
-
-      window.location.href = "/";
-
-=======
       const data = await loginUser({ email: formData.email, password: formData.password });
       console.log("esto nos trae data", data);
+      if (!data.user) {
+        //esta validacion para mostrar el mensaje de error del backend o uno genérico y detener la ejecución
+        alert(data.msg || data.error || data.message || "Credenciales inválidas. Verifica tu correo y contraseña.");
+        return;
+      }
       
 
       localStorage.setItem("TOKENJWT", data.token);
       localStorage.setItem("userName", data.user.name);
+      localStorage.setItem("userRole", data.user.role);
 
       setFormData({ email: "", password: "" });
       
       window.location.href = "/";
 
 
->>>>>>> 96e6ac6d500f4470bb7a3f0d6d26f0f60f57df69
     } catch (error) {
       console.error("Error en el login:", error);
       alert("Ocurrió un error inesperado. Por favor, vuelve a intentarlo.");

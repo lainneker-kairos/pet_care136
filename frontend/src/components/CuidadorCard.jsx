@@ -7,7 +7,7 @@ export default function CuidadorCard({ cuidador }) {
             {/* Foto del cuidador */}
             <div className="w-full h-48 overflow-hidden">
                 <img 
-                    src={cuidador.profile_pic ? cuidador.profile_pic :  "https://placehold.co/300x200"}
+                    src={cuidador.profile_pic ? cuidador.profile_pic :  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcStJuyNXzGveIgMbrPYW0fIzVvXADqEAFuYFwP9s87UyA&s=10"}
                     alt={cuidador.name}
                     className="w-full h-48 object-cover" />
             </div>
@@ -65,7 +65,7 @@ export default function CuidadorCard({ cuidador }) {
             {/* Botón Ver perfil */}
             <div className="px-5 pb-5">
                 <Link
-                    href={`/cuidador/${cuidador.id}`}
+                    href={`/cuidador/${cuidador.user_id}`}
                     className="block w-full text-center bg-[#6338CC] hover:bg-[#522cb3] text-white font-bold text-sm py-2.5 rounded-xl transition">
                     Ver perfil
                 </Link>
