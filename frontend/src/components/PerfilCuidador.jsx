@@ -630,6 +630,12 @@ export default function PerfilCuidador() {
               >
                 ⚙️ Configurar Mis Tarifas
               </button>
+              <button className="w-full bg-[#6338CC] hover:bg-[#522cb3] text-white font-semibold py-3 px-4 rounded-xl transition duration-200 flex items-center justify-center gap-2 shadow-md">
+               <Link 
+               href="/misreservas">
+                Ver Mis Reservas
+                </Link>
+              </button>
             </div>
 
             {/* Disponibilidad */}
