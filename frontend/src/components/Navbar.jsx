@@ -57,9 +57,9 @@ return (
                     <Image
                         src="/logo_petcare.svg"
                         alt="Logo de PetCare"
-                        width={130} 
-                        height={40}
-                        className="h-9 w-auto" 
+                        width={150} 
+                        height={50}
+                        className="h-14 w-auto" 
                     />
                 </Link>
 
