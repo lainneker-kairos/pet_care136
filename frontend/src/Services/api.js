@@ -229,3 +229,18 @@ export const createBooking = async (bookingData) => {
     if (!response.ok) throw new Error("Error al crear la reserva");
     return await response.json();
 };
+
+// Cambiar estado de una reserva (cancelar)
+export const updateBookingStatus = async (bookingId, newStatus) => {
+    const response = await fetch(`${API_URL}/bookings/${bookingId}/status`, {
+        method: 'PATCH',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ status: newStatus }),
+    });
+    
+    if (!response.ok) {
+        throw new Error("Error al cambiar el estado de la reserva");
+    }
+    
+    return await response.json();
+};
