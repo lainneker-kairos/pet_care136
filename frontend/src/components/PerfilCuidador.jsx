@@ -6,6 +6,7 @@ import {
   createPetsitterProfile,
   updatePetsitterProfile
 } from "../Services/api";
+import Link from "next/link";
 
 export default function PerfilCuidador() {
   const [profile, setProfile] = useState(null);
@@ -267,12 +268,12 @@ export default function PerfilCuidador() {
       <div className="max-w-6xl mx-auto px-4 py-8">
 
         {/* Encabezado Principal */}
-          <div className="bg-[#FAF6F0] p-6 rounded-2xl border border-[#EADBCE] shadow-sm">
-            <h1 className="text-2xl font-extrabold text-[#6338CC]">Mi Perfil de Cuidador</h1>
-            <p className="text-sm text-gray-500">
-              Administra tus datos de contacto personales.
-            </p>
-          </div>
+        <div className="bg-[#FAF6F0] p-6 rounded-2xl border border-[#EADBCE] shadow-sm">
+          <h1 className="text-2xl font-extrabold text-[#6338CC]">Mi Perfil de Cuidador</h1>
+          <p className="text-sm text-gray-500">
+            Administra tus datos de contacto personales.
+          </p>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
 
