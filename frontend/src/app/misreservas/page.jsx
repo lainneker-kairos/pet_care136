@@ -22,6 +22,8 @@ export default function MisReservas() {
           // 2. Traemos las reservas de ese dueño
           const bookingsData = await getUserBookings("owner", ownerId);
           setReservas(bookingsData);
+          console.log(reservas);
+          
         }
       } catch (error) {
         console.error("Error al cargar reservas:", error);
@@ -164,7 +166,7 @@ export default function MisReservas() {
                       />
                       <div>
                         <span className="text-[10px] uppercase text-gray-400 font-bold block">Reserva ID: #{res.id}</span>
-                        <h3 className="text-sm font-bold text-[#1A202C]">{res.cuidador_nombre || "Profesional"}</h3>
+                        <h3 className="text-sm font-bold text-[#1A202C]">{res.user_id || "Profesional"}</h3>
                         <p className="text-xs text-[#6338CC] font-medium">{getIconServicio(res.service_type)}</p>
                       </div>
                     </div>

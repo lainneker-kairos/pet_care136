@@ -87,12 +87,6 @@ return (
                                 Hola, <span className="font-semibold text-gray-800">{user?.name || "usuario"}</span>
                             </span>
 
-                            <span className="hidden text-gray-200 sm:inline">|</span>
-
-                            <Link href="/perfil" className="text-sm font-medium text-gray-600 transition-colors hover:text-purple-700">
-                                Mi perfil
-                            </Link>
-
                             {/* BOTONES DE ROLES INTERNOS: Integrados en el flujo, con diseño sutil y coherente */}
                             {user && user.ownerProfile && (
                                 <Link href="/perfil-owner" className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 transition-all hover:bg-emerald-100">
