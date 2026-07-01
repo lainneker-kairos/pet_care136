@@ -1,0 +1,13 @@
+# Archivos de caché de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Base de datos local
+backend/flask/instance/*.db
+backend/flask/instance/database.db
+
+# Entorno virtual (si lo tienes)
+venv/
+env/
