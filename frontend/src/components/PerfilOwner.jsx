@@ -1,13 +1,14 @@
 
 import React, { useState, useEffect } from "react";
-import { 
-  getUserProfile, 
-  updateOwnerProfile, 
-  getMyPets, 
-  createPet, 
-  updatePet, 
-  deletePet 
+import {
+  getUserProfile,
+  updateOwnerProfile,
+  getMyPets,
+  createPet,
+  updatePet,
+  deletePet
 } from "../Services/api";
+import Link from "next/link";
 
 export default function PerfilDueno() {
   // --- ESTADOS PARA DATOS REALES ---
@@ -48,7 +49,7 @@ export default function PerfilDueno() {
       setCargando(true);
       const profileData = await getUserProfile();
       setPerfilUsuario(profileData);
-      
+
       if (profileData && profileData.owner_profile) {
         setOwnerForm({
           name: profileData.owner_profile.name || "",
@@ -59,7 +60,7 @@ export default function PerfilDueno() {
           max_budget: profileData.owner_profile.max_budget || ""
         });
       }
-      
+
       const petsData = await getMyPets();
       setMascotas(petsData);
     } catch (error) {
@@ -69,7 +70,7 @@ export default function PerfilDueno() {
     }
   };
 
-  useEffect(() => {    
+  useEffect(() => {
     fetchDatos();
   }, []);
 
@@ -96,11 +97,11 @@ export default function PerfilDueno() {
     e.preventDefault();
     if (!nombre.trim()) return alert("El nombre es obligatorio");
 
-const petData = {
+    const petData = {
       name: nombre,
       species: tipo,
       breed: raza,
-      age: parseInt(edad) || null, 
+      age: parseInt(edad) || null,
       size: tamano,
       tags: etiquetas,
       behavior: comportamiento,
@@ -111,14 +112,14 @@ const petData = {
     };
 
     if (editandoId !== null) {
-      try{
-        await updatePet(editandoId,petData);
+      try {
+        await updatePet(editandoId, petData);
         limpiarFormulario();
         setEditandoId(null)
         await fetchDatos();
         alert("Mascota actualizada correctamente")
-      } catch (error){
-        console.error("Error al actualizar la mascota:",error);
+      } catch (error) {
+        console.error("Error al actualizar la mascota:", error);
       }
     } else {
       // CREAR NUEVA MASCOTA (Conectado al backend)
@@ -127,10 +128,10 @@ const petData = {
           name: nombre,
           species: tipo,
           breed: raza,
-          age: parseInt(edad) || null, 
+          age: parseInt(edad) || null,
           special_notes: notas
         };
-        
+
         const nuevaMascota = await createPet(petData);
         setMascotas([...mascotas, nuevaMascota.pet]);
         alert("Mascota registrada con éxito");
@@ -156,7 +157,7 @@ const petData = {
 
   const handleIniciarEditar = (mascota) => {
     setEditandoId(mascota.id);
-    setNombre(mascota.name); 
+    setNombre(mascota.name);
     setTipo(mascota.species);
     setRaza(mascota.breed || "");
     setEdad(mascota.age ? mascota.age.toString() : "");
@@ -205,7 +206,7 @@ const petData = {
   return (
     <div className="min-h-screen bg-[#F0F7F7] font-sans antialiased text-[#2D3748] py-8 px-4">
       <div className="max-w-6xl mx-auto space-y-6">
-        
+
         {/* Encabezado Principal */}
         <div className="bg-[#FAF6F0] p-6 rounded-2xl border border-[#EADBCE] shadow-sm">
           <h1 className="text-2xl font-extrabold text-[#6338CC]">Mi Perfil de Dueño</h1>
@@ -215,14 +216,14 @@ const petData = {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          
+
           {/* COLUMNA IZQUIERDA: Información del Dueño */}
           <div className="lg:col-span-4 bg-[#FAF6F0] rounded-2xl border border-[#EADBCE] p-6 shadow-sm space-y-6 sticky top-6">
             <div className="text-center space-y-3">
               <div className="w-28 h-28 mx-auto rounded-full overflow-hidden border-2 border-[#6338CC] shadow-sm">
-                <img 
-                  src={owner.profile_pic || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&q=80"} 
-                  alt={owner.name} 
+                <img
+                  src={owner.profile_pic || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&q=80"}
+                  alt={owner.name}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -266,91 +267,98 @@ const petData = {
                   </div>
                 )}
 
-                <button 
+                <button
                   onClick={() => setEditandoOwner(true)}
                   className="w-full bg-white hover:bg-[#EFE9E2] text-gray-700 font-bold text-xs py-2.5 px-4 rounded-xl border border-[#EADBCE] transition shadow-sm"
                 >
                   ✏️ Editar Perfil Personal
                 </button>
+
+                <Link
+                  href="/misreservas"
+                  className="w-full bg-purple-700 hover:bg-[#008f80] hover:bg-purple-800 shadow-md shadow-purple-200 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition shadow-md flex items-center justify-center gap-2"
+                >
+                  📋 Mis Reservas
+                </Link>
               </div>
             ) : (
               <form onSubmit={handleGuardarOwner} className="space-y-4 pt-4 border-t border-[#EADBCE]/60">
                 <h3 className="font-bold text-[#6338CC] uppercase tracking-wider text-[10px]">
                   Editar Datos Personales
                 </h3>
-                
+
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold text-gray-500 uppercase">Nombre Completo</label>
-                  <input 
-                    type="text" 
-                    value={ownerForm.name} 
-                    onChange={(e) => setOwnerForm({...ownerForm, name: e.target.value})}
+                  <input
+                    type="text"
+                    value={ownerForm.name}
+                    onChange={(e) => setOwnerForm({ ...ownerForm, name: e.target.value })}
                     required
-                    className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-[#6338CC]" 
+                    className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-[#6338CC]"
                   />
                 </div>
 
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold text-gray-500 uppercase">Teléfono</label>
-                  <input 
-                    type="text" 
-                    value={ownerForm.phone} 
-                    onChange={(e) => setOwnerForm({...ownerForm, phone: e.target.value})}
-                    className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-[#6338CC]" 
+                  <input
+                    type="text"
+                    value={ownerForm.phone}
+                    onChange={(e) => setOwnerForm({ ...ownerForm, phone: e.target.value })}
+                    className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-[#6338CC]"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
                     <label className="text-[10px] font-bold text-gray-500 uppercase">Ciudad</label>
-                    <input 
-                      type="text" 
-                      value={ownerForm.city} 
-                      onChange={(e) => setOwnerForm({...ownerForm, city: e.target.value})}
-                      className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-[#6338CC]" 
+                    <input
+                      type="text"
+                      value={ownerForm.city}
+                      onChange={(e) => setOwnerForm({ ...ownerForm, city: e.target.value })}
+                      className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-[#6338CC]"
                     />
                   </div>
                   <div className="space-y-1">
                     <label className="text-[10px] font-bold text-gray-500 uppercase">Barrio</label>
-                    <input 
-                      type="text" 
-                      value={ownerForm.neighborhood} 
-                      onChange={(e) => setOwnerForm({...ownerForm, neighborhood: e.target.value})}
-                      className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-[#6338CC]" 
+                    <input
+                      type="text"
+                      value={ownerForm.neighborhood}
+                      onChange={(e) => setOwnerForm({ ...ownerForm, neighborhood: e.target.value })}
+                      className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-[#6338CC]"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold text-gray-500 uppercase">Presupuesto Máximo (€)</label>
-                  <input 
-                    type="number" 
-                    value={ownerForm.max_budget} 
-                    onChange={(e) => setOwnerForm({...ownerForm, max_budget: e.target.value})}
-                    className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-[#6338CC]" 
+                  <input
+                    type="number"
+                    value={ownerForm.max_budget}
+                    onChange={(e) => setOwnerForm({ ...ownerForm, max_budget: e.target.value })}
+                    className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-[#6338CC]"
                   />
                 </div>
 
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold text-gray-500 uppercase">Biografía corta</label>
-                  <textarea 
+                  <textarea
                     rows="3"
-                    value={ownerForm.bio} 
-                    onChange={(e) => setOwnerForm({...ownerForm, bio: e.target.value})}
-                    className="w-full bg-white border border-[#EADBCE] rounded-xl p-2.5 text-xs focus:outline-none focus:border-[#6338CC] resize-none" 
+                    value={ownerForm.bio}
+                    onChange={(e) => setOwnerForm({ ...ownerForm, bio: e.target.value })}
+                    className="w-full bg-white border border-[#EADBCE] rounded-xl p-2.5 text-xs focus:outline-none focus:border-[#6338CC] resize-none"
                   />
                 </div>
 
                 <div className="flex gap-2">
-                  <button 
-                    type="button" 
-                    onClick={() => setEditandoOwner(false)} 
+                  <button
+                    type="button"
+                    onClick={() => setEditandoOwner(false)}
                     className="w-1/2 bg-white text-gray-700 py-2 rounded-xl border border-[#EADBCE] text-xs font-bold"
                   >
                     Cancelar
                   </button>
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="w-1/2 bg-[#6338CC] text-white py-2 rounded-xl text-xs font-bold shadow-sm"
                   >
                     Guardar
@@ -362,11 +370,11 @@ const petData = {
 
           {/* COLUMNA DERECHA: Gestión de Mascotas */}
           <div className="lg:col-span-8 space-y-6">
-            
+
             {/* Lista de Mascotas */}
             <div className="space-y-4">
               <h2 className="text-lg font-bold text-[#1A202C] flex items-center gap-2">
-                🐾 Mis Mascotas Vinculadas 
+                🐾 Mis Mascotas Vinculadas
                 <span className="text-xs bg-[#7FE3D8] text-[#004D44] px-2.5 py-0.5 rounded-full font-bold">
                   {mascotas.length}
                 </span>
@@ -375,8 +383,8 @@ const petData = {
               {mascotas.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {mascotas.map((mascota) => (
-                    <div 
-                      key={mascota.id} 
+                    <div
+                      key={mascota.id}
                       className="bg-[#FAF6F0] rounded-2xl border border-[#EADBCE] p-4 flex flex-col justify-between shadow-sm relative overflow-hidden hover:shadow-md transition"
                     >
                       <div className="space-y-3">
@@ -400,14 +408,14 @@ const petData = {
                       </div>
 
                       <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-[#EADBCE]/60">
-                        <button 
-                          onClick={() => handleIniciarEditar(mascota)} 
+                        <button
+                          onClick={() => handleIniciarEditar(mascota)}
                           className="bg-white hover:bg-[#EFE9E2] text-gray-700 font-bold text-xs py-2 px-3 rounded-xl border border-[#EADBCE] transition"
                         >
                           ✏️ Editar
                         </button>
-                        <button 
-                          onClick={() => handleEliminar(mascota.id)} 
+                        <button
+                          onClick={() => handleEliminar(mascota.id)}
                           className="bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs py-2 px-3 rounded-xl border border-red-200 transition"
                         >
                           🗑️ Eliminar
@@ -436,60 +444,60 @@ const petData = {
                   <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Nombre de la Mascota *
                   </label>
-                  <input 
-                    type="text" 
-                    value={nombre} 
-                    onChange={(e) => setNombre(e.target.value)} 
-                    required 
-                    className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]" 
+                  <input
+                    type="text"
+                    value={nombre}
+                    onChange={(e) => setNombre(e.target.value)}
+                    required
+                    className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1">
-                        <label className="text-xs font-bold text-gray-700 uppercase tracking-wider block">
-                          Tipo de Mascota
-                        </label>
-                        <select 
-                          value={tipo} 
-                          onChange={(e) => setTipo(e.target.value)} 
-                          className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]"
-                        >
-                          <option value="perro">🐶 Perro</option>
-                          <option value="gato">🐱 Gato</option>
-                        </select>
-                      </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-700 uppercase tracking-wider block">
+                      Tipo de Mascota
+                    </label>
+                    <select
+                      value={tipo}
+                      onChange={(e) => setTipo(e.target.value)}
+                      className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]"
+                    >
+                      <option value="perro">🐶 Perro</option>
+                      <option value="gato">🐱 Gato</option>
+                    </select>
+                  </div>
 
-                      <div className="space-y-1">
-                            <label className="text-xs font-bold text-gray-700 uppercase tracking-wider block">Tamaño</label>
-                            <select value={tamano} onChange={(e) => setTamano(e.target.value)} className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]">
-                              <option value="">Seleccionar...</option>
-                              <option value="pequeño">Pequeño (0-10kg)</option>
-                              <option value="mediano">Mediano (10-25kg)</option>
-                              <option value="grande">Grande (+25kg)</option>
-                            </select>
-                          </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-700 uppercase tracking-wider block">Tamaño</label>
+                    <select value={tamano} onChange={(e) => setTamano(e.target.value)} className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]">
+                      <option value="">Seleccionar...</option>
+                      <option value="pequeño">Pequeño (0-10kg)</option>
+                      <option value="mediano">Mediano (10-25kg)</option>
+                      <option value="grande">Grande (+25kg)</option>
+                    </select>
+                  </div>
 
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Raza</label>
-                    <input 
-                      type="text" 
-                      value={raza} 
-                      onChange={(e) => setRaza(e.target.value)} 
-                      className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]" 
+                    <input
+                      type="text"
+                      value={raza}
+                      onChange={(e) => setRaza(e.target.value)}
+                      className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]"
                     />
                   </div>
 
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Edad (Años)</label>
-                    <input 
-                      type="number" 
-                      value={edad} 
-                      onChange={(e) => setEdad(e.target.value)} 
-                      className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]" 
+                    <input
+                      type="number"
+                      value={edad}
+                      onChange={(e) => setEdad(e.target.value)}
+                      className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC]"
                     />
                   </div>
                 </div>
@@ -514,7 +522,7 @@ const petData = {
                     <textarea rows="2" value={alergias} onChange={(e) => setAlergias(e.target.value)} className="w-full bg-white border border-[#EADBCE] rounded-xl p-3 text-sm focus:outline-none focus:border-[#6338CC] resize-none"></textarea>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Medicación</label>
@@ -528,16 +536,16 @@ const petData = {
 
                 <div className="flex gap-2 pt-2">
                   {editandoId !== null && (
-                    <button 
-                      type="button" 
-                      onClick={limpiarFormulario} 
+                    <button
+                      type="button"
+                      onClick={limpiarFormulario}
                       className="w-1/3 bg-white text-gray-700 py-3 rounded-xl border border-[#EADBCE] font-bold"
                     >
                       Cancelar
                     </button>
                   )}
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className={`bg-[#6338CC] text-white font-bold py-3 px-4 rounded-xl shadow-sm hover:bg-[#522cb3] transition ${editandoId !== null ? "w-2/3" : "w-full"}`}
                   >
                     {editandoId !== null ? "💾 Guardar Cambios" : "➕ Registrar Mascota"}

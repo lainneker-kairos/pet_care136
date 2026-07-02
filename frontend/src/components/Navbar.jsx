@@ -57,9 +57,9 @@ return (
                     <Image
                         src="/logo_petcare.svg"
                         alt="Logo de PetCare"
-                        width={130} 
-                        height={40}
-                        className="h-9 w-auto" 
+                        width={150} 
+                        height={50}
+                        className="h-14 w-auto" 
                     />
                 </Link>
 
@@ -86,12 +86,6 @@ return (
                             <span className="hidden text-sm text-gray-600 sm:inline">
                                 Hola, <span className="font-semibold text-gray-800">{user?.name || "usuario"}</span>
                             </span>
-
-                            <span className="hidden text-gray-200 sm:inline">|</span>
-
-                            <Link href="/perfil" className="text-sm font-medium text-gray-600 transition-colors hover:text-purple-700">
-                                Mi perfil
-                            </Link>
 
                             {/* BOTONES DE ROLES INTERNOS: Integrados en el flujo, con diseño sutil y coherente */}
                             {user && user.ownerProfile && (

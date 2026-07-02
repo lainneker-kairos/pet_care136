@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { getUserProfile, getUserBookings } from "../../Services/api";
+import { getUserProfile, getUserBookings, updateBookingStatus } from "../../Services/api";
 
 export default function MisReservas() {
   const [filtroEstado, setFiltroEstado] = useState("todas");
@@ -22,6 +22,8 @@ export default function MisReservas() {
           // 2. Traemos las reservas de ese dueño
           const bookingsData = await getUserBookings("owner", ownerId);
           setReservas(bookingsData);
+          console.log(reservas);
+          
         }
       } catch (error) {
         console.error("Error al cargar reservas:", error);
@@ -164,7 +166,7 @@ export default function MisReservas() {
                       />
                       <div>
                         <span className="text-[10px] uppercase text-gray-400 font-bold block">Reserva ID: #{res.id}</span>
-                        <h3 className="text-sm font-bold text-[#1A202C]">{res.cuidador_nombre || "Profesional"}</h3>
+                        <h3 className="text-sm font-bold text-[#1A202C]">{res.petsitter_name || "Profesional"}</h3>
                         <p className="text-xs text-[#6338CC] font-medium">{getIconServicio(res.service_type)}</p>
                       </div>
                     </div>
@@ -212,9 +214,11 @@ export default function MisReservas() {
                   {/* Acciones contextuales según el estado */}
                   <div className="flex gap-2 w-full sm:w-auto">
                     {(res.status === "pending" || res.status === "pendiente") && (
-                      <button className="w-full sm:w-auto bg-white hover:bg-red-50 text-red-600 border border-red-200 text-xs font-bold py-2 px-4 rounded-xl transition">
+                    <button
+                        onClick={() => updateBookingStatus(res.id, 'cancelado')}
+                        className="w-full sm:w-auto bg-[#6338CC] hover:bg-[#522cb3] text-white text-xs font-bold py-2 px-4 rounded-xl transition">
                         Cancelar Solicitud
-                      </button>
+                    </button>
                     )}
                     {(res.status === "confirmada" || res.status === "aceptado" || res.status === "confirmado") && (
                       <button className="w-full sm:w-auto bg-[#6338CC] hover:bg-[#522cb3] text-white text-xs font-bold py-2 px-4 rounded-xl transition">
