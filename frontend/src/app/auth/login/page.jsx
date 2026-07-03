@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { loginUser } from "@/Services/api";
+import { loginUser, resetPassword } from "@/Services/api";
 import { useRouter } from "next/navigation";
 
 export default function Login() {
@@ -12,6 +12,10 @@ export default function Login() {
   });
 
   const [errors, setErrors] = useState({});
+
+  const [showModal, setShowModal] = useState(false);
+  const [email, setEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
 
   // Estados extra para el diseño (mostrar/ocultar contraseñas)
   const [showPassword, setShowPassword] = useState(false);
@@ -45,7 +49,7 @@ export default function Login() {
 
     try {
       // lógica de registro real (API call)
-      
+
       const data = await loginUser({ email: formData.email, password: formData.password });
       console.log("esto nos trae data", data);
       if (!data.user) {
@@ -53,14 +57,14 @@ export default function Login() {
         alert(data.msg || data.error || data.message || "Credenciales inválidas. Verifica tu correo y contraseña.");
         return;
       }
-      
+
 
       localStorage.setItem("TOKENJWT", data.token);
       localStorage.setItem("userName", data.user.name);
       localStorage.setItem("userRole", data.user.role);
 
       setFormData({ email: "", password: "" });
-      
+
       window.location.href = "/";
 
 
@@ -82,6 +86,21 @@ export default function Login() {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
+
+  // RESETEAR CONTRASEÑA
+  const handleResetPassword = async () => {
+    try {
+      await resetPassword({ email: email, new_password: newPassword });
+      alert("Contraseña reestablecida con éxito!")
+      setShowModal(false)
+      setEmail("")
+      setNewPassword("")
+
+    } catch (error) {
+      alert(error.message || "Error al restablecer la contraseña")
+    }
+  }
+
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-green-600/20 overflow-hidden font-sans">
@@ -206,10 +225,55 @@ export default function Login() {
                 </>
               )}
             </button>
+            <p className="text-center text-xs text-gray-600 mt-3">
+              ¿Olvidaste tu contraseña?{" "}
+              <button
+                type="button"
+                onClick={() => setShowModal(true)}
+                className="text-purple-700 font-semibold hover:underline"
+              >
+                Restablécela aquí
+              </button>
+            </p>
           </form>
 
         </div>
       </div>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl space-y-4">
+            <h2 className="text-lg font-bold text-purple-800">Restablecer contraseña</h2>
+
+            <input
+              type="email"
+              placeholder="Tu correo electrónico"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-400" />
+
+            <input
+              type="password"
+              placeholder="Nueva contraseña"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-400" />
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowModal(false)}
+                className="w-1/2 bg-white text-gray-700 py-2 rounded-xl border border-gray-200 text-xs font-bold">
+                Cancelar
+              </button>
+              <button
+                onClick={handleResetPassword}
+                className="w-1/2 bg-purple-700 text-white py-2 rounded-xl text-xs font-bold">
+                Restablecer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
