@@ -55,5 +55,6 @@ class Booking(db.Model):
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "pet_name": self.pet.name if self.pet else "Mascota desconocida",
             "petsitter_name": self.petsitter.name if self.petsitter else "Cuidador",
-            "petsitter_photo": self.petsitter.profile_pic if self.petsitter else None
+            "petsitter_photo": self.petsitter.profile_pic if self.petsitter else None,
+            "owner_name": self.owner.name if self.owner else "Dueño"
         }

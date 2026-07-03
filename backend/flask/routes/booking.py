@@ -5,6 +5,7 @@ from models.user import Owner, Petsitter
 from models.pets import Pet
 from datetime import datetime, timedelta
 from decimal import Decimal
+from extension_sockets import socketio
 
 bookings_bp = Blueprint('bookings_bp', __name__)
 
@@ -136,10 +137,24 @@ def create_booking():
     db.session.add(new_booking)
     db.session.commit()
 
+
+  # EMITIR NOTIFICACIÓN AL PETSITTER
+    room_name = f"user_{petsitter.user_id}"
+    notification_data = {
+        "type": "new_request",
+        "title": "¡Nueva solicitud de servicio! 🐾",
+        "message": f"{owner.name} necesita que cuides de {pet.name}.",
+        "service": service_type,
+        "pet_photo": pet.photo,
+        "booking_id": new_booking.id
+    }
+    socketio.emit('new_notification', notification_data, room=room_name)
+
     return jsonify({
         "msg": "Reserva creada exitosamente",
         "booking": new_booking.serialize()
     }), 201
+
 
 # ==========================================
 # CAMBIAR ESTADO DE LA RESERVA
@@ -167,10 +182,30 @@ def update_booking_status(booking_id):
             petsitter.booking_count += 1
 
     db.session.commit()
+
+  # EMITIR NOTIFICACIÓN AL OWNER
+    room_name = f"user_{booking.owner.user_id}"
+    status_es = {
+        "aceptado": "aceptada",
+        "rechazado": "declinada",
+        "completado": "completada",
+        "cancelado": "cancelada"
+    }.get(new_status, new_status)
+
+    notification_data = {
+        "type": "status_update",
+        "title": f"Reserva {status_es}",
+        "message": f"Tu solicitud con {booking.petsitter.name} para {booking.pet.name} ha sido {status_es}.",
+        "status": new_status,
+        "booking_id": booking.id
+    }
+    socketio.emit('new_notification', notification_data, room=room_name)
+
     return jsonify({
         "msg": f"El estado de la reserva ha cambiado a: {new_status}",
         "booking": booking.serialize()
     }), 200
+
 
 # ==========================================
 # VER RESERVAS DE UN DUEÑO O CUIDADOR
