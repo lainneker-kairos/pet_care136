@@ -264,3 +264,17 @@ export const createReview = async (reviewData) => {
 
     return await response.json();
 };
+
+
+// Reseñas para un Petsitter
+export const getPetsitterReviews = async (petsitter_id) => {
+    const response = await fetch(`${API_URL}/reviews/petsitter/${petsitter_id}`, {
+        method: 'GET',
+        headers: {
+             "Content-Type": "aplication/json",
+        },
+ });
+
+if (!response.ok) throw new Error("Error al obtener las reseñas");
+    return await response.json();
+};
