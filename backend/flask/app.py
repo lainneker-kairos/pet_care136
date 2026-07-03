@@ -17,6 +17,7 @@ from models.pets import Pet
 from models.availability import Availability
 from models.booking import Booking
 from models.reviews import Review
+from routes.reviews import reviews_bp
 
 load_dotenv()
 
@@ -36,6 +37,9 @@ app.register_blueprint(bookings_bp, url_prefix='/api')
 app.register_blueprint(calendar_bp)
 app.register_blueprint(maps_bp)
 app.register_blueprint(searchpetsitter_bp, url_prefix='/api')
+app.register_blueprint(reviews_bp, url_prefix='/api')
+
+
 
 if __name__ == '__main__':
     with app.app_context():

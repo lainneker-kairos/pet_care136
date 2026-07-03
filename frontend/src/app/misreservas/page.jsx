@@ -1,12 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { getUserProfile, getUserBookings, updateBookingStatus } from "../../Services/api";
+import { getUserProfile, getUserBookings, updateBookingStatus, createReview } from "../../Services/api";
 
 export default function MisReservas() {
   const [filtroEstado, setFiltroEstado] = useState("todas");
   const [reservas, setReservas] = useState([]);
-  const [cargando, setCargando] = useState(true);
+  const [cargando, setCargando] = useState();
+  const [reservaSeleccionada, setReservaSeleccionada] = useState(null);
+  const [comentario, setComentario] = useState("")
+  const [rating, setRating] = useState(0)
+  const [perfil, setPerfil] = useState(null)
 
   // --- OBTENER RESERVAS REALES ---
   useEffect(() => {
@@ -15,15 +19,15 @@ export default function MisReservas() {
         setCargando(true);
         // 1. Obtenemos el perfil del usuario autenticado de forma limpia
         const profileData = await getUserProfile();
-        
+        setPerfil(profileData)
+
         if (profileData && profileData.owner_profile) {
           const ownerId = profileData.owner_profile.id;
-          
+
           // 2. Traemos las reservas de ese dueño
           const bookingsData = await getUserBookings("owner", ownerId);
           setReservas(bookingsData);
-          console.log(reservas);
-          
+
         }
       } catch (error) {
         console.error("Error al cargar reservas:", error);
@@ -38,9 +42,9 @@ export default function MisReservas() {
   // Mapear filtros lógicos defendiéndonos de posibles estados en español e inglés
   const reservasFiltradas = reservas.filter(r => {
     if (filtroEstado === "todas") return true;
-    
+
     const statusLower = r.status?.toLowerCase();
-    
+
     if (filtroEstado === "pendiente") {
       return statusLower === "pendiente" || statusLower === "pending";
     }
@@ -50,7 +54,7 @@ export default function MisReservas() {
     if (filtroEstado === "completada") {
       return statusLower === "completada" || statusLower === "completado";
     }
-    
+
     return statusLower === filtroEstado;
   });
 
@@ -103,10 +107,31 @@ export default function MisReservas() {
     );
   }
 
+  const handleEnviarResena = async () => {
+    try {
+      const reviewData = {
+        booking_id: reservaSeleccionada.id,
+        reviewer_id: perfil.user.id,
+        reviewed_id: reservaSeleccionada.petsitter_id,
+        rating: rating,
+        comment: comentario,
+        review_type: "owner_to_petsitter"
+      }
+      await createReview(reviewData)
+      alert("¡Reseña enviada con éxito!")
+      setReservaSeleccionada(null)
+      setComentario("")
+      setRating(0)
+    } catch (error) {
+      console.error("Error al enviar reseña:", error)
+      alert("Error al enviar la reseña, inténtalo de nuevo")
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#F0F7F7] font-sans antialiased text-[#2D3748] py-8 px-4">
       <div className="max-w-4xl mx-auto space-y-6">
-        
+
         {/* Encabezado */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#FAF6F0] p-6 rounded-2xl border border-[#EADBCE] shadow-sm gap-4">
           <div>
@@ -124,11 +149,10 @@ export default function MisReservas() {
             <button
               key={tab}
               onClick={() => setFiltroEstado(tab)}
-              className={`flex-1 text-center font-bold text-xs py-2.5 px-4 rounded-lg transition whitespace-nowrap capitalize ${
-                filtroEstado === tab
-                  ? "bg-[#6338CC] text-white shadow-sm"
-                  : "text-gray-600 hover:bg-[#FAF6F0] hover:text-[#1A202C]"
-              }`}
+              className={`flex-1 text-center font-bold text-xs py-2.5 px-4 rounded-lg transition whitespace-nowrap capitalize ${filtroEstado === tab
+                ? "bg-[#6338CC] text-white shadow-sm"
+                : "text-gray-600 hover:bg-[#FAF6F0] hover:text-[#1A202C]"
+                }`}
             >
               {tab === "todas" ? "Ver Todas" : tab}
             </button>
@@ -139,8 +163,8 @@ export default function MisReservas() {
         <div className="space-y-4">
           {reservasFiltradas.length > 0 ? (
             reservasFiltradas.map((res) => (
-              <div 
-                key={res.id} 
+              <div
+                key={res.id}
                 className="bg-[#FAF6F0] rounded-2xl border border-[#EADBCE] shadow-sm overflow-hidden flex flex-col justify-between transition hover:shadow-md"
               >
                 {/* Cuerpo de la Reserva */}
@@ -156,12 +180,12 @@ export default function MisReservas() {
 
                   {/* Fila Central: Cuidador y Fechas */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                    
+
                     {/* Bloque Cuidador */}
                     <div className="flex items-center gap-3">
-                      <img 
-                        src={res.cuidador_foto || "https://placehold.co/150x150"} 
-                        alt={res.cuidador_nombre || "Cuidador"} 
+                      <img
+                        src={res.cuidador_foto || "https://placehold.co/150x150"}
+                        alt={res.cuidador_nombre || "Cuidador"}
                         className="w-12 h-12 rounded-xl object-cover border border-[#EADBCE]"
                       />
                       <div>
@@ -214,11 +238,11 @@ export default function MisReservas() {
                   {/* Acciones contextuales según el estado */}
                   <div className="flex gap-2 w-full sm:w-auto">
                     {(res.status === "pending" || res.status === "pendiente") && (
-                    <button
+                      <button
                         onClick={() => updateBookingStatus(res.id, 'cancelado')}
                         className="w-full sm:w-auto bg-[#6338CC] hover:bg-[#522cb3] text-white text-xs font-bold py-2 px-4 rounded-xl transition">
                         Cancelar Solicitud
-                    </button>
+                      </button>
                     )}
                     {(res.status === "confirmada" || res.status === "aceptado" || res.status === "confirmado") && (
                       <button className="w-full sm:w-auto bg-[#6338CC] hover:bg-[#522cb3] text-white text-xs font-bold py-2 px-4 rounded-xl transition">
@@ -226,7 +250,9 @@ export default function MisReservas() {
                       </button>
                     )}
                     {(res.status === "completada" || res.status === "completado") && (
-                      <button className="w-full sm:w-auto bg-[#7FE3D8] hover:bg-[#68cfc4] text-[#004D44] text-xs font-bold py-2 px-4 rounded-xl transition">
+                      <button
+                        onClick={() => setReservaSeleccionada({ id: res.id, petsitter_id: res.petsitter_id })}
+                        className="w-full sm:w-auto bg-[#7FE3D8] hover:bg-[#68cfc4] text-[#004D44] text-xs font-bold py-2 px-4 rounded-xl transition">
                         ⭐ Dejar una Reseña
                       </button>
                     )}
@@ -246,6 +272,53 @@ export default function MisReservas() {
         </div>
 
       </div>
+
+
+      {reservaSeleccionada && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-[#FAF6F0] rounded-2xl p-6 w-full max-w-md shadow-xl space-y-4">
+            <h2 className="text-lg font-bold text-[#1A202C]">⭐ Dejar una Reseña</h2>
+            <p className="text-xs text-gray-500">Reserva #{reservaSeleccionada.id}</p>
+
+            {/* Estrellas */}
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((estrella) => (
+                <button
+                  key={estrella}
+                  onClick={() => setRating(estrella)}
+                  className={`text-2xl ${rating >= estrella ? "text-amber-400" : "text-gray-300"}`}>
+                  ★
+                </button>
+              ))}
+            </div>
+
+            {/* Comentario */}
+            <textarea
+              rows="4"
+              placeholder="Escribe tu comentario..."
+              value={comentario}
+              onChange={(e) => setComentario(e.target.value)}
+              className="w-full bg-white border border-[#EADBCE] rounded-xl p-3 text-sm focus:outline-none focus:border-[#6338CC] resize-none"
+            />
+
+            {/* Botones */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setReservaSeleccionada(null)}
+                className="w-1/2 bg-white text-gray-700 py-2 rounded-xl border border-[#EADBCE] text-xs font-bold">
+                Cancelar
+              </button>
+
+              <button
+                onClick={handleEnviarResena}
+                className="w-1/2 bg-[#6338CC] text-white py-2 rounded-xl text-xs font-bold">
+                Enviar Reseña
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }
