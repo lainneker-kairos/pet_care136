@@ -41,3 +41,11 @@ def create_review():
         "review": new_review.serialize()
     }), 201
 
+# ==========================================
+# RESEÑAS DE UN PETSITTER
+# ==========================================
+
+@reviews_bp.route('/reviews/petsitter/<int:petsitter_id>', methods= ['GET'])
+def  get_petsitter_reviews(petsitter_id):
+    reviews = db.session.execute(db.select(Review).filter_by(reviewed_id=petsitter_id)).scalars().all()
+    return jsonify([review.serialize() for review in reviews]), 200
