@@ -44,6 +44,21 @@ const getAuthHeaders = () => {
 }
 
 // ==========================================
+// RUTA DE REESTABLECER CONTRASEÑA
+// ==========================================
+
+export const resetPassword = async (data) => {
+    const result = await fetch(`${API_URL}/reset-password`, {
+        method: 'POST',
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data),
+    })
+
+    if (!result.ok) throw new Error("Error al restablecer la contraseña")
+    return await result.json()
+}
+
+// ==========================================
 // RUTAS DE AUTENTICACIÓN
 // ==========================================
 
@@ -278,3 +293,5 @@ export const getPetsitterReviews = async (petsitter_id) => {
 if (!response.ok) throw new Error("Error al obtener las reseñas");
     return await response.json();
 };
+
+
