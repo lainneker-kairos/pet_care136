@@ -17,6 +17,7 @@ from models.pets import Pet
 from models.availability import Availability
 from models.booking import Booking
 from models.reviews import Review
+from routes.reviews import reviews_bp
 
 # Importar la instancia de socketio
 from extension_sockets import socketio
@@ -39,6 +40,9 @@ app.register_blueprint(bookings_bp, url_prefix='/api')
 app.register_blueprint(calendar_bp)
 app.register_blueprint(maps_bp)
 app.register_blueprint(searchpetsitter_bp, url_prefix='/api')
+app.register_blueprint(reviews_bp, url_prefix='/api')
+
+
 
 # Inicializar SocketIO con la app de Flask
 socketio.init_app(app)

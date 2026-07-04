@@ -1,47 +1,35 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { getUserProfile, getUserBookings, updateBookingStatus } from "@/Services/api";
+import { getUserProfile, getUserBookings, updateBookingStatus, createReview } from "@/Services/api";
 
 export default function MisReservas() {
   const [activeRole, setActiveRole] = useState("owner"); // "owner" (dueño) o "petsitter" (cuidador)
   const [hasPetsitterProfile, setHasPetsitterProfile] = useState(false);
   const [filtroEstado, setFiltroEstado] = useState("todas");
   const [reservas, setReservas] = useState([]);
-  const [cargando, setCargando] = useState(true);
-  const [profile, setProfile] = useState(null);
-  
-  // Mensajes de feedback (reemplazan alert() y confirm())
-  const [feedback, setFeedback] = useState(null);
-  const [confirmCancelId, setConfirmCancelId] = useState(null);
+  const [cargando, setCargando] = useState();
+  const [reservaSeleccionada, setReservaSeleccionada] = useState(null);
+  const [comentario, setComentario] = useState("")
+  const [rating, setRating] = useState(0)
+  const [perfil, setPerfil] = useState(null)
 
-  const fetchReservas = async (roleToFetch) => {
-    try {
-      setCargando(true);
-      const profileData = await getUserProfile();
-      setProfile(profileData);
-      
-      if (profileData) {
-        // Guardamos si el usuario tiene perfil de cuidador activo
-        if (profileData.petsitter_profile) {
-          setHasPetsitterProfile(true);
-        } else {
-          setHasPetsitterProfile(false);
-          setActiveRole("owner"); // Fuerza rol dueño si no es cuidador
-        }
-        
-        let targetProfileId = null;
-        if (roleToFetch === "owner" && profileData.owner_profile) {
-          targetProfileId = profileData.owner_profile.id;
-        } else if (roleToFetch === "petsitter" && profileData.petsitter_profile) {
-          targetProfileId = profileData.petsitter_profile.id;
-        }
+  // --- OBTENER RESERVAS REALES ---
+  useEffect(() => {
+    const fetchReservas = async () => {
+      try {
+        setCargando(true);
+        // 1. Obtenemos el perfil del usuario autenticado de forma limpia
+        const profileData = await getUserProfile();
+        setPerfil(profileData)
 
-        if (targetProfileId) {
-          const bookingsData = await getUserBookings(roleToFetch, targetProfileId);
+        if (profileData && profileData.owner_profile) {
+          const ownerId = profileData.owner_profile.id;
+
+          // 2. Traemos las reservas de ese dueño
+          const bookingsData = await getUserBookings("owner", ownerId);
           setReservas(bookingsData);
-        } else {
-          setReservas([]);
+
         }
       }
     } catch (error) {
@@ -78,9 +66,9 @@ export default function MisReservas() {
 
   const reservasFiltradas = reservas.filter(r => {
     if (filtroEstado === "todas") return true;
-    
+
     const statusLower = r.status?.toLowerCase();
-    
+
     if (filtroEstado === "pendiente") {
       return statusLower === "pendiente" || statusLower === "pending";
     }
@@ -90,10 +78,6 @@ export default function MisReservas() {
     if (filtroEstado === "completada") {
       return statusLower === "completada" || statusLower === "completado";
     }
-    if (filtroEstado === "rechazado") {
-      return statusLower === "rechazado" || statusLower === "declinada";
-    }
-    
     return statusLower === filtroEstado;
   });
 
@@ -153,70 +137,32 @@ export default function MisReservas() {
     );
   }
 
+  const handleEnviarResena = async () => {
+    try {
+      const reviewData = {
+        booking_id: reservaSeleccionada.id,
+        reviewer_id: perfil.user.id,
+        reviewed_id: reservaSeleccionada.petsitter_id,
+        rating: rating,
+        comment: comentario,
+        review_type: "owner_to_petsitter"
+      }
+      await createReview(reviewData)
+      alert("¡Reseña enviada con éxito!")
+      setReservaSeleccionada(null)
+      setComentario("")
+      setRating(0)
+    } catch (error) {
+      console.error("Error al enviar reseña:", error)
+      alert("Error al enviar la reseña, inténtalo de nuevo")
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#F0F7F7] font-sans antialiased text-[#2D3748] py-8 px-4">
       <div className="max-w-4xl mx-auto space-y-6">
-        
-        {/* BANNER DE NOTIFICACIÓN DE FEEDBACK */}
-        {feedback && (
-          <div className={`p-4 rounded-xl text-sm font-semibold transition-all shadow-md ${
-            feedback.type === "success" ? "bg-emerald-100 text-emerald-800 border border-emerald-300" : "bg-red-100 text-red-800 border border-red-300"
-          }`}>
-            {feedback.message}
-          </div>
-        )}
 
-        {/* MODAL INLINE DE CONFIRMACIÓN DE CANCELACIÓN */}
-        {confirmCancelId && (
-          <div className="bg-amber-50 border border-amber-300 p-4 rounded-xl shadow-md flex flex-col sm:flex-row justify-between items-center gap-3 animate-pulse">
-            <div>
-              <p className="font-bold text-amber-900 text-sm">¿Estás seguro de que deseas cancelar esta solicitud?</p>
-              <p className="text-xs text-amber-700">Esta acción cambiará el estado a cancelado permanentemente.</p>
-            </div>
-            <div className="flex gap-2 w-full sm:w-auto">
-              <button 
-                onClick={() => setConfirmCancelId(null)} 
-                className="flex-1 sm:flex-none bg-white border border-amber-300 hover:bg-amber-100 text-gray-700 text-xs font-bold py-1.5 px-3 rounded-lg"
-              >
-                No, mantener
-              </button>
-              <button 
-                onClick={() => handleUpdateStatus(confirmCancelId, "cancelado")} 
-                className="flex-1 sm:flex-none bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-1.5 px-3 rounded-lg"
-              >
-                Sí, cancelar
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* --- PESTAÑAS DE CAMBIO DE ROL DUAL --- */}
-        {hasPetsitterProfile && (
-          <div className="flex bg-white p-1 rounded-2xl border border-[#EADBCE] shadow-sm">
-            <button
-              onClick={() => { setActiveRole("owner"); setFiltroEstado("todas"); }}
-              className={`flex-1 text-center font-extrabold text-sm py-3.5 px-4 rounded-xl transition duration-200 ${
-                activeRole === "owner"
-                  ? "bg-emerald-600 text-white shadow-sm"
-                  : "text-gray-500 hover:text-emerald-700 hover:bg-emerald-50"
-              }`}
-            >
-              🙋‍♂️ Soy Dueño (Mis Mascotas)
-            </button>
-            <button
-              onClick={() => { setActiveRole("petsitter"); setFiltroEstado("todas"); }}
-              className={`flex-1 text-center font-extrabold text-sm py-3.5 px-4 rounded-xl transition duration-200 ${
-                activeRole === "petsitter"
-                  ? "bg-purple-600 text-white shadow-sm"
-                  : "text-gray-500 hover:text-purple-700 hover:bg-purple-50"
-              }`}
-            >
-              🐾 Soy Cuidador (Mis Clientes)
-            </button>
-          </div>
-        )}
-
-        {/* Encabezado contextual */}
+        {/* Encabezado */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#FAF6F0] p-6 rounded-2xl border border-[#EADBCE] shadow-sm gap-4">
           <div>
             <h1 className="text-2xl font-extrabold text-[#1A202C]">
@@ -240,11 +186,10 @@ export default function MisReservas() {
             <button
               key={tab}
               onClick={() => setFiltroEstado(tab)}
-              className={`flex-1 text-center font-bold text-xs py-2.5 px-4 rounded-lg transition whitespace-nowrap capitalize ${
-                filtroEstado === tab
-                  ? (activeRole === "owner" ? "bg-emerald-600 text-white shadow-sm" : "bg-purple-600 text-white shadow-sm")
-                  : "text-gray-600 hover:bg-[#FAF6F0] hover:text-[#1A202C]"
-              }`}
+              className={`flex-1 text-center font-bold text-xs py-2.5 px-4 rounded-lg transition whitespace-nowrap capitalize ${filtroEstado === tab
+                ? "bg-[#6338CC] text-white shadow-sm"
+                : "text-gray-600 hover:bg-[#FAF6F0] hover:text-[#1A202C]"
+                }`}
             >
               {tab === "todas" ? "Ver Todas" : tab}
             </button>
@@ -255,8 +200,8 @@ export default function MisReservas() {
         <div className="space-y-4">
           {reservasFiltradas.length > 0 ? (
             reservasFiltradas.map((res) => (
-              <div 
-                key={res.id} 
+              <div
+                key={res.id}
                 className="bg-[#FAF6F0] rounded-2xl border border-[#EADBCE] shadow-sm overflow-hidden flex flex-col justify-between transition hover:shadow-md"
               >
                 {/* Cuerpo de la Reserva */}
@@ -272,15 +217,12 @@ export default function MisReservas() {
 
                   {/* Fila Central: Información Cuidador/Dueño */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                    
-                    {/* Tarjeta de datos de la otra parte */}
+
+                    {/* Bloque Cuidador */}
                     <div className="flex items-center gap-3">
-                      <img 
-                        src={activeRole === "owner" 
-                          ? (res.petsitter_photo || "https://placehold.co/150x150")
-                          : "https://placehold.co/150x150/9333ea/ffffff?text=Cliente"
-                        } 
-                        alt="Foto de perfil" 
+                      <img
+                        src={res.cuidador_foto || "https://placehold.co/150x150"}
+                        alt={res.cuidador_nombre || "Cuidador"}
                         className="w-12 h-12 rounded-xl object-cover border border-[#EADBCE]"
                       />
                       <div>
@@ -341,73 +283,24 @@ export default function MisReservas() {
 
                   {/* Acciones contextuales según el rol y el estado */}
                   <div className="flex gap-2 w-full sm:w-auto">
-                    {/* VISTA ROL DUEÑO */}
-                    {activeRole === "owner" && (
-                      <>
-                        {(res.status === "pending" || res.status === "pendiente") && (
-                          <button
-                            onClick={() => setConfirmCancelId(res.id)}
-                            className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition shadow-sm"
-                          >
-                            Cancelar Solicitud
-                          </button>
-                        )}
-                        {(res.status === "confirmada" || res.status === "aceptado" || res.status === "confirmado") && (
-                          <button className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition shadow-sm">
-                            💬 Chat con Cuidador
-                          </button>
-                        )}
-                        {(res.status === "completada" || res.status === "completado") && (
-                          <button className="w-full sm:w-auto bg-[#7FE3D8] hover:bg-[#68cfc4] text-[#004D44] text-xs font-bold py-2.5 px-4 rounded-xl transition shadow-sm">
-                            ⭐ Dejar una Reseña
-                          </button>
-                        )}
-                      </>
+                    {(res.status === "pending" || res.status === "pendiente") && (
+                      <button
+                        onClick={() => updateBookingStatus(res.id, 'cancelado')}
+                        className="w-full sm:w-auto bg-[#6338CC] hover:bg-[#522cb3] text-white text-xs font-bold py-2 px-4 rounded-xl transition">
+                        Cancelar Solicitud
+                      </button>
                     )}
-
-                    {/* VISTA ROL CUIDADOR (Benito gestiona sus solicitudes) */}
-                    {activeRole === "petsitter" && (
-                      <>
-                        {(res.status === "pending" || res.status === "pendiente") && (
-                          <div className="flex gap-2 w-full">
-                            <button
-                              onClick={() => handleUpdateStatus(res.id, "rechazado")}
-                              className="flex-1 bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition shadow-sm"
-                            >
-                              Decline
-                            </button>
-                            <button
-                              onClick={() => handleUpdateStatus(res.id, "aceptado")}
-                              className="flex-1 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition shadow-sm"
-                            >
-                              Accept Request
-                            </button>
-                          </div>
-                        )}
-                        {(res.status === "confirmada" || res.status === "aceptado" || res.status === "confirmado") && (
-                          <div className="flex gap-2 w-full">
-                            <button className="flex-1 bg-white hover:bg-[#FAF6F0] text-gray-700 text-xs font-bold py-2.5 px-4 rounded-xl border border-[#EADBCE] transition shadow-sm">
-                              💬 Contactar
-                            </button>
-                            <button
-                              onClick={() => handleUpdateStatus(res.id, "completado")}
-                              className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition shadow-sm"
-                            >
-                              Complete Service
-                            </button>
-                          </div>
-                        )}
-                        {(res.status === "completada" || res.status === "completado") && (
-                          <span className="text-xs text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl">
-                            ✅ ¡Servicio completado!
-                          </span>
-                        )}
-                        {(res.status === "rechazado" || res.status === "declinada") && (
-                          <span className="text-xs text-red-700 font-bold bg-red-50 border border-red-200 px-3 py-1.5 rounded-xl">
-                            Declinaste este cuidado.
-                          </span>
-                        )}
-                      </>
+                    {(res.status === "confirmada" || res.status === "aceptado" || res.status === "confirmado") && (
+                      <button className="w-full sm:w-auto bg-[#6338CC] hover:bg-[#522cb3] text-white text-xs font-bold py-2 px-4 rounded-xl transition">
+                        💬 Chat con Cuidador
+                      </button>
+                    )}
+                    {(res.status === "completada" || res.status === "completado") && (
+                      <button
+                        onClick={() => setReservaSeleccionada({ id: res.id, petsitter_id: res.petsitter_id })}
+                        className="w-full sm:w-auto bg-[#7FE3D8] hover:bg-[#68cfc4] text-[#004D44] text-xs font-bold py-2 px-4 rounded-xl transition">
+                        ⭐ Dejar una Reseña
+                      </button>
                     )}
                   </div>
                 </div>
@@ -430,6 +323,53 @@ export default function MisReservas() {
         </div>
 
       </div>
+
+
+      {reservaSeleccionada && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-[#FAF6F0] rounded-2xl p-6 w-full max-w-md shadow-xl space-y-4">
+            <h2 className="text-lg font-bold text-[#1A202C]">⭐ Dejar una Reseña</h2>
+            <p className="text-xs text-gray-500">Reserva #{reservaSeleccionada.id}</p>
+
+            {/* Estrellas */}
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((estrella) => (
+                <button
+                  key={estrella}
+                  onClick={() => setRating(estrella)}
+                  className={`text-2xl ${rating >= estrella ? "text-amber-400" : "text-gray-300"}`}>
+                  ★
+                </button>
+              ))}
+            </div>
+
+            {/* Comentario */}
+            <textarea
+              rows="4"
+              placeholder="Escribe tu comentario..."
+              value={comentario}
+              onChange={(e) => setComentario(e.target.value)}
+              className="w-full bg-white border border-[#EADBCE] rounded-xl p-3 text-sm focus:outline-none focus:border-[#6338CC] resize-none"
+            />
+
+            {/* Botones */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setReservaSeleccionada(null)}
+                className="w-1/2 bg-white text-gray-700 py-2 rounded-xl border border-[#EADBCE] text-xs font-bold">
+                Cancelar
+              </button>
+
+              <button
+                onClick={handleEnviarResena}
+                className="w-1/2 bg-[#6338CC] text-white py-2 rounded-xl text-xs font-bold">
+                Enviar Reseña
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }

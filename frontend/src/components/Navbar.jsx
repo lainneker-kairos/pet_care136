@@ -102,7 +102,7 @@ return (
 
                             <button
                                 onClick={handleLogout}
-                                className="rounded-full bg-purple-600 px-3.5 py-1 text-xs font-medium text-white transition-colors hover:bg-red-600">
+                                className="rounded-full bg-purple-700 px-3.5 py-1 text-xs font-medium text-white transition-colors hover:bg-red-400">
                                 Cerrar sesión
                             </button>
                         </>
