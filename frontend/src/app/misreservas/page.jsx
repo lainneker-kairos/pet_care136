@@ -14,22 +14,36 @@ export default function MisReservas() {
   const [rating, setRating] = useState(0)
   const [perfil, setPerfil] = useState(null)
 
+ // Estados faltantes que causaban errores
+  const [feedback, setFeedback] = useState(null);
+  const [confirmCancelId, setConfirmCancelId] = useState(null);
+
+  const showFeedback = (type, message) => {
+    setFeedback({ type, message });
+    setTimeout(() => setFeedback(null), 5000);
+  };
+
   // --- OBTENER RESERVAS REALES ---
-  useEffect(() => {
-    const fetchReservas = async () => {
-      try {
-        setCargando(true);
-        // 1. Obtenemos el perfil del usuario autenticado de forma limpia
-        const profileData = await getUserProfile();
-        setPerfil(profileData)
+  // Se saca fuera del useEffect para que pueda ser llamada desde otras funciones
+  const fetchReservas = async (role) => {
+    try {
+      setCargando(true);
+      // 1. Obtenemos el perfil del usuario autenticado de forma limpia
+      const profileData = await getUserProfile();
+      setPerfil(profileData);
 
-        if (profileData && profileData.owner_profile) {
+      if (profileData) {
+        // 2. Traemos las reservas dependiendo del rol activo
+        if (role === "owner" && profileData.owner_profile) {
           const ownerId = profileData.owner_profile.id;
-
-          // 2. Traemos las reservas de ese dueño
           const bookingsData = await getUserBookings("owner", ownerId);
           setReservas(bookingsData);
-
+        } else if (role === "petsitter" && profileData.petsitter_profile) {
+          const petsitterId = profileData.petsitter_profile.id;
+          const bookingsData = await getUserBookings("petsitter", petsitterId);
+          setReservas(bookingsData);
+        } else {
+          setReservas([]);
         }
       }
     } catch (error) {
@@ -40,14 +54,10 @@ export default function MisReservas() {
     }
   };
 
+  // Efecto para cargar las reservas al montar o al cambiar de rol
   useEffect(() => {
     fetchReservas(activeRole);
   }, [activeRole]);
-
-  const showFeedback = (type, message) => {
-    setFeedback({ type, message });
-    setTimeout(() => setFeedback(null), 5000);
-  };
 
   const handleUpdateStatus = async (bookingId, newStatus) => {
     try {
@@ -64,7 +74,7 @@ export default function MisReservas() {
     }
   };
 
-  const reservasFiltradas = reservas.filter(r => {
+  const reservasFiltradas = reservas.filter((r) => {
     if (filtroEstado === "todas") return true;
 
     const statusLower = r.status?.toLowerCase();
@@ -127,6 +137,27 @@ export default function MisReservas() {
     return "🐕 Servicio Especial";
   };
 
+  const handleEnviarResena = async () => {
+    try {
+      const reviewData = {
+        booking_id: reservaSeleccionada.id,
+        reviewer_id: perfil.user.id,
+        reviewed_id: reservaSeleccionada.petsitter_id,
+        rating: rating,
+        comment: comentario,
+        review_type: "owner_to_petsitter",
+      };
+      await createReview(reviewData);
+      alert("¡Reseña enviada con éxito!");
+      setReservaSeleccionada(null);
+      setComentario("");
+      setRating(0);
+    } catch (error) {
+      console.error("Error al enviar reseña:", error);
+      alert("Error al enviar la reseña, inténtalo de nuevo");
+    }
+  };
+
   if (cargando && reservas.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F0F7F7]">
@@ -137,30 +168,16 @@ export default function MisReservas() {
     );
   }
 
-  const handleEnviarResena = async () => {
-    try {
-      const reviewData = {
-        booking_id: reservaSeleccionada.id,
-        reviewer_id: perfil.user.id,
-        reviewed_id: reservaSeleccionada.petsitter_id,
-        rating: rating,
-        comment: comentario,
-        review_type: "owner_to_petsitter"
-      }
-      await createReview(reviewData)
-      alert("¡Reseña enviada con éxito!")
-      setReservaSeleccionada(null)
-      setComentario("")
-      setRating(0)
-    } catch (error) {
-      console.error("Error al enviar reseña:", error)
-      alert("Error al enviar la reseña, inténtalo de nuevo")
-    }
-  }
-
   return (
     <div className="min-h-screen bg-[#F0F7F7] font-sans antialiased text-[#2D3748] py-8 px-4">
       <div className="max-w-4xl mx-auto space-y-6">
+        
+        {/* Banner de Feedback si existe */}
+        {feedback && (
+          <div className={`p-4 rounded-xl text-sm font-bold ${feedback.type === 'error' ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800'}`}>
+            {feedback.message}
+          </div>
+        )}
 
         {/* Encabezado */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#FAF6F0] p-6 rounded-2xl border border-[#EADBCE] shadow-sm gap-4">
@@ -169,13 +186,16 @@ export default function MisReservas() {
               {activeRole === "owner" ? "Mis Reservas de Mascotas" : "Solicitudes de Cuidado Recibidas"}
             </h1>
             <p className="text-sm text-gray-500">
-              {activeRole === "owner" 
+              {activeRole === "owner"
                 ? "Historial y estado de los cuidados solicitados para tus mascotas."
-                : "Gestiona los servicios que los dueños de mascotas te han solicitado."
-              }
+                : "Gestiona los servicios que los dueños de mascotas te han solicitado."}
             </p>
           </div>
-          <span className={`text-xs text-white font-bold px-4 py-2 rounded-xl shadow-sm ${activeRole === "owner" ? "bg-emerald-600" : "bg-purple-600"}`}>
+          <span
+            className={`text-xs text-white font-bold px-4 py-2 rounded-xl shadow-sm ${
+              activeRole === "owner" ? "bg-emerald-600" : "bg-purple-600"
+            }`}
+          >
             Total: {reservas.length} registros
           </span>
         </div>
@@ -186,10 +206,11 @@ export default function MisReservas() {
             <button
               key={tab}
               onClick={() => setFiltroEstado(tab)}
-              className={`flex-1 text-center font-bold text-xs py-2.5 px-4 rounded-lg transition whitespace-nowrap capitalize ${filtroEstado === tab
-                ? "bg-[#6338CC] text-white shadow-sm"
-                : "text-gray-600 hover:bg-[#FAF6F0] hover:text-[#1A202C]"
-                }`}
+              className={`flex-1 text-center font-bold text-xs py-2.5 px-4 rounded-lg transition whitespace-nowrap capitalize ${
+                filtroEstado === tab
+                  ? "bg-[#6338CC] text-white shadow-sm"
+                  : "text-gray-600 hover:bg-[#FAF6F0] hover:text-[#1A202C]"
+              }`}
             >
               {tab === "todas" ? "Ver Todas" : tab}
             </button>
@@ -209,15 +230,18 @@ export default function MisReservas() {
                   {/* Fila superior: ID y Estado */}
                   <div className="flex justify-between items-center border-b border-[#EADBCE]/60 pb-3">
                     <div className="space-y-0.5">
-                      <span className="text-[11px] uppercase tracking-wider text-gray-400 font-bold">Código Reserva</span>
-                      <p className="text-sm font-mono font-bold text-gray-800">RES-{res.id.toString().padStart(4, '0')}</p>
+                      <span className="text-[11px] uppercase tracking-wider text-gray-400 font-bold">
+                        Código Reserva
+                      </span>
+                      <p className="text-sm font-mono font-bold text-gray-800">
+                        RES-{res.id.toString().padStart(4, "0")}
+                      </p>
                     </div>
                     {getBadgeEstado(res.status)}
                   </div>
 
                   {/* Fila Central: Información Cuidador/Dueño */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-
                     {/* Bloque Cuidador */}
                     <div className="flex items-center gap-3">
                       <img
@@ -232,7 +256,9 @@ export default function MisReservas() {
                         <h3 className="text-sm font-bold text-[#1A202C]">
                           {activeRole === "owner" ? res.petsitter_name : res.owner_name}
                         </h3>
-                        <p className="text-xs text-[#6338CC] font-medium">{getIconServicio(res.service_type)}</p>
+                        <p className="text-xs text-[#6338CC] font-medium">
+                          {getIconServicio(res.service_type)}
+                        </p>
                       </div>
                     </div>
 
@@ -240,28 +266,37 @@ export default function MisReservas() {
                     <div className="space-y-1 md:col-span-2 bg-[#EFE9E2]/50 p-3 rounded-xl border border-[#EADBCE]/40">
                       <div className="grid grid-cols-2 text-xs">
                         <div>
-                          <span className="text-[10px] uppercase text-gray-400 font-bold block">Entrada / Comienzo</span>
+                          <span className="text-[10px] uppercase text-gray-400 font-bold block">
+                            Entrada / Comienzo
+                          </span>
                           <p className="font-semibold text-gray-800">📅 {res.start_date}</p>
-                          <p className="text-gray-500 font-medium text-[11px]">🕒 {res.start_time || "N/A"}</p>
+                          <p className="text-gray-500 font-medium text-[11px]">
+                            🕒 {res.start_time || "N/A"}
+                          </p>
                         </div>
                         <div>
-                          <span className="text-[10px] uppercase text-gray-400 font-bold block">Salida / Fin</span>
+                          <span className="text-[10px] uppercase text-gray-400 font-bold block">
+                            Salida / Fin
+                          </span>
                           <p className="font-semibold text-gray-800">📅 {res.end_date}</p>
-                          <p className="text-gray-500 font-medium text-[11px]">🕒 {res.end_time || "N/A"}</p>
+                          <p className="text-gray-500 font-medium text-[11px]">
+                            🕒 {res.end_time || "N/A"}
+                          </p>
                         </div>
                       </div>
                     </div>
-
                   </div>
 
                   {/* Mascota y Comentarios Adicionales */}
                   <div className="text-xs space-y-1 pt-1 border-t border-[#EADBCE]/30">
                     <p className="text-gray-700">
-                      🐾 <span className="font-bold text-gray-900">Mascota protegida:</span> {res.pet_name || "Mascota"}
+                      🐾 <span className="font-bold text-gray-900">Mascota protegida:</span>{" "}
+                      {res.pet_name || "Mascota"}
                     </p>
                     {activeRole === "petsitter" && res.owner_phone && (
                       <p className="text-gray-700">
-                        📱 <span className="font-bold text-gray-900">Contacto del Dueño:</span> {res.owner_phone}
+                        📱 <span className="font-bold text-gray-900">Contacto del Dueño:</span>{" "}
+                        {res.owner_phone}
                       </p>
                     )}
                     {res.comments && (
@@ -275,9 +310,12 @@ export default function MisReservas() {
                 {/* Footer de la Tarjeta de Reserva */}
                 <div className="bg-[#EFE9E2] px-6 py-4 border-t border-[#EADBCE] flex flex-col sm:flex-row justify-between items-center gap-3">
                   <div className="text-center sm:text-left">
-                    <span className="text-[10px] uppercase text-gray-400 font-bold block">Monto Total Facturado</span>
+                    <span className="text-[10px] uppercase text-gray-400 font-bold block">
+                      Monto Total Facturado
+                    </span>
                     <p className="text-base font-extrabold text-[#6338CC]">
-                      {res.total_price} € <span className="text-xs font-normal text-gray-500">con IVA incl.</span>
+                      {res.total_price} €{" "}
+                      <span className="text-xs font-normal text-gray-500">con IVA incl.</span>
                     </p>
                   </div>
 
@@ -285,26 +323,31 @@ export default function MisReservas() {
                   <div className="flex gap-2 w-full sm:w-auto">
                     {(res.status === "pending" || res.status === "pendiente") && (
                       <button
-                        onClick={() => updateBookingStatus(res.id, 'cancelado')}
-                        className="w-full sm:w-auto bg-[#6338CC] hover:bg-[#522cb3] text-white text-xs font-bold py-2 px-4 rounded-xl transition">
+                        onClick={() => handleUpdateStatus(res.id, "cancelado")}
+                        className="w-full sm:w-auto bg-[#6338CC] hover:bg-[#522cb3] text-white text-xs font-bold py-2 px-4 rounded-xl transition"
+                      >
                         Cancelar Solicitud
                       </button>
                     )}
-                    {(res.status === "confirmada" || res.status === "aceptado" || res.status === "confirmado") && (
+                    {(res.status === "confirmada" ||
+                      res.status === "aceptado" ||
+                      res.status === "confirmado") && (
                       <button className="w-full sm:w-auto bg-[#6338CC] hover:bg-[#522cb3] text-white text-xs font-bold py-2 px-4 rounded-xl transition">
                         💬 Chat con Cuidador
                       </button>
                     )}
                     {(res.status === "completada" || res.status === "completado") && (
                       <button
-                        onClick={() => setReservaSeleccionada({ id: res.id, petsitter_id: res.petsitter_id })}
-                        className="w-full sm:w-auto bg-[#7FE3D8] hover:bg-[#68cfc4] text-[#004D44] text-xs font-bold py-2 px-4 rounded-xl transition">
+                        onClick={() =>
+                          setReservaSeleccionada({ id: res.id, petsitter_id: res.petsitter_id })
+                        }
+                        className="w-full sm:w-auto bg-[#7FE3D8] hover:bg-[#68cfc4] text-[#004D44] text-xs font-bold py-2 px-4 rounded-xl transition"
+                      >
                         ⭐ Dejar una Reseña
                       </button>
                     )}
                   </div>
                 </div>
-
               </div>
             ))
           ) : (
@@ -313,18 +356,16 @@ export default function MisReservas() {
               <span className="text-4xl">📭</span>
               <h3 className="text-md font-bold text-gray-700">No tienes reservas en este estado</h3>
               <p className="text-xs text-gray-400 max-w-xs mx-auto">
-                {activeRole === "owner" 
+                {activeRole === "owner"
                   ? "Explora nuestra lista de cuidadores calificados para programar un nuevo servicio para tu mascota."
-                  : "Por el momento ningún cliente ha solicitado tus servicios para este filtro."
-                }
+                  : "Por el momento ningún cliente ha solicitado tus servicios para este filtro."}
               </p>
             </div>
           )}
         </div>
-
       </div>
 
-
+      {/* Modal para dejar reseña */}
       {reservaSeleccionada && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-[#FAF6F0] rounded-2xl p-6 w-full max-w-md shadow-xl space-y-4">
@@ -337,7 +378,10 @@ export default function MisReservas() {
                 <button
                   key={estrella}
                   onClick={() => setRating(estrella)}
-                  className={`text-2xl ${rating >= estrella ? "text-amber-400" : "text-gray-300"}`}>
+                  className={`text-2xl ${
+                    rating >= estrella ? "text-amber-400" : "text-gray-300"
+                  }`}
+                >
                   ★
                 </button>
               ))}
@@ -356,17 +400,18 @@ export default function MisReservas() {
             <div className="flex gap-2">
               <button
                 onClick={() => setReservaSeleccionada(null)}
-                className="w-1/2 bg-white text-gray-700 py-2 rounded-xl border border-[#EADBCE] text-xs font-bold">
+                className="w-1/2 bg-white text-gray-700 py-2 rounded-xl border border-[#EADBCE] text-xs font-bold"
+              >
                 Cancelar
               </button>
 
               <button
                 onClick={handleEnviarResena}
-                className="w-1/2 bg-[#6338CC] text-white py-2 rounded-xl text-xs font-bold">
+                className="w-1/2 bg-[#6338CC] text-white py-2 rounded-xl text-xs font-bold"
+              >
                 Enviar Reseña
               </button>
             </div>
-
           </div>
         </div>
       )}

@@ -18,6 +18,7 @@ from models.availability import Availability
 from models.booking import Booking
 from models.reviews import Review
 from routes.reviews import reviews_bp
+from models.notification import Notification
 
 # Importar la instancia de socketio
 from extension_sockets import socketio
