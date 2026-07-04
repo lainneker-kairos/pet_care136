@@ -18,6 +18,10 @@ from models.availability import Availability
 from models.booking import Booking
 from models.reviews import Review
 from routes.reviews import reviews_bp
+from models.notification import Notification
+
+# Importar la instancia de socketio
+from extension_sockets import socketio
 
 load_dotenv()
 
@@ -41,7 +45,10 @@ app.register_blueprint(reviews_bp, url_prefix='/api')
 
 
 
+# Inicializar SocketIO con la app de Flask
+socketio.init_app(app)
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=False)
+    socketio.run(app, debug=False, host='0.0.0.0', port=5000)

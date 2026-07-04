@@ -5,6 +5,8 @@ from models.user import Owner, Petsitter
 from models.pets import Pet
 from datetime import datetime, timedelta
 from decimal import Decimal
+from extension_sockets import socketio
+from models.notification import Notification
 
 bookings_bp = Blueprint('bookings_bp', __name__)
 
@@ -136,10 +138,36 @@ def create_booking():
     db.session.add(new_booking)
     db.session.commit()
 
+    # Crear y guardar la notificación en la Base de Datos
+    new_notification = Notification(
+        user_id=petsitter.user_id, # Enviamos al user_id base del cuidador
+        title="¡Nueva solicitud de servicio! 🐾",
+        message=f"{owner.name} necesita que cuides de {pet.name}.",
+        type="new_request"
+    )
+    db.session.add(new_notification)
+    db.session.commit()
+
+
+  # EMITIR NOTIFICACIÓN AL PETSITTER
+    room_name = f"user_{petsitter.user_id}"
+    notification_data = {
+        "id": new_notification.id,
+        "type": new_notification.type,
+        "title": new_notification.title,
+        "message": new_notification.message,
+        "service": service_type,
+        "pet_photo": pet.photo,
+        "booking_id": new_booking.id,
+        "is_read": False
+    }
+    socketio.emit('new_notification', notification_data, room=room_name)
+
     return jsonify({
         "msg": "Reserva creada exitosamente",
         "booking": new_booking.serialize()
     }), 201
+
 
 # ==========================================
 # CAMBIAR ESTADO DE LA RESERVA
@@ -167,10 +195,45 @@ def update_booking_status(booking_id):
             petsitter.booking_count += 1
 
     db.session.commit()
+
+     #propuesta para hacer mas natural el mensaje
+    status_nat = {
+        "aceptado": "aceptada",
+        "rechazado": "declinada",
+        "completado": "completada",
+        "cancelado": "cancelada"
+    }.get(new_status, new_status)
+
+     #  Crear y guardar la notificación en la Base de Datos para el Dueño
+    new_notification = Notification(
+        user_id=booking.owner.user_id, # Usamos la relación de la reserva para llegar al user_id del dueño
+        title=f"Reserva {status_nat.capitalize()} 🐾",
+        message=f"Tu solicitud con {booking.petsitter.name} para {booking.pet.name} ha sido {status_nat}.",
+        type="status_update"
+    )
+    db.session.add(new_notification)
+    db.session.commit()
+
+  # EMITIR NOTIFICACIÓN AL OWNER
+    room_name = f"user_{booking.owner.user_id}"
+
+    notification_data = {
+        "id": new_notification.id,
+        "type": new_notification.type,
+        "title": new_notification.title,
+        "message": new_notification.message,
+        "status": new_status,
+        "booking_id": booking.id,
+        "is_read": False
+    }
+    
+    socketio.emit('new_notification', notification_data, room=room_name)
+
     return jsonify({
         "msg": f"El estado de la reserva ha cambiado a: {new_status}",
         "booking": booking.serialize()
     }), 200
+
 
 # ==========================================
 # VER RESERVAS DE UN DUEÑO O CUIDADOR
