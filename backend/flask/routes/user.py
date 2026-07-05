@@ -43,10 +43,7 @@ def register():
     db.session.add(new_user)
     db.session.flush()
 
-    # ==========================================
-    # ACTUALIZACIÓN DEL PERFIL DUEÑO (Owner)
-    # ==========================================
-
+ # ACTUALIZACIÓN DEL PERFIL DUEÑO (Owner)
     new_profile = Owner(
         user_id=new_user.id,
         name=name,        
@@ -59,6 +56,7 @@ def register():
         "msg": "Usuario y perfil creados exitosamente",
         "user": new_user.serialize()
     }), 201
+
 
 # ==========================================
 # INICIO DE SESIÓN
@@ -94,6 +92,28 @@ def login():
         "user": user.serialize(),
         "token": jwt_token
     }), 200
+
+# ==========================================
+# RESTABLECER CONTRASEÑA
+# ==========================================
+@user_bp.route('/reset-password', methods=['POST'])
+def reset_password():
+    data = request.json
+    email = data.get('email')
+    new_password = data.get('new_password')
+
+    if not email or not new_password:
+        return jsonify({"msg": "Email y nueva contraseña son requeridos"}), 400
+
+    user = db.session.execute(db.select(User).filter_by(email=email)).scalar_one_or_none()
+    if not user:
+        return jsonify({"msg": "No existe ninguna cuenta con ese email"}), 404
+
+    user.password = generate_password_hash(new_password)
+    db.session.commit()
+
+    return jsonify({"msg": "Contraseña actualizada correctamente"}), 200
+
 
 # ==========================================
 # OBTENER PERFIL PROPIO 
@@ -231,3 +251,5 @@ def get_public_profile(user_id):
         "role": user.role,
         "profile": profile_data
     }), 200
+
+  

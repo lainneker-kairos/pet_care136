@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { getPublicProfile, getMyPets, getUserProfile, createBooking } from "@/Services/api";
+import { getPublicProfile, getMyPets, getUserProfile, createBooking, getPetsitterReviews } from "@/Services/api";
 
 export default function PerfilCuidadorDinamico() {
     const { id } = useParams();
@@ -11,6 +11,7 @@ export default function PerfilCuidadorDinamico() {
     const [cuidador, setCuidador] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [reseñas, setReseñas] = useState([])
 
     // Estados del formulario de reserva
     const [formData, setFormData] = useState({
@@ -33,6 +34,9 @@ export default function PerfilCuidadorDinamico() {
             try {
                 const data = await getPublicProfile(id);
                 setCuidador(data.profile);
+                const reviews = await getPetsitterReviews(data.profile.id)
+                setReseñas(reviews)
+
             } catch (err) {
                 setError(err.message || "Error al cargar cuidador");
             } finally {
@@ -44,7 +48,7 @@ export default function PerfilCuidadorDinamico() {
 
     useEffect(() => {
         const fetchMascotas = async () => {
-            const token = localStorage.getItem("TOKENJWT"); 
+            const token = localStorage.getItem("TOKENJWT");
             if (!token) return;
             try {
                 const data = await getMyPets();
@@ -63,7 +67,7 @@ export default function PerfilCuidadorDinamico() {
     const handleReserva = async () => {
         setBookingLoading(true);
         setBookingError(null);
-        
+
         const token = localStorage.getItem("TOKENJWT");
 
         if (!token) {
@@ -80,7 +84,7 @@ export default function PerfilCuidadorDinamico() {
 
         try {
             const profileData = await getUserProfile();
-            
+
             const owner_id = profileData.owner_profile?.id;
 
             if (!owner_id) {
@@ -93,14 +97,15 @@ export default function PerfilCuidadorDinamico() {
 
             await createBooking({
                 owner_id: owner_id,
-                petsitter_id: cuidador.id, 
+                petsitter_id: cuidador.id,
                 pet_id: parseInt(formData.pet_id),
                 service_type: formData.service_type,
                 start_date: formData.start_date,
                 end_date: formData.end_date,
                 start_time: formData.start_time || null,
                 end_time: formData.end_time || null,
-                comments: formData.comments
+                comments: formData.comments,
+                duration_hours: null, // Se puede calcular en el backend si es necesario
             });
 
             setBookingSuccess(true);
@@ -172,6 +177,24 @@ export default function PerfilCuidadorDinamico() {
                             <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE]">
                                 <h2 className="text-xl font-bold text-[#1A202C] mb-3">Sobre mí</h2>
                                 <p className="text-gray-700 leading-relaxed text-sm">{cuidador.bio}</p>
+                            </div>
+                        )}
+
+                        {/* Reseñas */}
+                        {reseñas.length > 0 && (
+                            <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE] space-y-4">
+                                <h2 className="text-xl font-bold text-[#1A202C]">Reseñas de clientes</h2>
+                                {reseñas.map((reseña) => (
+                                    <div key={reseña.id} className="bg-[#EFE9E2] p-4 rounded-xl space-y-2">
+                                        <div className="text-amber-400 text-sm">
+                                            {"★".repeat(reseña.rating)}{"☆".repeat(5 - reseña.rating)}
+                                        </div>
+                                        {reseña.comment && (
+                                            <p className="text-sm text-gray-700 italic">"{reseña.comment}"</p>
+                                        )}
+                                        <p className="text-xs text-gray-400">{new Date(reseña.created_at).toLocaleDateString("es-ES")}</p>
+                                    </div>
+                                ))}
                             </div>
                         )}
 

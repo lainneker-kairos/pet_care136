@@ -18,6 +18,11 @@ if TYPE_CHECKING:
 class User(db.Model):
     __tablename__ = "user"
 
+# ==========================================
+# EXTENSIÓN DE CLOUDYNARY: para subir fotos de perfil de usuario y mascotas
+# ==========================================
+    __table_args__ = {'extend_existing': True}
+
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(55), nullable=True)
     email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
@@ -155,3 +160,5 @@ class Petsitter(db.Model):
             "google_calendar_id": self.google_calendar_id,
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
+
+ 

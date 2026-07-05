@@ -46,7 +46,6 @@ export default function PerfilDueno() {
   const [editandoId, setEditandoId] = useState(null);
 
   // --- NUEVOS ESTADOS Y FUNCIONES PARA CLOUDINARY ---
-  // --- NUEVOS ESTADOS Y FUNCIONES PARA CLOUDINARY ---
   const handleFileChange = async (e) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
