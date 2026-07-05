@@ -43,6 +43,21 @@ def register():
     db.session.add(new_user)
     db.session.flush()
 
+ # ACTUALIZACIÓN DEL PERFIL DUEÑO (Owner)
+    new_profile = Owner(
+        user_id=new_user.id,
+        name=name,        
+    )
+
+    db.session.add(new_profile)
+    db.session.commit()
+
+    return jsonify({
+        "msg": "Usuario y perfil creados exitosamente",
+        "user": new_user.serialize()
+    }), 201
+
+
 # ==========================================
 # INICIO DE SESIÓN
 # ==========================================
@@ -98,23 +113,6 @@ def reset_password():
     db.session.commit()
 
     return jsonify({"msg": "Contraseña actualizada correctamente"}), 200
-
-  # ==========================================
-    # ACTUALIZACIÓN DEL PERFIL DUEÑO (Owner)
-    # ==========================================
-
-    new_profile = Owner(
-        user_id=new_user.id,
-        name=name,        
-    )
-
-    db.session.add(new_profile)
-    db.session.commit()
-
-    return jsonify({
-        "msg": "Usuario y perfil creados exitosamente",
-        "user": new_user.serialize()
-    }), 201
 
 
 # ==========================================

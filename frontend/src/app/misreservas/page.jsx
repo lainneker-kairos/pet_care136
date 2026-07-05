@@ -1,20 +1,19 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { getUserProfile, getUserBookings, updateBookingStatus, createReview } from "@/Services/api";
+import { getUserProfile, getUserBookings, updateBookingStatus, createReview } from "../../Services/api";
 
 export default function MisReservas() {
   const [activeRole, setActiveRole] = useState("owner"); // "owner" (dueño) o "petsitter" (cuidador)
   const [hasPetsitterProfile, setHasPetsitterProfile] = useState(false);
   const [filtroEstado, setFiltroEstado] = useState("todas");
   const [reservas, setReservas] = useState([]);
-  const [cargando, setCargando] = useState();
+  const [cargando, setCargando] = useState(true);
   const [reservaSeleccionada, setReservaSeleccionada] = useState(null);
-  const [comentario, setComentario] = useState("")
-  const [rating, setRating] = useState(0)
-  const [perfil, setPerfil] = useState(null)
+  const [comentario, setComentario] = useState("");
+  const [rating, setRating] = useState(0);
+  const [perfil, setPerfil] = useState(null);
 
- // Estados faltantes que causaban errores
   const [feedback, setFeedback] = useState(null);
   const [confirmCancelId, setConfirmCancelId] = useState(null);
 
@@ -23,17 +22,18 @@ export default function MisReservas() {
     setTimeout(() => setFeedback(null), 5000);
   };
 
-  // --- OBTENER RESERVAS REALES ---
-  // Se saca fuera del useEffect para que pueda ser llamada desde otras funciones
   const fetchReservas = async (role) => {
     try {
       setCargando(true);
-      // 1. Obtenemos el perfil del usuario autenticado de forma limpia
       const profileData = await getUserProfile();
       setPerfil(profileData);
 
+      // Verificamos si tiene perfil de cuidador para mostrarle los botones de cambio de rol
+      if (profileData && profileData.petsitter_profile) {
+        setHasPetsitterProfile(true);
+      }
+
       if (profileData) {
-        // 2. Traemos las reservas dependiendo del rol activo
         if (role === "owner" && profileData.owner_profile) {
           const ownerId = profileData.owner_profile.id;
           const bookingsData = await getUserBookings("owner", ownerId);
@@ -54,7 +54,6 @@ export default function MisReservas() {
     }
   };
 
-  // Efecto para cargar las reservas al montar o al cambiar de rol
   useEffect(() => {
     fetchReservas(activeRole);
   }, [activeRole]);
@@ -172,10 +171,31 @@ export default function MisReservas() {
     <div className="min-h-screen bg-[#F0F7F7] font-sans antialiased text-[#2D3748] py-8 px-4">
       <div className="max-w-4xl mx-auto space-y-6">
         
-        {/* Banner de Feedback si existe */}
         {feedback && (
           <div className={`p-4 rounded-xl text-sm font-bold ${feedback.type === 'error' ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800'}`}>
             {feedback.message}
+          </div>
+        )}
+
+        {/* --- NUEVO: SELECTOR DE ROL (Dueño/Cuidador) --- */}
+        {hasPetsitterProfile && (
+          <div className="flex bg-white p-1.5 rounded-xl border border-[#EADBCE] w-full sm:w-fit shadow-sm">
+            <button
+              onClick={() => setActiveRole("owner")}
+              className={`flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${
+                activeRole === "owner" ? "bg-[#6338CC] text-white shadow-md" : "text-gray-500 hover:bg-gray-50"
+              }`}
+            >
+              🐾 Como Dueño
+            </button>
+            <button
+              onClick={() => setActiveRole("petsitter")}
+              className={`flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${
+                activeRole === "petsitter" ? "bg-[#6338CC] text-white shadow-md" : "text-gray-500 hover:bg-gray-50"
+              }`}
+            >
+              💼 Como Cuidador
+            </button>
           </div>
         )}
 
@@ -225,9 +245,7 @@ export default function MisReservas() {
                 key={res.id}
                 className="bg-[#FAF6F0] rounded-2xl border border-[#EADBCE] shadow-sm overflow-hidden flex flex-col justify-between transition hover:shadow-md"
               >
-                {/* Cuerpo de la Reserva */}
                 <div className="p-6 space-y-4">
-                  {/* Fila superior: ID y Estado */}
                   <div className="flex justify-between items-center border-b border-[#EADBCE]/60 pb-3">
                     <div className="space-y-0.5">
                       <span className="text-[11px] uppercase tracking-wider text-gray-400 font-bold">
@@ -240,13 +258,11 @@ export default function MisReservas() {
                     {getBadgeEstado(res.status)}
                   </div>
 
-                  {/* Fila Central: Información Cuidador/Dueño */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                    {/* Bloque Cuidador */}
                     <div className="flex items-center gap-3">
                       <img
                         src={res.cuidador_foto || "https://placehold.co/150x150"}
-                        alt={res.cuidador_nombre || "Cuidador"}
+                        alt={res.cuidador_nombre || "Perfil"}
                         className="w-12 h-12 rounded-xl object-cover border border-[#EADBCE]"
                       />
                       <div>
@@ -262,7 +278,6 @@ export default function MisReservas() {
                       </div>
                     </div>
 
-                    {/* Bloque Tiempos (Fecha y Hora Inicio/Fin) */}
                     <div className="space-y-1 md:col-span-2 bg-[#EFE9E2]/50 p-3 rounded-xl border border-[#EADBCE]/40">
                       <div className="grid grid-cols-2 text-xs">
                         <div>
@@ -287,7 +302,6 @@ export default function MisReservas() {
                     </div>
                   </div>
 
-                  {/* Mascota y Comentarios Adicionales */}
                   <div className="text-xs space-y-1 pt-1 border-t border-[#EADBCE]/30">
                     <p className="text-gray-700">
                       🐾 <span className="font-bold text-gray-900">Mascota protegida:</span>{" "}
@@ -307,7 +321,6 @@ export default function MisReservas() {
                   </div>
                 </div>
 
-                {/* Footer de la Tarjeta de Reserva */}
                 <div className="bg-[#EFE9E2] px-6 py-4 border-t border-[#EADBCE] flex flex-col sm:flex-row justify-between items-center gap-3">
                   <div className="text-center sm:text-left">
                     <span className="text-[10px] uppercase text-gray-400 font-bold block">
@@ -319,24 +332,53 @@ export default function MisReservas() {
                     </p>
                   </div>
 
-                  {/* Acciones contextuales según el rol y el estado */}
+                  {/* Acciones contextuales (Para dueño y cuidador) */}
                   <div className="flex gap-2 w-full sm:w-auto">
-                    {(res.status === "pending" || res.status === "pendiente") && (
+                    {/* Botones si es dueño */}
+                    {activeRole === "owner" && (res.status === "pending" || res.status === "pendiente") && (
                       <button
                         onClick={() => handleUpdateStatus(res.id, "cancelado")}
-                        className="w-full sm:w-auto bg-[#6338CC] hover:bg-[#522cb3] text-white text-xs font-bold py-2 px-4 rounded-xl transition"
+                        className="w-full sm:w-auto bg-gray-500 hover:bg-gray-600 text-white text-xs font-bold py-2 px-4 rounded-xl transition"
                       >
                         Cancelar Solicitud
                       </button>
                     )}
-                    {(res.status === "confirmada" ||
-                      res.status === "aceptado" ||
-                      res.status === "confirmado") && (
-                      <button className="w-full sm:w-auto bg-[#6338CC] hover:bg-[#522cb3] text-white text-xs font-bold py-2 px-4 rounded-xl transition">
-                        💬 Chat con Cuidador
-                      </button>
+
+                    {/* Botones si es cuidador */}
+                    {activeRole === "petsitter" && (res.status === "pending" || res.status === "pendiente") && (
+                      <>
+                        <button
+                          onClick={() => handleUpdateStatus(res.id, "rechazado")}
+                          className="flex-1 sm:flex-none bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-2 px-4 rounded-xl transition"
+                        >
+                          Rechazar
+                        </button>
+                        <button
+                          onClick={() => handleUpdateStatus(res.id, "aceptado")}
+                          className="flex-1 sm:flex-none bg-[#004D44] hover:bg-[#00362f] text-white text-xs font-bold py-2 px-4 rounded-xl transition"
+                        >
+                          Aceptar Reserva
+                        </button>
+                      </>
                     )}
-                    {(res.status === "completada" || res.status === "completado") && (
+
+                    {(res.status === "confirmada" || res.status === "aceptado" || res.status === "confirmado") && (
+                      <>
+                         {activeRole === "petsitter" && (
+                            <button
+                                onClick={() => handleUpdateStatus(res.id, "completado")}
+                                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-4 rounded-xl transition"
+                            >
+                                Marcar Completado
+                            </button>
+                         )}
+                         <button className="w-full sm:w-auto bg-[#6338CC] hover:bg-[#522cb3] text-white text-xs font-bold py-2 px-4 rounded-xl transition">
+                           💬 Abrir Chat
+                         </button>
+                      </>
+                    )}
+
+                    {activeRole === "owner" && (res.status === "completada" || res.status === "completado") && (
                       <button
                         onClick={() =>
                           setReservaSeleccionada({ id: res.id, petsitter_id: res.petsitter_id })
@@ -351,7 +393,6 @@ export default function MisReservas() {
               </div>
             ))
           ) : (
-            /* Estado vacío */
             <div className="bg-[#FAF6F0] rounded-2xl border border-[#EADBCE] p-12 text-center space-y-3 shadow-sm">
               <span className="text-4xl">📭</span>
               <h3 className="text-md font-bold text-gray-700">No tienes reservas en este estado</h3>
@@ -365,14 +406,12 @@ export default function MisReservas() {
         </div>
       </div>
 
-      {/* Modal para dejar reseña */}
       {reservaSeleccionada && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-[#FAF6F0] rounded-2xl p-6 w-full max-w-md shadow-xl space-y-4">
             <h2 className="text-lg font-bold text-[#1A202C]">⭐ Dejar una Reseña</h2>
             <p className="text-xs text-gray-500">Reserva #{reservaSeleccionada.id}</p>
 
-            {/* Estrellas */}
             <div className="flex gap-2">
               {[1, 2, 3, 4, 5].map((estrella) => (
                 <button
@@ -387,7 +426,6 @@ export default function MisReservas() {
               ))}
             </div>
 
-            {/* Comentario */}
             <textarea
               rows="4"
               placeholder="Escribe tu comentario..."
@@ -396,7 +434,6 @@ export default function MisReservas() {
               className="w-full bg-white border border-[#EADBCE] rounded-xl p-3 text-sm focus:outline-none focus:border-[#6338CC] resize-none"
             />
 
-            {/* Botones */}
             <div className="flex gap-2">
               <button
                 onClick={() => setReservaSeleccionada(null)}
