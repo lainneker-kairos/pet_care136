@@ -27,6 +27,8 @@ export default function PerfilDueno() {
     max_budget: ""
   });
 
+  const [subiendoFoto, setSubiendoFoto] = useState(false);
+
   // --- ESTADOS DEL FORMULARIO DE MASCOTAS ---
   const [nombre, setNombre] = useState("");
   const [tipo, setTipo] = useState("perro");
@@ -42,6 +44,45 @@ export default function PerfilDueno() {
 
   // Estado para controlar qué mascota estamos editando (null si es creación)
   const [editandoId, setEditandoId] = useState(null);
+
+  // --- NUEVOS ESTADOS Y FUNCIONES PARA CLOUDINARY ---
+  const handleFileChange = async (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const data = new FormData();
+    data.append("file", files[0]);
+
+    // ✅ CORREGIDO: Aquí va el nombre de tu preset ("petcare_preset")
+    data.append("upload_preset", "petcare_preset");
+
+    setSubiendoFoto(true);
+    try {
+      const res = await fetch(
+        // ✅ CORREGIDO: Aquí va tu cloud name real ("ufpvylnw") en la URL
+        "https://api.cloudinary.com/v1_1/ufpvylnw/image/upload",
+        { method: "POST", body: data }
+      );
+
+      const file = await res.json();
+
+      if (res.ok && file.secure_url) {
+        setOwnerForm(prev => ({
+          ...prev,
+          profile_pic: file.secure_url
+        }));
+        alert("¡Imagen subida a Cloudinary con éxito! Recuerda hacer clic en 'Guardar' para actualizar tu perfil.");
+      } else {
+        console.error("Error detallado de Cloudinary:", file);
+        alert(`Error de Cloudinary: ${file.error?.message || 'No autorizado'}`);
+      }
+    } catch (error) {
+      console.error("Error en la petición de red:", error);
+      alert("Error de conexión al intentar subir la imagen");
+    } finally {
+      setSubiendoFoto(false);
+    }
+  };
 
   // Función para obtener todos los datos frescos del backend
   const fetchDatos = async () => {
@@ -220,18 +261,38 @@ export default function PerfilDueno() {
           {/* COLUMNA IZQUIERDA: Información del Dueño */}
           <div className="lg:col-span-4 bg-[#FAF6F0] rounded-2xl border border-[#EADBCE] p-6 shadow-sm space-y-6 sticky top-6">
             <div className="text-center space-y-3">
-              <div className="w-28 h-28 mx-auto rounded-full overflow-hidden border-2 border-[#6338CC] shadow-sm">
-                <img
-                  src={owner.profile_pic || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&q=80"}
-                  alt={owner.name}
-                  className="w-full h-full object-cover"
+
+              {/* Contenedor interactivo del Avatar */}
+              <div className="w-28 h-28 mx-auto relative group cursor-pointer">
+                <label htmlFor="foto-upload" className="w-full h-full block rounded-full overflow-hidden border-2 border-[#6338CC] shadow-sm">
+                  <img
+                    src={ownerForm.profile_pic || owner.profile_pic || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&q=80"}
+                    alt={owner.name}
+                    className="w-full h-full object-cover group-hover:opacity-75 transition-opacity"
+                  />
+                  {/* Capa oscura decorativa al pasar el mouse */}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-40 rounded-full text-white text-[10px] font-semibold">
+                    {subiendoFoto ? "Cargando..." : "Cambiar foto"}
+                  </div>
+                </label>
+
+                {/* Input oculto vinculado al label */}
+                <input
+                  id="foto-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  disabled={subiendoFoto}
+                  className="hidden"
                 />
               </div>
+
               <div>
                 <h2 className="text-xl font-bold text-[#1A202C]">{owner.name}</h2>
                 <p className="text-xs text-gray-500 font-medium">
                   📍 Miembro desde {new Date(owner.created_at).getFullYear()}
                 </p>
+                {subiendoFoto && <p className="text-[10px] text-purple-600 font-bold mt-1">Subiendo a Cloudinary...</p>}
               </div>
             </div>
 

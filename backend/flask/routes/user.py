@@ -252,3 +252,4 @@ def get_public_profile(user_id):
         "profile": profile_data
     }), 200
 
+  
