@@ -67,6 +67,12 @@ def get_searchpetsitters():
                 query = query.filter(Petsitter.price_per_night >= min_price)
             if max_price is not None:
                 query = query.filter(Petsitter.price_per_night <= max_price)
+        else:
+            # Si busca por precio pero no por servicio, comprobamos si alguno de sus precios encaja
+            if min_price is not None:
+                query = query.filter((Petsitter.price_per_hour >= min_price) | (Petsitter.price_per_night >= min_price))
+            if max_price is not None:
+                query = query.filter((Petsitter.price_per_hour <= max_price) | (Petsitter.price_per_night <= max_price))
 
     # Filtro por disponibilidad de fechas
     start_date = None

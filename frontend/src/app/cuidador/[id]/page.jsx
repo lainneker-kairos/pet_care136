@@ -104,7 +104,8 @@ export default function PerfilCuidadorDinamico() {
                 end_date: formData.end_date,
                 start_time: formData.start_time || null,
                 end_time: formData.end_time || null,
-                comments: formData.comments
+                comments: formData.comments,
+                duration_hours: null, // Se puede calcular en el backend si es necesario
             });
 
             setBookingSuccess(true);
