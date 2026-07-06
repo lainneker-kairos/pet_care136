@@ -150,7 +150,7 @@ export default function PerfilCuidador() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Nombre Profesional</label>
+                <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Nombre Completo</label>
                 <input
                   type="text"
                   name="name"
@@ -269,7 +269,7 @@ export default function PerfilCuidador() {
 
         {/* Encabezado Principal */}
         <div className="bg-[#FAF6F0] p-6 rounded-2xl border border-[#EADBCE] shadow-sm">
-          <h1 className="text-2xl font-extrabold text-[#6338CC]">Mi Perfil de Cuidador</h1>
+          <h1 className="text-2xl font-extrabold text-purple-700">Mi Perfil de Cuidador</h1>
           <p className="text-sm text-gray-500">
             Administra tus datos de contacto personales.
           </p>
@@ -626,11 +626,11 @@ export default function PerfilCuidador() {
 
               <button
                 onClick={() => setIsEditing(true)}
-                className="w-full bg-[#6338CC] hover:bg-[#522cb3] text-white font-semibold py-3 px-4 rounded-xl transition duration-200 flex items-center justify-center gap-2 shadow-md"
+                className="w-full bg-purple-700 hover:bg-[#522cb3] text-white font-semibold py-3 px-4 rounded-xl transition duration-200 flex items-center justify-center gap-2 shadow-md"
               >
                 ⚙️ Configurar Mis Tarifas
               </button>
-              <button className="w-full bg-[#6338CC] hover:bg-[#522cb3] text-white font-semibold py-3 px-4 rounded-xl transition duration-200 flex items-center justify-center gap-2 shadow-md">
+              <button className="w-full bg-purple-700 hover:bg-[#522cb3] text-white font-semibold py-3 px-4 rounded-xl transition duration-200 flex items-center justify-center gap-2 shadow-md">
                <Link 
                href="/misreservas">
                 Ver Mis Reservas
