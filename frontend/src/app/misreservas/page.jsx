@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { getUserProfile, getUserBookings, updateBookingStatus, createReview } from "../../Services/api";
+import { toast } from "sonner";
 
 export default function MisReservas() {
   const [activeRole, setActiveRole] = useState("owner"); // "owner" (dueño) o "petsitter" (cuidador)
@@ -147,13 +148,13 @@ export default function MisReservas() {
         review_type: "owner_to_petsitter",
       };
       await createReview(reviewData);
-      alert("¡Reseña enviada con éxito!");
+      toast.success("¡Reseña enviada con éxito!")
       setReservaSeleccionada(null);
       setComentario("");
       setRating(0);
     } catch (error) {
       console.error("Error al enviar reseña:", error);
-      alert("Error al enviar la reseña, inténtalo de nuevo");
+      toast.error("Error al enviar la reseña, inténtalo de nuevo")
     }
   };
 

@@ -66,7 +66,7 @@ export default function CuidadorCard({ cuidador }) {
             <div className="px-5 pb-5">
                 <Link
                     href={`/cuidador/${cuidador.user_id}`}
-                    className="block w-full text-center bg-[#6338CC] hover:bg-[#522cb3] text-white font-bold text-sm py-2.5 rounded-xl transition">
+                    className="block w-full text-center bg-purple-700 hover:bg-[#522cb3] text-white font-bold text-sm py-2.5 rounded-xl transition">
                     Ver perfil
                 </Link>
             </div>
