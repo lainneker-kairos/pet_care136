@@ -14,6 +14,7 @@ export default function PerfilCuidador() {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [subiendoFoto, setSubiendoFoto] = useState(false); // Estado para controlar la carga de la imagen
 
   // --- FORMULARIOS DE REGISTRO / EDICIÓN ---
   const [formData, setFormData] = useState({
@@ -30,7 +31,8 @@ export default function PerfilCuidador() {
     offers_daycare: false,
     offers_nightcare: false,
     available_days: "Lunes, Martes, Miércoles, Jueves, Viernes, Sábado",
-    accepted_dog_sizes: "Pequeño, Mediano"
+    accepted_dog_sizes: "Pequeño, Mediano",
+    profile_pic: "" // Añadido para almacenar la URL de Cloudinary
   });
 
   const fetchProfile = async () => {
@@ -53,7 +55,8 @@ export default function PerfilCuidador() {
           offers_daycare: data.petsitter_profile.offers_daycare || false,
           offers_nightcare: data.petsitter_profile.offers_nightcare || false,
           available_days: data.petsitter_profile.available_days || "",
-          accepted_dog_sizes: data.petsitter_profile.accepted_dog_sizes || ""
+          accepted_dog_sizes: data.petsitter_profile.accepted_dog_sizes || "",
+          profile_pic: data.petsitter_profile.profile_pic || ""
         });
       }
     } catch (error) {
@@ -68,7 +71,43 @@ export default function PerfilCuidador() {
     setIsMounted(true);
   }, []);
 
-  if (!isMounted) return null; // No renderizar nada en el servidor o durante el primer render
+  // --- FUNCIÓN DE CONTROL DE ARCHIVOS PARA CLOUDINARY ---
+  const handleFileChange = async (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const data = new FormData();
+    data.append("file", files[0]);
+    data.append("upload_preset", "petcare_preset"); // Tu preset Unsigned verificado
+
+    setSubiendoFoto(true);
+    try {
+      const res = await fetch(
+        "https://api.cloudinary.com/v1_1/ufpvylnw/image/upload", // Tu Cloud Name verificado
+        { method: "POST", body: data }
+      );
+
+      const fileData = await res.json();
+
+      if (res.ok && fileData.secure_url) {
+        setFormData((prev) => ({
+          ...prev,
+          profile_pic: fileData.secure_url
+        }));
+        toast.success("¡Imagen subida con éxito! Recuerda guardar los cambios del perfil.");
+      } else {
+        console.error("Error en respuesta de Cloudinary:", fileData);
+        toast.error(`Error de Cloudinary: ${fileData.error?.message || "No autorizado"}`);
+      }
+    } catch (error) {
+      console.error("Error en la petición de red a Cloudinary:", error);
+      toast.error("Error de conexión al intentar subir la imagen");
+    } finally {
+      setSubiendoFoto(false);
+    }
+  };
+
+  if (!isMounted) return null;
 
   if (loading) {
     return (
@@ -117,14 +156,6 @@ export default function PerfilCuidador() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F0F7F7]">
-        Cargando tu perfil de Cuidador...
-      </div>
-    );
-  }
-
   if (!profile) {
     return (
       <div className="text-center p-10 bg-[#F0F7F7] min-h-screen">
@@ -148,6 +179,32 @@ export default function PerfilCuidador() {
           </div>
 
           <form onSubmit={handleRegisterPetsitter} className="space-y-4">
+            
+            {/* Sección Avatar Interactiva para el registro inicial */}
+            <div className="flex flex-col items-center space-y-2">
+              <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Foto de Perfil Profesional</label>
+              <div className="w-28 h-28 relative group cursor-pointer">
+                <label htmlFor="foto-cuidador-register" className="w-full h-full block rounded-full overflow-hidden border-2 border-purple-700 shadow-sm cursor-pointer">
+                  <img
+                    src={formData.profile_pic || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&auto=format&fit=crop&q=80"}
+                    alt="Previsualización"
+                    className="w-full h-full object-cover group-hover:opacity-75 transition-opacity"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-40 rounded-full text-white text-[10px] font-semibold">
+                    {subiendoFoto ? "Cargando..." : "Subir foto"}
+                  </div>
+                </label>
+                <input
+                  id="foto-cuidador-register"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  disabled={subiendoFoto}
+                  className="hidden"
+                />
+              </div>
+              {subiendoFoto && <p className="text-[10px] text-purple-600 font-bold">Subiendo a Cloudinary...</p>}
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
@@ -272,7 +329,7 @@ export default function PerfilCuidador() {
         <div className="bg-[#FAF6F0] p-6 rounded-2xl border border-[#EADBCE] shadow-sm">
           <h1 className="text-2xl font-extrabold text-purple-700">Mi Perfil de Cuidador</h1>
           <p className="text-sm text-gray-500">
-            Administra tus datos de contacto personales.
+            Administra tus datos de contacto personales y profesionales de tu actividad.
           </p>
         </div>
 
@@ -284,13 +341,27 @@ export default function PerfilCuidador() {
             {/* Tarjeta de Perfil Principal */}
             <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE] flex flex-col md:flex-row gap-6 items-center md:items-start">
 
-              <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden flex-shrink-0 bg-amber-200">
-                <img
-                  src={caregiver.profile_pic || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&auto=format&fit=crop&q=80"}
-                  alt={caregiver.name}
-                  className="w-full h-full object-cover"
+              {/* Contenedor interactivo del Avatar con soporte Cloudinary */}
+              <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden flex-shrink-0 bg-amber-200 group cursor-pointer">
+                <label htmlFor="foto-cuidador-dashboard" className="w-full h-full block cursor-pointer">
+                  <img
+                    src={formData.profile_pic || caregiver.profile_pic || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&auto=format&fit=crop&q=80"}
+                    alt={caregiver.name}
+                    className="w-full h-full object-cover group-hover:opacity-75 transition-opacity"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-40 text-white text-xs font-semibold">
+                    {subiendoFoto ? "Cargando..." : "Cambiar foto"}
+                  </div>
+                </label>
+                <input
+                  id="foto-cuidador-dashboard"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  disabled={subiendoFoto}
+                  className="hidden"
                 />
-                <span className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-[#00A896] text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1 shadow-md whitespace-nowrap">
+                <span className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-[#00A896] text-white text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-md whitespace-nowrap">
                   ✓ Verificado
                 </span>
               </div>
@@ -305,6 +376,7 @@ export default function PerfilCuidador() {
                     <span className="text-gray-300">|</span>
                     <span className="flex items-center gap-1">📍 {caregiver.neighborhood ? `${caregiver.neighborhood}, ` : ""}{caregiver.city}</span>
                   </div>
+                  {subiendoFoto && <p className="text-xs text-purple-600 font-bold mt-1 text-center md:text-left">Subiendo nueva imagen...</p>}
                 </div>
 
                 <div className="grid grid-cols-3 gap-2 bg-[#EFE9E2] p-3 rounded-xl text-center">
@@ -322,7 +394,6 @@ export default function PerfilCuidador() {
                   </div>
                 </div>
               </div>
-
             </div>
 
             {/* Formulario de Edición o Sección Sobre Mí */}
@@ -445,7 +516,6 @@ export default function PerfilCuidador() {
                 <div className="space-y-2 border-t border-[#EADBCE]/50 pt-3">
                   <span className="text-xs font-bold text-gray-500 uppercase block">Servicios Ofrecidos</span>
                   <div className="grid grid-cols-2 gap-2">
-
                     <label className="flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer">
                       <input
                         type="checkbox"
@@ -489,7 +559,6 @@ export default function PerfilCuidador() {
                       />
                       🌙 Ofrecer Cuidado Nocturno
                     </label>
-
                   </div>
                 </div>
 
@@ -519,14 +588,13 @@ export default function PerfilCuidador() {
                     Guardar Cambios
                   </button>
                 </div>
-
               </form>
             )}
 
             <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE] space-y-4">
               <h2 className="text-lg font-bold text-[#1A202C]">Ubicación del Cuidador</h2>
               <div className="w-full h-48 bg-[#EFE9E2] rounded-xl flex items-center justify-center border border-[#EADBCE]">
-                <p className="text-gray-500 text-sm">
+                <p className="text-gray-500 text-sm text-center">
                   {caregiver.neighborhood}, {caregiver.city}
                   <br />
                   <span className="text-xs italic">(Aquí irá el mapa de Google Maps)</span>
@@ -534,7 +602,6 @@ export default function PerfilCuidador() {
               </div>
             </div>
 
-            {/* Sección: Integración Calendario */}
             <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE] space-y-4">
               <h2 className="text-lg font-bold text-[#1A202C]">Disponibilidad en Calendario</h2>
               <p className="text-sm text-gray-600">
@@ -544,87 +611,38 @@ export default function PerfilCuidador() {
                 📅 Sincronizar con Google Calendar
               </button>
             </div>
-
-            {/* Sección: Clientes Felices (Sección estática de confianza) */}
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold text-[#1A202C]">Clientes Felices</h2>
-                <span className="text-xs font-bold text-gray-400">Próximamente opiniones de tus clientes</span>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                <div className="bg-[#FAF6F0] p-4 rounded-xl border border-[#EADBCE] flex gap-4 items-start opacity-70">
-                  <div className="w-16 h-16 rounded-lg bg-[#EFE9E2] flex items-center justify-center text-xl flex-shrink-0">🐶</div>
-                  <div className="space-y-1">
-                    <div className="text-amber-500 text-xs">★★★★★</div>
-                    <p className="text-xs text-gray-700 italic">"Ejemplo de reseña de un dueño de mascota feliz..."</p>
-                    <p className="text-xs font-bold text-gray-900">— Sarah M.</p>
-                  </div>
-                </div>
-
-                <div className="bg-[#FAF6F0] p-4 rounded-xl border border-[#EADBCE] flex gap-4 items-start opacity-70">
-                  <div className="w-16 h-16 rounded-lg bg-[#EFE9E2] flex items-center justify-center text-xl flex-shrink-0">🐱</div>
-                  <div className="space-y-1">
-                    <div className="text-amber-500 text-xs">★★★★★</div>
-                    <p className="text-xs text-gray-700 italic">"Ejemplo de comentario excelente sobre tus paseos..."</p>
-                    <p className="text-xs font-bold text-gray-900">— James K.</p>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
           </div>
 
           {/* COLUMNA DERECHA: Servicios, Precios y Disponibilidad */}
           <div className="space-y-6">
-
-            {/* Servicios y Precios Dinámicos */}
             <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE] space-y-4">
               <h2 className="text-lg font-bold text-[#1A202C]">Mis Servicios y Tarifas</h2>
-
               <div className="space-y-3">
                 {caregiver.offers_walk && (
                   <div className="flex justify-between items-center bg-[#EFE9E2] p-3 rounded-xl">
                     <span className="flex items-center gap-2 text-sm font-medium">🚶 Paseo de Perros</span>
-                    <span className="font-bold text-[#6338CC] text-sm">
-                      {caregiver.price_per_hour} €<span className="text-xs font-normal text-gray-500">/hr</span>
-                    </span>
+                    <span className="font-bold text-[#6338CC] text-sm">{caregiver.price_per_hour} €/hr</span>
                   </div>
                 )}
                 {caregiver.offers_daycare && (
                   <div className="flex justify-between items-center bg-[#EFE9E2] p-3 rounded-xl">
                     <span className="flex items-center gap-2 text-sm font-medium">🐾 Guardería Diurna</span>
-                    <span className="font-bold text-[#6338CC] text-sm">
-                      {caregiver.price_per_hour} €<span className="text-xs font-normal text-gray-500">/día</span>
-                    </span>
+                    <span className="font-bold text-[#6338CC] text-sm">{caregiver.price_per_hour} €/día</span>
                   </div>
                 )}
                 {caregiver.offers_hotel && (
                   <div className="flex justify-between items-center bg-[#EFE9E2] p-3 rounded-xl">
                     <span className="flex items-center gap-2 text-sm font-medium">🏠 Alojamiento Completo</span>
-                    <span className="font-bold text-[#6338CC] text-sm">
-                      {caregiver.price_per_night} €<span className="text-xs font-normal text-gray-500">/noche</span>
-                    </span>
+                    <span className="font-bold text-[#6338CC] text-sm">{caregiver.price_per_night} €/noche</span>
                   </div>
                 )}
                 {caregiver.offers_nightcare && (
                   <div className="flex justify-between items-center bg-[#EFE9E2] p-3 rounded-xl">
                     <span className="flex items-center gap-2 text-sm font-medium">🌙 Cuidado Nocturno</span>
-                    <span className="font-bold text-[#6338CC] text-sm">
-                      {caregiver.price_per_night} €<span className="text-xs font-normal text-gray-500">/noche</span>
-                    </span>
+                    <span className="font-bold text-[#6338CC] text-sm">{caregiver.price_per_night} €/noche</span>
                   </div>
                 )}
-
-                {!caregiver.offers_walk && !caregiver.offers_daycare && !caregiver.offers_hotel && !caregiver.offers_nightcare && (
-                  <p className="text-xs text-gray-500 text-center py-2">
-                    No has seleccionado ningún servicio activo. Edita tu perfil para activar tus servicios.
-                  </p>
-                )}
               </div>
-
               <button
                 onClick={() => setIsEditing(true)}
                 className="w-full bg-purple-700 hover:bg-[#522cb3] text-white font-semibold py-3 px-4 rounded-xl transition duration-200 flex items-center justify-center gap-2 shadow-md"
@@ -632,19 +650,12 @@ export default function PerfilCuidador() {
                 ⚙️ Configurar Mis Tarifas
               </button>
               <button className="w-full bg-purple-700 hover:bg-[#522cb3] text-white font-semibold py-3 px-4 rounded-xl transition duration-200 flex items-center justify-center gap-2 shadow-md">
-               <Link 
-               href="/misreservas">
-                Ver Mis Reservas
-                </Link>
+                <Link href="/misreservas">Ver Mis Reservas</Link>
               </button>
             </div>
 
-            {/* Disponibilidad */}
             <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE] space-y-4">
-              <div className="flex justify-between items-center">
-                <h2 className="text-md font-bold text-[#1A202C]">Disponibilidad Semanal</h2>
-              </div>
-
+              <h2 className="text-md font-bold text-[#1A202C]">Disponibilidad Semanal</h2>
               <div className="text-xs text-gray-700 space-y-1">
                 <p>🗓️ <span className="font-bold text-[#6338CC]">Días disponibles:</span></p>
                 <p className="bg-[#EFE9E2] p-2.5 rounded-lg border border-[#EADBCE]/40 font-semibold">
@@ -652,7 +663,6 @@ export default function PerfilCuidador() {
                 </p>
               </div>
             </div>
-
           </div>
 
         </div>
