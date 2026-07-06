@@ -9,6 +9,7 @@ import {
   deletePet
 } from "../Services/api";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export default function PerfilDueno() {
   // --- ESTADOS PARA DATOS REALES ---
@@ -71,14 +72,14 @@ export default function PerfilDueno() {
           ...prev,
           profile_pic: file.secure_url
         }));
-        alert("¡Imagen subida a Cloudinary con éxito! Recuerda hacer clic en 'Guardar' para actualizar tu perfil.");
+        toast.success("¡Imagen subida a Cloudinary con éxito! Recuerda hacer clic en 'Guardar' para actualizar tu perfil.");
       } else {
         console.error("Error detallado de Cloudinary:", file);
-        alert(`Error de Cloudinary: ${file.error?.message || 'No autorizado'}`);
+        toast.error(`Error de Cloudinary: ${file.error?.message || 'No autorizado'}`);
       }
     } catch (error) {
       console.error("Error en la petición de red:", error);
-      alert("Error de conexión al intentar subir la imagen");
+      toast.error("Error de conexión al intentar subir la imagen");
     } finally {
       setSubiendoFoto(false);
     }
@@ -126,10 +127,10 @@ export default function PerfilDueno() {
       await updateOwnerProfile(dataToSend);
       setEditandoOwner(false);
       await fetchDatos();
-      alert("Perfil actualizado correctamente");
+      toast.success("Perfil actualizado correctamente");
     } catch (error) {
       console.error("Error al actualizar dueño:", error);
-      alert("Error al actualizar el perfil");
+      toast.error("Error al actualizar el perfil");
     }
   };
 
@@ -158,7 +159,7 @@ export default function PerfilDueno() {
         limpiarFormulario();
         setEditandoId(null)
         await fetchDatos();
-        alert("Mascota actualizada correctamente")
+        toast.success("Mascota actualizada correctamente")
       } catch (error) {
         console.error("Error al actualizar la mascota:", error);
       }
@@ -175,10 +176,10 @@ export default function PerfilDueno() {
 
         const nuevaMascota = await createPet(petData);
         setMascotas([...mascotas, nuevaMascota.pet]);
-        alert("Mascota registrada con éxito");
+        toast.success("Mascota registrada con éxito");
         limpiarFormulario();
       } catch (error) {
-        alert("Error al registrar mascota");
+        toast.error("Error al registrar mascota");
         console.error(error);
       }
     }
@@ -189,7 +190,7 @@ export default function PerfilDueno() {
       try {
         await deletePet(id);
         await fetchDatos();
-        alert("Mascota eliminada");
+        toast.success("Mascota eliminada");
       } catch (error) {
         console.error("Error al eliminar la mascota:", error);
       }

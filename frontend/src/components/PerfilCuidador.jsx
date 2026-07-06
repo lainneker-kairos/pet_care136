@@ -7,6 +7,7 @@ import {
   updatePetsitterProfile
 } from "../Services/api";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export default function PerfilCuidador() {
   const [profile, setProfile] = useState(null);
@@ -90,11 +91,11 @@ export default function PerfilCuidador() {
     try {
       setLoading(true);
       await createPetsitterProfile(formData);
-      alert("¡Felicidades! Ahora tienes un perfil de cuidador.");
+      toast.success("¡Felicidades! Ahora tienes un perfil de cuidador.");
       await fetchProfile();
     } catch (error) {
       console.error(error);
-      alert("Error al registrar perfil de cuidador");
+      toast.error("Error al registrar perfil de cuidador");
     } finally {
       setLoading(false);
     }
@@ -106,11 +107,11 @@ export default function PerfilCuidador() {
       setLoading(true);
       await updatePetsitterProfile(formData);
       setIsEditing(false);
-      alert("Perfil de cuidador actualizado con éxito");
+      toast.success("Perfil de cuidador actualizado con éxito");
       await fetchProfile();
     } catch (error) {
       console.error(error);
-      alert("Error al actualizar perfil de cuidador");
+      toast.error("Error al actualizar perfil de cuidador");
     } finally {
       setLoading(false);
     }

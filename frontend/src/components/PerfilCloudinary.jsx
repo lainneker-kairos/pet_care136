@@ -1,6 +1,7 @@
 "use client"; // <--- REGLA DE NEXT.JS: Fundamental para usar useState y subida de archivos
 
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function EditarPerfil() {
   // 1. Estados del formulario bien definidos
@@ -50,7 +51,7 @@ export default function EditarPerfil() {
         
       } else {
         // ❌ Error controlado si Cloudinary rechaza la petición
-        alert("Error de Cloudinary: " + fileData.error.message);
+        toast.error("Error de Cloudinary: " + fileData.error.message);
       }
     } catch (error) {
       console.error("Error de red al conectar con Cloudinary:", error);
