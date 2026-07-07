@@ -54,7 +54,7 @@ export default function PerfilCuidadorDinamico() {
                 const data = await getMyPets();
                 setMascotas(data);
             } catch (err) {
-                console.error("Error cargando mascotas:", err);
+                console.log("Sin mascotas o sin sesión iniciada");
             }
         };
         fetchMascotas();
@@ -200,7 +200,7 @@ export default function PerfilCuidadorDinamico() {
 
                         {/* Servicios */}
                         <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE]">
-                            <h2 className="text-xl font-bold text-[#6338CC] mb-3">Servicios disponibles</h2>
+                            <h2 className="text-xl font-bold text-purple-700 mb-3">Servicios disponibles</h2>
                             <div className="flex flex-wrap gap-2">
                                 {cuidador?.offers_walk && <span className="bg-[#7FE3D8]/40 text-[#004D44] text-xs font-semibold px-3 py-1.5 rounded-full border border-[#7FE3D8]/60">🚶 Paseos</span>}
                                 {cuidador?.offers_hotel && <span className="bg-[#7FE3D8]/40 text-[#004D44] text-xs font-semibold px-3 py-1.5 rounded-full border border-[#7FE3D8]/60">🏠 Hotel</span>}
@@ -211,29 +211,34 @@ export default function PerfilCuidadorDinamico() {
                     </div>
 
                     {/* COLUMNA DERECHA — Formulario de reserva */}
-                    <div className="space-y-6">
-                        <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE] space-y-4">
-                            <h2 className="text-lg font-bold text-[#1A202C]">Solicitar reserva</h2>
+                    <div className="space-y-4">
 
-                            {/* Precios */}
+                        {/* Precios destacados */}
+                        <div className="bg-[#FAF6F0] rounded-2xl p-5 shadow-sm border border-[#EADBCE] space-y-3">
+                            <h2 className="text-lg font-bold text-[#1A202C]">Tarifas</h2>
                             <div className="space-y-2">
                                 {cuidador?.price_per_hour && (
-                                    <div className="flex justify-between bg-[#EFE9E2] p-3 rounded-xl">
-                                        <span className="text-sm font-medium">Precio/hora</span>
-                                        <span className="font-bold text-[#6338CC]">{cuidador.price_per_hour}€</span>
+                                    <div className="flex justify-between items-center bg-purple-50 border border-purple-100 p-3 rounded-xl">
+                                        <span className="text-sm font-medium text-gray-700">🚶 Paseo / Guardería</span>
+                                        <span className="font-extrabold text-[#6338CC] text-lg">{cuidador.price_per_hour}€<span className="text-xs font-normal text-gray-500">/hr</span></span>
                                     </div>
                                 )}
                                 {cuidador?.price_per_night && (
-                                    <div className="flex justify-between bg-[#EFE9E2] p-3 rounded-xl">
-                                        <span className="text-sm font-medium">Precio/noche</span>
-                                        <span className="font-bold text-[#6338CC]">{cuidador.price_per_night}€</span>
+                                    <div className="flex justify-between items-center bg-teal-50 border border-teal-100 p-3 rounded-xl">
+                                        <span className="text-sm font-medium text-gray-700">🏠 Hotel / Nocturno</span>
+                                        <span className="font-extrabold text-[#00A896] text-lg">{cuidador.price_per_night}€<span className="text-xs font-normal text-gray-500">/noche</span></span>
                                     </div>
                                 )}
                             </div>
+                        </div>
+
+                        {/* Formulario */}
+                        <div className="bg-[#FAF6F0] rounded-2xl p-5 shadow-sm border border-[#EADBCE] space-y-4">
+                            <h2 className="text-lg font-bold text-[#1A202C]">Solicitar reserva</h2>
 
                             {bookingSuccess ? (
                                 <div className="bg-green-50 border border-green-300 rounded-xl p-4 text-center space-y-2">
-                                    <p className="text-2xl">✅</p>
+                                    <p className="text-3xl">✅</p>
                                     <p className="text-green-700 font-bold text-sm">¡Reserva enviada con éxito!</p>
                                     <p className="text-green-600 text-xs">El cuidador revisará tu solicitud pronto.</p>
                                     <button
@@ -244,15 +249,16 @@ export default function PerfilCuidadorDinamico() {
                                     </button>
                                 </div>
                             ) : (
-                                <div className="space-y-3">
+                                <div className="space-y-4">
+
                                     {/* Servicio */}
-                                    <div>
-                                        <label className="text-xs font-bold text-gray-600 block mb-1">Tipo de servicio *</label>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">Tipo de servicio *</label>
                                         <select
                                             name="service_type"
                                             value={formData.service_type}
                                             onChange={handleChange}
-                                            className="w-full border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-purple-400"
+                                            className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#6338CC]"
                                         >
                                             <option value="">Selecciona un servicio</option>
                                             {cuidador?.offers_walk && <option value="paseo">🚶 Paseo</option>}
@@ -263,13 +269,13 @@ export default function PerfilCuidadorDinamico() {
                                     </div>
 
                                     {/* Mascota */}
-                                    <div>
-                                        <label className="text-xs font-bold text-gray-600 block mb-1">Mascota *</label>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">Mascota *</label>
                                         <select
                                             name="pet_id"
                                             value={formData.pet_id}
                                             onChange={handleChange}
-                                            className="w-full border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-purple-400"
+                                            className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#6338CC]"
                                         >
                                             <option value="">Selecciona tu mascota</option>
                                             {mascotas.map(pet => (
@@ -277,79 +283,99 @@ export default function PerfilCuidadorDinamico() {
                                             ))}
                                         </select>
                                         {mascotas.length === 0 && (
-                                            <p className="text-xs text-amber-600 mt-1">⚠️ No tienes mascotas registradas. <a href="/perfil-owner" className="underline">Agregar mascota</a></p>
+                                            <p className="text-xs text-amber-600 mt-1">⚠️ Sin mascotas registradas. <a href="/perfil-owner" className="underline font-semibold">Agregar aquí</a></p>
                                         )}
                                     </div>
 
                                     {/* Fechas */}
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div>
-                                            <label className="text-xs font-bold text-gray-600 block mb-1">Fecha inicio *</label>
-                                            <input
-                                                type="date"
-                                                name="start_date"
-                                                value={formData.start_date}
-                                                onChange={handleChange}
-                                                className="w-full border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-purple-400"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-xs font-bold text-gray-600 block mb-1">Fecha fin *</label>
-                                            <input
-                                                type="date"
-                                                name="end_date"
-                                                value={formData.end_date}
-                                                onChange={handleChange}
-                                                className="w-full border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-purple-400"
-                                            />
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">Fechas *</label>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <div>
+                                                <p className="text-[10px] text-gray-400 mb-1">Entrada</p>
+                                                <input
+                                                    type="date"
+                                                    name="start_date"
+                                                    value={formData.start_date}
+                                                    onChange={handleChange}
+                                                    className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#6338CC]"
+                                                />
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] text-gray-400 mb-1">Salida</p>
+                                                <input
+                                                    type="date"
+                                                    name="end_date"
+                                                    value={formData.end_date}
+                                                    onChange={handleChange}
+                                                    className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#6338CC]"
+                                                />
+                                            </div>
                                         </div>
                                     </div>
 
                                     {/* Horas */}
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div>
-                                            <label className="text-xs font-bold text-gray-600 block mb-1">Hora inicio</label>
-                                            <input
-                                                type="time"
-                                                name="start_time"
-                                                value={formData.start_time}
-                                                onChange={handleChange}
-                                                className="w-full border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-purple-400"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-xs font-bold text-gray-600 block mb-1">Hora fin</label>
-                                            <input
-                                                type="time"
-                                                name="end_time"
-                                                value={formData.end_time}
-                                                onChange={handleChange}
-                                                className="w-full border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-purple-400"
-                                            />
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">Horas (opcional)</label>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <div>
+                                                <p className="text-[10px] text-gray-400 mb-1">Inicio</p>
+                                                <select
+                                                    name="start_time"
+                                                    value={formData.start_time}
+                                                    onChange={handleChange}
+                                                    className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#6338CC]"
+                                                >
+                                                    <option value="">--:--</option>
+                                                    {Array.from({ length: 48 }, (_, i) => {
+                                                        const hours = Math.floor(i / 2);
+                                                        const minutes = i % 2 === 0 ? "00" : "30";
+                                                        const time = `${hours.toString().padStart(2, "0")}:${minutes}`;
+                                                        return <option key={time} value={time}>{time}</option>;
+                                                    })}
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] text-gray-400 mb-1">Fin</p>
+                                                <select
+                                                    name="end_time"
+                                                    value={formData.end_time}
+                                                    onChange={handleChange}
+                                                    className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#6338CC]"
+                                                >
+                                                    <option value="">--:--</option>
+                                                    {Array.from({ length: 48 }, (_, i) => {
+                                                        const hours = Math.floor(i / 2);
+                                                        const minutes = i % 2 === 0 ? "00" : "30";
+                                                        const time = `${hours.toString().padStart(2, "0")}:${minutes}`;
+                                                        return <option key={time} value={time}>{time}</option>;
+                                                    })}
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
 
                                     {/* Comentarios */}
-                                    <div>
-                                        <label className="text-xs font-bold text-gray-600 block mb-1">Comentarios</label>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">Comentarios</label>
                                         <textarea
                                             name="comments"
                                             value={formData.comments}
                                             onChange={handleChange}
                                             rows={3}
                                             placeholder="Instrucciones especiales, medicación, etc."
-                                            className="w-full border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-purple-400 resize-none"
+                                            className="w-full bg-white border border-[#EADBCE] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6338CC] resize-none"
                                         />
                                     </div>
 
                                     {bookingError && (
-                                        <p className="text-red-500 text-xs bg-red-50 p-2 rounded-xl">{bookingError}</p>
+                                        <p className="text-red-500 text-xs bg-red-50 border border-red-200 p-2.5 rounded-xl">{bookingError}</p>
                                     )}
 
                                     <button
                                         onClick={handleReserva}
                                         disabled={bookingLoading}
-                                        className="w-full bg-[#6338CC] hover:bg-[#522cb3] text-white font-bold py-3 rounded-xl transition text-sm disabled:opacity-60"
+                                        className="w-full bg-purple-700 hover:bg-[#522cb3] text-white font-bold py-3.5 rounded-xl transition text-sm disabled:opacity-60 shadow-md shadow-purple-200"
                                     >
                                         {bookingLoading ? "Enviando reserva..." : "Solicitar reserva →"}
                                     </button>

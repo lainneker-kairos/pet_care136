@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { loginUser, resetPassword } from "@/Services/api";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function Login() {
   const router = useRouter();
@@ -54,7 +55,7 @@ export default function Login() {
       console.log("esto nos trae data", data);
       if (!data.user) {
         //esta validacion para mostrar el mensaje de error del backend o uno genérico y detener la ejecución
-        alert(data.msg || data.error || data.message || "Credenciales inválidas. Verifica tu correo y contraseña.");
+        toast.error(data.msg || data.error || data.message || "Credenciales inválidas. Verifica tu correo y contraseña.");
         return;
       }
 
@@ -71,7 +72,7 @@ export default function Login() {
 
     } catch (error) {
       console.error("Error en el login:", error);
-      alert("Ocurrió un error inesperado. Por favor, vuelve a intentarlo.");
+      toast.error("Ocurrió un error inesperado. Por favor, vuelve a intentarlo.");
       setIsLoading(false);
     }
   };
@@ -92,13 +93,13 @@ export default function Login() {
   const handleResetPassword = async () => {
     try {
       await resetPassword({ email: email, new_password: newPassword });
-      alert("Contraseña reestablecida con éxito!")
+      toast.success("Contraseña reestablecida con éxito!")
       setShowModal(false)
       setEmail("")
       setNewPassword("")
 
     } catch (error) {
-      alert(error.message || "Error al restablecer la contraseña")
+      toast.error(error.message || "Error al restablecer la contraseña")
     }
   }
 
