@@ -7,7 +7,6 @@ import {
   updatePetsitterProfile
 } from "../Services/api";
 import Link from "next/link";
-import { toast } from "sonner";
 
 export default function PerfilCuidador() {
   const [profile, setProfile] = useState(null);
@@ -594,7 +593,7 @@ export default function PerfilCuidador() {
             <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE] space-y-4">
               <h2 className="text-lg font-bold text-[#1A202C]">Ubicación del Cuidador</h2>
               <div className="w-full h-48 bg-[#EFE9E2] rounded-xl flex items-center justify-center border border-[#EADBCE]">
-                <p className="text-gray-500 text-sm text-center">
+                <p className="text-gray-500 text-sm">
                   {caregiver.neighborhood}, {caregiver.city}
                   <br />
                   <span className="text-xs italic">(Aquí irá el mapa de Google Maps)</span>
@@ -649,8 +648,11 @@ export default function PerfilCuidador() {
               >
                 ⚙️ Configurar Mis Tarifas
               </button>
-              <button className="w-full bg-purple-700 hover:bg-[#522cb3] text-white font-semibold py-3 px-4 rounded-xl transition duration-200 flex items-center justify-center gap-2 shadow-md">
-                <Link href="/misreservas">Ver Mis Reservas</Link>
+              <button className="w-full bg-[#6338CC] hover:bg-[#522cb3] text-white font-semibold py-3 px-4 rounded-xl transition duration-200 flex items-center justify-center gap-2 shadow-md">
+               <Link 
+               href="/misreservas">
+                Ver Mis Reservas
+                </Link>
               </button>
             </div>
 
