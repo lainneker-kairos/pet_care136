@@ -1,7 +1,6 @@
 from flask_socketio import SocketIO
 
 # Inicializamos SocketIO permitiendo conexiones desde cualquier origen (CORS)
-# En producción, deberías restringir cors_allowed_origins a tu dominio frontend
 socketio = SocketIO(cors_allowed_origins="*")
 
 from flask import request

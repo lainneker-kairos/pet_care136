@@ -286,7 +286,7 @@ export const getPetsitterReviews = async (petsitter_id) => {
     const response = await fetch(`${API_URL}/reviews/petsitter/${petsitter_id}`, {
         method: 'GET',
         headers: {
-             "Content-Type": "aplication/json",
+             "Content-Type": "application/json",
         },
  });
 
