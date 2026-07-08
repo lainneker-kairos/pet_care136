@@ -37,7 +37,7 @@ export default function HeroSection() {
               Encontrar un cuidador
             </Link>
 
-            <Link href="/perfil" className="rounded-lg border-2 border-purple-700 px-8 py-4 text-center font-bold text-purple-700">
+            <Link href="/perfil-cuidador" className="rounded-lg border-2 border-purple-700 px-8 py-4 text-center font-bold text-purple-700">
               Convertirse en cuidador
             </Link>
           </div>

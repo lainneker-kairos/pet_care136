@@ -3,6 +3,7 @@ import { useState } from "react";
 import Image from 'next/image';
 import { registerUser } from "@/Services/api";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function Register() {
   const router = useRouter()
@@ -65,7 +66,7 @@ export default function Register() {
     }
 
     setIsLoading(false);
-    alert("¡Registro exitoso!");
+    toast.success("¡Registro exitoso!");
 
     setFormData({
       name: "",
