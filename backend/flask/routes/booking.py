@@ -21,7 +21,8 @@ def create_booking():
     pet_id = data.get('pet_id')
     service_type = data.get('service_type') 
     start_date = data.get('start_date')     
-    end_date = data.get('end_date')  
+    end_date = data.get('end_date')
+    role = data.get('role')  # 'owner' o 'petsitter' 
 
     start_time = data.get('start_time')
     duration_hours = data.get('duration_hours')
@@ -92,7 +93,6 @@ def create_booking():
         days_dec = Decimal(str(days))
         hours_dec = Decimal(str(hours_calculated))    
 
-
         if service_type == "hotel":
             if not petsitter.offers_hotel:
                  return jsonify({"msg": "Este cuidador no ofrece servicio de hotel"}), 400
@@ -159,7 +159,8 @@ def create_booking():
         "service": service_type,
         "pet_photo": pet.photo,
         "booking_id": new_booking.id,
-        "is_read": False
+        "is_read": False,
+        "redirect_url": "/perfil-owner/reservas" if role == 'owner' else "/perfil-petsitter/reservas"
     }
     socketio.emit('new_notification', notification_data, room=room_name)
 
@@ -176,6 +177,7 @@ def create_booking():
 def update_booking_status(booking_id):
     data = request.json
     new_status = data.get('status')
+    role = data.get('role')  # 'owner' o 'petsitter'
 
     if not new_status:
         return jsonify({"msg": "Falta el nuevo estado"}), 400
@@ -224,7 +226,8 @@ def update_booking_status(booking_id):
         "message": new_notification.message,
         "status": new_status,
         "booking_id": booking.id,
-        "is_read": False
+        "is_read": False,
+        "redirect_url": "/perfil-owner/reservas" if role == 'owner' else "/perfil-petsitter/reservas"
     }
     
     socketio.emit('new_notification', notification_data, room=room_name)

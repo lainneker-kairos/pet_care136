@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify
 from database import db
 from models.reviews import Review
+from extension_sockets import socketio
+from models.notification import Notification
 
 reviews_bp = Blueprint('reviews_bp', __name__)
 
@@ -36,6 +38,29 @@ def create_review():
     db.session.add(new_review)
     db.session.commit()
 
+    new_notification = Notification(
+        user_id=reviewed_id,
+        title="¡Nueva reseña recibida! ⭐",
+        message=f"Alguien te ha calificado con {rating} estrellas.",
+        type="new_review"
+    )
+    
+    db.session.add(new_notification)
+    db.session.commit()
+
+    room_name = f"user_{reviewed_id}"
+    notification_data = {
+        "id": new_notification.id,
+        "type": new_notification.type,
+        "title": new_notification.title,
+        "message": new_notification.message,
+        "booking_id": booking_id,
+        "rating": rating,
+        "is_read": False
+    }
+
+    socketio.emit('new_notification', notification_data, room=room_name)
+    
     return jsonify({
         "msg": "Reseña creada exitosamente",
         "review": new_review.serialize()

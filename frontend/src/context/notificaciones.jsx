@@ -1,25 +1,28 @@
 "use client";
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
+import { useRouter } from "next/navigation";
+import { toast } from 'sonner';
 
 // Función manual para decodificar JWT sin librerías externas
 const parseJwt = (token) => {
   try {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(function (c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join('')
+    );
     return JSON.parse(jsonPayload);
   } catch (e) {
     return null;
   }
 };
-
-// Simulación del router de Next.js para evitar errores
-const useRouter = () => ({
-  push: (url) => console.log(`Redirigiendo a: ${url}`)
-});
 
 const NotificationContext = createContext();
 
@@ -34,11 +37,11 @@ export const NotificationProvider = ({ children }) => {
   useEffect(() => {
     // obtener el token
     const token = typeof window !== 'undefined' ? localStorage.getItem('TOKENJWT') : null;
-    
+
     if (token) {
       try {
         const decoded = parseJwt(token);
-        const userId = decoded ? decoded.sub : 1; 
+        const userId = decoded ? decoded.sub : 1;
 
         // Inicializar conexión Socket.IO
         const socketInstance = io(process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000', {
@@ -54,10 +57,17 @@ export const NotificationProvider = ({ children }) => {
         socketInstance.on('new_notification', (data) => {
           console.log("Nueva notificación recibida:", data);
           const newNotif = { ...data, id: Date.now() };
-          
+
           // Añadir notificación a la pila
           setNotifications((prev) => [newNotif, ...prev]);
-          
+
+          toast.info(data.title, {
+            onClick: () => {
+              if (data.redirect_url) {
+                router.push(data.redirect_url);
+              }
+            }
+          });
         });
 
         setSocket(socketInstance);
@@ -82,7 +92,7 @@ export const NotificationProvider = ({ children }) => {
   return (
     <NotificationContext.Provider value={{ socket, notifications }}>
       {children}
-      
+
       {/* Contenedor de la burbuja flotante en la esquina inferior derecha */}
       <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
         
@@ -92,7 +102,7 @@ export const NotificationProvider = ({ children }) => {
             <div className="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
               <h3 className="font-bold text-gray-800">Notificaciones</h3>
               {unreadCount > 0 && (
-                <button 
+                <button
                   onClick={clearAll}
                   className="text-xs text-purple-600 hover:text-purple-800 font-semibold transition-colors"
                 >
@@ -100,7 +110,7 @@ export const NotificationProvider = ({ children }) => {
                 </button>
               )}
             </div>
-            
+
             <div className="max-h-96 overflow-y-auto p-2 custom-scrollbar">
               {notifications.length === 0 ? (
                 <div className="p-8 text-center text-gray-500 flex flex-col items-center">
@@ -109,11 +119,17 @@ export const NotificationProvider = ({ children }) => {
                 </div>
               ) : (
                 notifications.map((notif) => (
-                  <div 
-                    key={notif.id} 
+                  <div
+                    key={notif.id}
                     className="p-3 mb-2 bg-white hover:bg-purple-50/50 rounded-xl transition-all border border-transparent hover:border-purple-100 relative group cursor-pointer"
                     onClick={() => {
-                      router.push('/misreservas');
+                      // Usa el redirect_url si viene del backend, o usa el predeterminado
+                      if (notif.redirect_url) {
+                        router.push(notif.redirect_url);
+                      } else {
+                        router.push('/misreservas');
+                      }
+                      
                       removeNotification(notif.id);
                       if (notifications.length === 1) setIsOpen(false); // Cierra si era la última
                     }}
@@ -122,20 +138,20 @@ export const NotificationProvider = ({ children }) => {
                       {/* Icono miniatura */}
                       <div className="flex-shrink-0 mt-0.5">
                         {notif.type === 'new_request' ? (
-                           <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center overflow-hidden border border-purple-200">
-                             {notif.pet_photo ? (
-                               <img src={notif.pet_photo} alt="Pet" className="w-full h-full object-cover" />
-                             ) : (
-                               <span className="text-lg">🐾</span>
-                             )}
-                           </div>
+                          <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center overflow-hidden border border-purple-200">
+                            {notif.pet_photo ? (
+                              <img src={notif.pet_photo} alt="Pet" className="w-full h-full object-cover" />
+                            ) : (
+                              <span className="text-lg">🐾</span>
+                            )}
+                          </div>
                         ) : (
-                           <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${notif.status === 'aceptado' ? 'bg-green-100 border border-green-200' : 'bg-red-100 border border-red-200'}`}>
-                              {notif.status === 'aceptado' ? '✨' : '😞'}
-                           </div>
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${notif.status === 'aceptado' ? 'bg-green-100 border border-green-200' : 'bg-red-100 border border-red-200'}`}>
+                            {notif.status === 'aceptado' ? '✨' : '😞'}
+                          </div>
                         )}
                       </div>
-                      
+
                       {/* Textos */}
                       <div className="flex-1 min-w-0 pr-6">
                         <p className="text-sm font-bold text-gray-900 leading-tight">
@@ -148,7 +164,7 @@ export const NotificationProvider = ({ children }) => {
                     </div>
 
                     {/* Botón oculto para eliminar una sola notificación */}
-                    <button 
+                    <button
                       onClick={(e) => {
                         e.stopPropagation(); // Evita que se dispare el onClick de toda la tarjeta
                         removeNotification(notif.id);
@@ -165,7 +181,7 @@ export const NotificationProvider = ({ children }) => {
         )}
 
         {/* Botón principal (Burbuja) */}
-        <button 
+        <button
           onClick={() => setIsOpen(!isOpen)}
           className="relative w-14 h-14 bg-purple-600 hover:bg-purple-700 text-white rounded-full shadow-[0_8px_30px_rgb(147,51,234,0.4)] flex items-center justify-center transition-transform duration-200 hover:scale-105 active:scale-95"
           aria-label={isOpen ? "Cerrar notificaciones" : "Abrir notificaciones"}
@@ -183,7 +199,7 @@ export const NotificationProvider = ({ children }) => {
               <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
             </svg>
           )}
-          
+
           {/* Badge de contador rojo */}
           {!isOpen && unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full shadow-sm">
@@ -192,9 +208,10 @@ export const NotificationProvider = ({ children }) => {
           )}
         </button>
       </div>
-      
+
       {/* Estilos para animaciones y scrollbar */}
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes fade-in-up {
           0% { opacity: 0; transform: translateY(20px) scale(0.95); }
           100% { opacity: 1; transform: translateY(0) scale(1); }
