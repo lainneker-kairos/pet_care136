@@ -214,9 +214,8 @@ export default function MisReservas() {
           </div>
           <span
             className={`text-xs text-white font-bold px-4 py-2 rounded-xl shadow-sm ${
-              activeRole === "owner" ? "bg-emerald-600" : "bg-purple-600"
-            }`}
-          >
+              activeRole === "owner" ? "bg-emerald-600" : "bg-[#6338CC]"
+            }`}>
             Total: {reservas.length} registros
           </span>
         </div>
@@ -305,7 +304,7 @@ export default function MisReservas() {
 
                   <div className="text-xs space-y-1 pt-1 border-t border-[#EADBCE]/30">
                     <p className="text-gray-700">
-                      🐾 <span className="font-bold text-gray-900">Mascota protegida:</span>{" "}
+                      🐾 <span className="font-bold text-gray-900">Mascota:</span>{" "}
                       {res.pet_name || "Mascota"}
                     </p>
                     {activeRole === "petsitter" && res.owner_phone && (
