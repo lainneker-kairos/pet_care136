@@ -7,6 +7,7 @@ import {
   updatePetsitterProfile
 } from "../Services/api";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export default function PerfilCuidador() {
   const [profile, setProfile] = useState(null);
@@ -178,7 +179,7 @@ export default function PerfilCuidador() {
           </div>
 
           <form onSubmit={handleRegisterPetsitter} className="space-y-4">
-            
+
             {/* Sección Avatar Interactiva para el registro inicial */}
             <div className="flex flex-col items-center space-y-2">
               <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Foto de Perfil Profesional</label>
@@ -402,9 +403,8 @@ export default function PerfilCuidador() {
                   <h2 className="text-xl font-bold text-[#1A202C]">Mi Biografía Profesional</h2>
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="text-sm font-semibold text-purple-700 hover:underline"
-                  >
-                    ✏️ Editar Perfil Cuidador
+                    className="text-base font-semibold text-purple-700">
+                    ✏️ <span className="hover:underline">Editar Perfil Cuidador</span>
                   </button>
                 </div>
 
@@ -648,10 +648,10 @@ export default function PerfilCuidador() {
               >
                 ⚙️ Configurar Mis Tarifas
               </button>
-              <button className="w-full bg-[#6338CC] hover:bg-[#522cb3] text-white font-semibold py-3 px-4 rounded-xl transition duration-200 flex items-center justify-center gap-2 shadow-md">
-               <Link 
-               href="/misreservas">
-                Ver Mis Reservas
+              <button className="w-full bg-purple-700 hover:bg-[#522cb3] text-white font-semibold py-3 px-4 rounded-xl transition duration-200 flex items-center justify-center gap-2 shadow-md">
+                <Link
+                  href="/misreservas">
+                  Ver Mis Reservas
                 </Link>
               </button>
             </div>

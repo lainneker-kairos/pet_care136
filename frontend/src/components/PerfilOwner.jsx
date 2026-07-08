@@ -137,7 +137,10 @@ export default function PerfilDueno() {
   // --- ACCIONES DEL CRUD DE MASCOTAS ---
   const handleGuardarMascota = async (e) => {
     e.preventDefault();
-    if (!nombre.trim()) return alert("El nombre es obligatorio");
+    if (!nombre.trim()) {
+      toast.error("El nombre es obligatorio");
+      return;
+    }
 
     const petData = {
       name: nombre,
@@ -153,7 +156,7 @@ export default function PerfilDueno() {
       photo: foto
     };
 
-    if (editandoId !== null) {
+    if (editandoId !== null && editandoId !== "nuevo") {
       try {
         await updatePet(editandoId, petData);
         limpiarFormulario();
@@ -245,7 +248,7 @@ export default function PerfilDueno() {
 
   const owner = perfilUsuario.owner_profile;
 
-return (
+  return (
     <div className="min-h-screen bg-[#F0F7F7] font-sans antialiased text-[#2D3748] py-8 px-4">
       <div className="max-w-6xl mx-auto space-y-6">
 
@@ -305,6 +308,11 @@ return (
                 </button>
                 <Link href="/misreservas" className="w-full bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2 shadow-md">
                   📋 Mis Reservas
+                </Link>
+                <Link
+                  href="/perfil-cuidador"
+                  className="w-full bg-[#00A896] hover:bg-[#008f80] text-white font-bold text-xs py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2 shadow-md">
+                  🐾 Convertirse en Cuidador
                 </Link>
               </div>
             ) : (
@@ -366,7 +374,7 @@ return (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {mascotas.map((mascota) => (
                   <div key={mascota.id} className="bg-[#FAF6F0] rounded-2xl border border-[#EADBCE] shadow-sm overflow-hidden hover:shadow-md transition">
-                    
+
                     {/* Foto de la mascota */}
                     <div className="w-full h-36 overflow-hidden bg-[#EFE9E2]">
                       <img
