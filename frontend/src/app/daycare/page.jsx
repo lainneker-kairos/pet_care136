@@ -13,10 +13,12 @@ export default function GuarderiaPage() {
                             <span className="w-fit rounded-full bg-teal-100 px-4 py-2 text-sm font-semibold text-teal-700">
                                 ✓ Entorno seguro y divertido
                             </span>
-
-                            <h1 className="text-5xl font-bold leading-tight text-purple-700">
-                                Cuidado y Guardería para tu mascota
+                        
+                        <div className="mt-2 rounded-2xl bg-[#FAF6F0] p-6 shadow-x1 border border-[#EADBCE]">
+                            <h1 className="text-4xl font-bold leading-tight text-purple-700">
+                                Cuidado y Guardería Para Tu Mascota
                             </h1>
+                        </div>
 
                             <p className="text-lg leading-7 text-gray-600">
                                 El lugar perfecto para que tu mascota socialice, juegue o pase la noche de forma segura. Supervisión experta y amigos peludos garantizados en cada estancia.
@@ -24,7 +26,7 @@ export default function GuarderiaPage() {
 
                             {/* Widget Buscador sincronizado con el Back (daycare / nightcare) */}
                             <div className="mt-2 rounded-2xl bg-[#FAF6F0] p-6 shadow-xl border border-gray-100">
-                                <h3 className="text-lg font-bold text-teal-700 mb-4">Reserva su lugar hoy</h3>
+                                <h3 className="text-lg font-bold text-purple-700 mb-4">Reserva su lugar hoy</h3>
 
                                 <form action="/cuidadores" className="flex flex-col gap-4">
                                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

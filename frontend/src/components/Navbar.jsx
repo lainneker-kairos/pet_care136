@@ -66,13 +66,13 @@ return (
                 {/* MENÚ CENTRAL - Reducido gap-8 a gap-6 para optimizar espacio horizontal */}
                 <div className="hidden items-center gap-6 text-sm font-medium text-gray-600 md:flex">
                     <Link href="/DogWalkingPage" className="transition-colors hover:text-purple-700">
-                        Paseo de mascotas
+                        Paseo de Mascotas
                     </Link>
                     <Link href="/daycare" className="transition-colors hover:text-purple-700">
                         Guardería
                     </Link>
                     <Link href="/hotel" className="transition-colors hover:text-purple-700">
-                        Hotel de mascotas
+                        Hotel de Mascotas
                     </Link>
                     <Link href="/cuidadores" className="transition-colors hover:text-purple-700">
                         Cuidadores

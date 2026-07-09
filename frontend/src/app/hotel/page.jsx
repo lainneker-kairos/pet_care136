@@ -14,9 +14,11 @@ export default function HotelPage() {
                                 ✓ Tu mascota en las mejores manos
                             </span>
 
-                            <h1 className="text-5xl font-bold leading-tight text-purple-700">
-                                Hotel Canino: Estancias Llenas de Amor
+                        <div className="mt-2 rounded-2xl bg-[#FAF6F0] p-6 shadow-x1 border border-[#EADBCE]">
+                            <h1 className="text-4xl font-bold leading-tight text-purple-700">
+                                Hotel Canino: Estancias Llenas De Amor
                             </h1>
+                        </div>
 
                             <p className="text-lg leading-7 text-gray-600">
                                 El alojamiento ideal para cuando tienes que viajar. Tu perro disfrutará de un hogar cálido, paseos diarios y atención las 24 horas del día.
@@ -24,7 +26,7 @@ export default function HotelPage() {
 
                             {/* Widget Buscador sincronizado con 'offers_hotel' */}
                             <div className="mt-2 rounded-2xl bg-[#FAF6F0] p-6 shadow-xl border border-gray-100">
-                                <h3 className="text-lg font-bold text-teal-700 mb-4">Reserva su estancia</h3>
+                                <h3 className="text-lg font-bold text-purple-700 mb-4">Reserva su estancia</h3>
                                 
                                 <form action="/cuidadores" className="flex flex-col gap-4">
                                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

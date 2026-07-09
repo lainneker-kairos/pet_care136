@@ -381,15 +381,15 @@ export default function PerfilCuidador() {
 
                 <div className="grid grid-cols-3 gap-2 bg-[#EFE9E2] p-3 rounded-xl text-center">
                   <div>
-                    <p className="text-xl font-bold text-[#6338CC]">{caregiver.booking_count || 0}</p>
+                    <p className="text-xl font-bold text-purple-700">{caregiver.booking_count || 0}</p>
                     <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">Reservas</p>
                   </div>
                   <div className="border-x border-gray-300">
-                    <p className="text-xl font-bold text-[#6338CC]">{caregiver.experience_years} {caregiver.experience_years === 1 ? 'Año' : 'Años'}</p>
-                    <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">Exp.</p>
+                    <p className="text-xl font-bold text-purple-700">{caregiver.experience_years} {caregiver.experience_years === 1 ? 'Año' : 'Años'}</p>
+                    <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">Experiencia</p>
                   </div>
                   <div>
-                    <p className="text-xl font-bold text-[#6338CC]">Disponible</p>
+                    <p className="text-xl font-bold text-purple-700">Disponible</p>
                     <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">Calendario</p>
                   </div>
                 </div>
@@ -400,7 +400,7 @@ export default function PerfilCuidador() {
             {!isEditing ? (
               <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE] space-y-4">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-bold text-[#1A202C]">Mi Biografía Profesional</h2>
+                  <h2 className="text-xl font-bold text-purple-700">Mi Biografía Profesional</h2>
                   <button
                     onClick={() => setIsEditing(true)}
                     className="text-base font-semibold text-purple-700">
@@ -521,7 +521,7 @@ export default function PerfilCuidador() {
                         name="offers_walk"
                         checked={formData.offers_walk}
                         onChange={handleChange}
-                        className="rounded text-[#6338CC] focus:ring-[#6338CC]"
+                        className="rounded text-purple-700 focus:ring-[#6338CC]"
                       />
                       🚶 Ofrecer Paseos
                     </label>
@@ -532,7 +532,7 @@ export default function PerfilCuidador() {
                         name="offers_hotel"
                         checked={formData.offers_hotel}
                         onChange={handleChange}
-                        className="rounded text-[#6338CC] focus:ring-[#6338CC]"
+                        className="rounded text-purple-700 focus:ring-[#6338CC]"
                       />
                       🏠 Ofrecer Hotel / Alojamiento
                     </label>
@@ -543,7 +543,7 @@ export default function PerfilCuidador() {
                         name="offers_daycare"
                         checked={formData.offers_daycare}
                         onChange={handleChange}
-                        className="rounded text-[#6338CC] focus:ring-[#6338CC]"
+                        className="rounded text-purple-700 focus:ring-[#6338CC]"
                       />
                       🐾 Ofrecer Guardería Diurna
                     </label>
@@ -554,7 +554,7 @@ export default function PerfilCuidador() {
                         name="offers_nightcare"
                         checked={formData.offers_nightcare}
                         onChange={handleChange}
-                        className="rounded text-[#6338CC] focus:ring-[#6338CC]"
+                        className="rounded text-purple-700 focus:ring-[#6338CC]"
                       />
                       🌙 Ofrecer Cuidado Nocturno
                     </label>
@@ -562,7 +562,7 @@ export default function PerfilCuidador() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-gray-500 uppercase">Biografía profesional</label>
+                  <label className="text-xs font-bold text-gray-500 uppercase">Biografía Profesional</label>
                   <textarea
                     rows="3"
                     name="bio"
@@ -591,7 +591,7 @@ export default function PerfilCuidador() {
             )}
 
             <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE] space-y-4">
-              <h2 className="text-lg font-bold text-[#1A202C]">Ubicación del Cuidador</h2>
+              <h2 className="text-lg font-bold text-purple-700">Ubicación del Cuidador</h2>
               <div className="w-full h-48 bg-[#EFE9E2] rounded-xl flex items-center justify-center border border-[#EADBCE]">
                 <p className="text-gray-500 text-sm">
                   {caregiver.neighborhood}, {caregiver.city}
@@ -620,25 +620,25 @@ export default function PerfilCuidador() {
                 {caregiver.offers_walk && (
                   <div className="flex justify-between items-center bg-[#EFE9E2] p-3 rounded-xl">
                     <span className="flex items-center gap-2 text-sm font-medium">🚶 Paseo de Perros</span>
-                    <span className="font-bold text-[#6338CC] text-sm">{caregiver.price_per_hour} €/hr</span>
+                    <span className="font-bold text-purple-700 text-sm">{caregiver.price_per_hour} €/hr</span>
                   </div>
                 )}
                 {caregiver.offers_daycare && (
                   <div className="flex justify-between items-center bg-[#EFE9E2] p-3 rounded-xl">
                     <span className="flex items-center gap-2 text-sm font-medium">🐾 Guardería Diurna</span>
-                    <span className="font-bold text-[#6338CC] text-sm">{caregiver.price_per_hour} €/día</span>
+                    <span className="font-bold text-purple-700 text-sm">{caregiver.price_per_hour} €/día</span>
                   </div>
                 )}
                 {caregiver.offers_hotel && (
                   <div className="flex justify-between items-center bg-[#EFE9E2] p-3 rounded-xl">
                     <span className="flex items-center gap-2 text-sm font-medium">🏠 Alojamiento Completo</span>
-                    <span className="font-bold text-[#6338CC] text-sm">{caregiver.price_per_night} €/noche</span>
+                    <span className="font-bold text-purple-700 text-sm">{caregiver.price_per_night} €/noche</span>
                   </div>
                 )}
                 {caregiver.offers_nightcare && (
                   <div className="flex justify-between items-center bg-[#EFE9E2] p-3 rounded-xl">
                     <span className="flex items-center gap-2 text-sm font-medium">🌙 Cuidado Nocturno</span>
-                    <span className="font-bold text-[#6338CC] text-sm">{caregiver.price_per_night} €/noche</span>
+                    <span className="font-bold text-purple-700 text-sm">{caregiver.price_per_night} €/noche</span>
                   </div>
                 )}
               </div>
@@ -659,7 +659,7 @@ export default function PerfilCuidador() {
             <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE] space-y-4">
               <h2 className="text-md font-bold text-[#1A202C]">Disponibilidad Semanal</h2>
               <div className="text-xs text-gray-700 space-y-1">
-                <p>🗓️ <span className="font-bold text-[#6338CC]">Días disponibles:</span></p>
+                <p>🗓️ <span className="font-bold text-purple-700">Días disponibles:</span></p>
                 <p className="bg-[#EFE9E2] p-2.5 rounded-lg border border-[#EADBCE]/40 font-semibold">
                   {caregiver.available_days || "No especificado"}
                 </p>
