@@ -12,9 +12,11 @@ export default function Accordion({ faqs }) {
     <section className="bg-[#f7f8ff] px-8 py-20">
       <div className="mx-auto max-w-4xl">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-purple-700 mb-4">
+          <div className="mt-2 rounded-2xl bg-[#FAF6F0] p-3 shadow-x1 border border-[#EADBCE]">         
+          <h2 className="text-4xl font-bold text-purple-700 mb-1">
             Preguntas Frecuentes
           </h2>
+          </div>
           <p className="text-gray-600">
             Encuentra respuestas a las preguntas más comunes sobre nuestros servicios
           </p>

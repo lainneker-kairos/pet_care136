@@ -25,9 +25,11 @@ export default function HeroSection() {
           <span className="w-fit rounded-full bg-teal-100 px-4 py-2 text-sm font-semibold text-teal-700">
             ✓ Cuidadores verificados en tu zona
           </span>
+          <div className="mt-2 rounded-2xl bg-[#FAF6F0] p-6 shadow-x1 border border-[#EADBCE]">
           <h1 className="text-5xl font-bold leading-tight text-purple-700">
-            El mejor cuidado para tu mejor amigo
+            El Mejor Cuidado Para Tu Mejor Amigo
           </h1>
+          </div>
           <p className="text-lg leading-7 text-gray-600">
             Encuentra paseadores y cuidadores de confianza cerca de ti, listos para tratar a tu mascota como parte de su familia.
           </p>

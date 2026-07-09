@@ -12,7 +12,7 @@ export default function TrustSection() {
                             className="h-[420px] w-full rounded-[28px] object-cover"
                         />
 
-                        <div className="absolute bottom-[-24px] right-[-24px] w-44 rounded-xl bg-purple-700 p-6 text-white shadow-xl">
+                        <div className="absolute bottom-[-24px] right-[-34px] w-44 rounded-xl bg-purple-700 p-6 text-white shadow-xl">
                             <p className="text-lg font-bold leading-tight">
                                 Seguridad 100% garantizada en cada reserva.
                             </p>
@@ -20,11 +20,13 @@ export default function TrustSection() {
                     </div>
 
                     <div>
-                        <h2 className="mb-8 text-4xl font-bold leading-tight text-purple-700">
+                    <div className="mt-2 rounded-2xl bg-[#FAF6F0] p-1 shadow-x3 border border-[#EADBCE]">
+                        <h2 className="mb-2 text-4xl font-bold leading-tight text-purple-700">
                             ¿Por qué confiar en PetCare?
                         </h2>
+                    </div>
 
-                        <div className="space-y-6">
+                        <div className="space-y-7">
                             <div className="flex gap-4">
                                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-200">
                                     <ShieldCheck size={20} />

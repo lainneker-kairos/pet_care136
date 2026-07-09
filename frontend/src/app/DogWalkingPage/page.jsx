@@ -26,17 +26,19 @@ export default function DogWalkingPage() {
                                 ✓ Confianza en cada paso
                             </span>
 
-                            <h1 className="text-5xl font-bold leading-tight text-purple-700">
-                                Paseos Personalizados para tu mascota
-                            </h1>
-
+                            <div className="mt-2 rounded-2xl bg-[#FAF6F0] p-6 shadow-x1 border border-[#EADBCE]">
+                                <h1 className="text-4xl font-bold leading-tight text-purple-700">
+                                Paseos Personalizados Para Tu Mascota
+                                </h1>
+                            </div>
+                            
                             <p className="text-lg leading-7 text-gray-600">
                                 Paseos individuales o grupales adaptados al ritmo de tu mascota. Nuestros paseadores expertos garantizan seguridad y diversión en cada salida.
                             </p>
 
                             {/* El Widget Buscador que interactúa con el Back */}
                             <div className="mt-2 rounded-2xl bg-[#FAF6F0] p-6 shadow-xl border border-[#EADBCE]">
-                                <h3 className="text-lg font-bold text-teal-700 mb-4">Encuentra al paseador ideal</h3>
+                                <h3 className="text-lg font-bold text-purple-700 mb-4">Encuentra al paseador ideal</h3>
 
                                 <form onSubmit={handleSearch} className="flex flex-col gap-4">
 
