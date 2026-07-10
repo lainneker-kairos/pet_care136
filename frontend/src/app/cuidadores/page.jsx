@@ -1,12 +1,12 @@
 "use client";
 
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
 import CuidadorCard from "@/components/CuidadorCard";
 import CuidadoresMap from "@/components/CuidadoresMap";
 import { getPetsitters } from "@/Services/api";
 
-export default function ListaCuidadores() {
+function ListaCuidadoresContent() {
     const searchParams = useSearchParams();
 
     const serviceType = searchParams.get("service_type");
@@ -79,5 +79,13 @@ export default function ListaCuidadores() {
 
             </div>
         </div>
+    );
+}
+
+export default function ListaCuidadores() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Cargando cuidadores...</div>}>
+            <ListaCuidadoresContent />
+        </Suspense>
     );
 }
