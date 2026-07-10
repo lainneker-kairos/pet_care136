@@ -20,12 +20,10 @@ export default function TrustSection() {
                     </div>
 
                     <div>
-                    <div className="mt-2 rounded-2xl bg-[#FAF6F0] p-1 shadow-x3 border border-[#EADBCE]">
                         <h2 className="mb-2 text-4xl font-bold leading-tight text-purple-700">
                             ¿Por qué confiar en PetCare?
                         </h2>
-                    </div>
-
+                    
                         <div className="space-y-7">
                             <div className="flex gap-4">
                                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-200">
