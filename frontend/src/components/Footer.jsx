@@ -15,20 +15,17 @@ export default function Footer() {
                         className="w-18 h-18" 
                     />
                 </Link>
-                <div className="mt-2 rounded-2xl bg-[#FAF6F0] p-2 shadow-x1 border border-[#EADBCE]">
                     <p className="max-w-xs text-sm leading-6 text-purple-800">
-                        BRINDANDO CUIDADO PROFESIONAL PARA CADA MASCOTA, TODOS LOS DÍAS.
+                        Brindando cuidado profesional para cada mascota, todos los días.
                     </p>
                 </div>    
-                </div>
+                
 
                 <div>
-                    <div className="mt-2 rounded-2xl bg-[#FAF6F0] p-2 shadow-x1 border border-[#EADBCE]">
                     <h3 className="mb-1 text-sm font-bold uppercase tracking-wide text-gray-900">
                         Compañía
                     </h3>
-                    </div>
-
+                    
                     <ul className="space-y-3 text-sm text-gray-600">
                         <li className="transition-colors hover:text-purple-700">
                             <a href="#">Sobre Nosotros</a>
@@ -43,12 +40,10 @@ export default function Footer() {
                 </div>
 
                 <div>
-                    <div className="mt-2 rounded-2xl bg-[#FAF6F0] p-2 shadow-x1 border border-[#EADBCE]">
                     <h3 className="mb-1 text-sm font-bold uppercase tracking-wide text-gray-900">
                         Legal
                     </h3>
-                    </div>
-
+                    
                     <ul className="space-y-3 text-sm text-gray-600">
                         <li className="transition-colors hover:text-purple-700">
                             <a href="#">Política de privacidad</a>
@@ -63,12 +58,10 @@ export default function Footer() {
                 </div>
 
                 <div>
-                    <div className="mt-2 rounded-2xl bg-[#FAF6F0] p-2 shadow-x1 border border-[#EADBCE]">
                     <h3 className="mb-1 text-sm font-bold uppercase tracking-wide text-gray-900">
                         Síguenos
                     </h3>
-                    </div>
-
+                    
                     <div className="flex gap-3 mt-3">
                         {/* Facebook */}
                         <a
