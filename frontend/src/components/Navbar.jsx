@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { getUserProfile } from "@/Services/api";
 
 export default function Navbar() {
 
@@ -18,22 +19,13 @@ export default function Navbar() {
         if (token && userName) {
             setIsLoggedIn(true)
             setUser({ name: userName })
-
-            fetch('http://127.0.0.1:5000/api/profile/me', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+        getUserProfile()
+            .then((profileData) => {
+                setUser(profileData);
             })
-            .then(response => response.json())
-            .then(data => {
-                setUser({
-                    name: userName,
-                    ownerProfile: data.owner_profile,
-                    petsitterProfile: data.petsitter_profile
-                });
-            })
-            .catch(error => console.error('Error al obtener perfil:', error));
+            .catch((error) => {
+                console.error("Error al obtener el perfil del usuario:", error);
+            });
         }
 
     }, []);
