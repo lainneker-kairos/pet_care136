@@ -11,13 +11,13 @@ from routes.booking import bookings_bp
 from routes.calendar import calendar_bp
 from routes.maps import maps_bp
 from routes.searchpetsitter import searchpetsitter_bp
+from routes.reviews import reviews_bp
 # Importacion de modelos
 from models.user import User, Owner, Petsitter
 from models.pets import Pet
 from models.availability import Availability
 from models.booking import Booking
 from models.reviews import Review
-from routes.reviews import reviews_bp
 from models.notification import Notification
 
 # Importar la instancia de socketio
@@ -51,4 +51,5 @@ socketio.init_app(app)
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    socketio.run(app, debug=False, host='0.0.0.0', port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    socketio.run(app, debug=False, host='0.0.0.0', port=port)
