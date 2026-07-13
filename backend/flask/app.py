@@ -33,7 +33,7 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app, origins=[
     "http://localhost:3000",
-    "https://pet-care136.onrender.com"
+    "https://pet-care136-pr.vercel.app"
 ])
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
