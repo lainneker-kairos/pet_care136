@@ -21,7 +21,11 @@ export default function Navbar() {
             setUser({ name: userName })
         getUserProfile()
             .then((profileData) => {
-                setUser(profileData);
+                setUser({
+                    name: profileData.user?.name,
+                    ownerProfile: profileData.owner_profile,
+                    petsitterProfile: profileData.petsitter_profile,
+                });
             })
             .catch((error) => {
                 console.error("Error al obtener el perfil del usuario:", error);
