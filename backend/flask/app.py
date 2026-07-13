@@ -1,9 +1,14 @@
+import eventlet
+eventlet.monkey_patch()
+
 from flask import Flask
 from flask_cors import CORS
 from flask_migrate import Migrate
 from dotenv import load_dotenv
 from database import db
 import os
+from sqlalchemy.pool import NullPool
+
 # Importacion de routes
 from routes.user import user_bp
 from routes.pets import pets_bp  
@@ -26,7 +31,10 @@ from extension_sockets import socketio
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=[
+    "http://localhost:3000",
+    "https://pet-care136.onrender.com"
+])
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
