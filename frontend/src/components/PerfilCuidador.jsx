@@ -1,5 +1,5 @@
 "use client";
-
+import CuidadorLocationMap from "@/components/CuidadorLocationMap";
 import React, { useState, useEffect } from "react";
 import {
   getUserProfile,
@@ -592,12 +592,12 @@ export default function PerfilCuidador() {
 
             <div className="bg-[#FAF6F0] rounded-2xl p-6 shadow-sm border border-[#EADBCE] space-y-4">
               <h2 className="text-lg font-bold text-purple-700">Ubicación del Cuidador</h2>
-              <div className="w-full h-48 bg-[#EFE9E2] rounded-xl flex items-center justify-center border border-[#EADBCE]">
-                <p className="text-gray-500 text-sm">
-                  {caregiver.neighborhood}, {caregiver.city}
-                  <br />
-                  <span className="text-xs italic">(Aquí irá el mapa de Google Maps)</span>
-                </p>
+              <div className="w-full h-48 rounded-xl overflow-hidden border border-[#EADBCE]">
+                <CuidadorLocationMap
+                  city={caregiver.city}
+                  neighborhood={caregiver.neighborhood}
+                  name={caregiver.name}
+                />
               </div>
             </div>
 
