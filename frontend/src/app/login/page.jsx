@@ -1,7 +1,9 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation"; 
 
 export default function Login() {
+  const router = useRouter(); 
 
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -10,11 +12,9 @@ export default function Login() {
   });
   const [errors, setErrors] = useState({});
 
-  // Estados extra para el diseño (mostrar/ocultar contraseñas)
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // función de validación exacta
   const validateForm = () => {
     const newErrors = {};
 
@@ -33,42 +33,41 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // función de envío de formulario exacta
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     setIsLoading(true);
 
-    // lógica de registro real (API call)
+    try {
+      let result = await fetch('http://127.0.0.1:5000/api/user/login', {
+        method: 'POST',
+        body: JSON.stringify(formData),
+        headers:{
+          "Content-Type":"application/json"
+        }
+      });
 
-   let result = await fetch('http://127.0.0.1:5000/api/user/login', {
-      method: 'POST',
-      body: JSON.stringify(formData),
-      headers:{
-        "Content-Type":"application/Json"
+      let data = await result.json();
+      
+      if (result.ok) {
+        sessionStorage.setItem("TOKENJWT", data.token);
+        router.push("/private");
+      } else {
+        alert(data.msg || "Error al iniciar sesión");
       }
-    })
-
-    let data = await result.json();
-    console.log(data);
-    
-    localStorage.setItem("TOKENJWT", data.token);
-    setIsLoading(false);
-    alert("¡Sesion activa!");
-
-    setFormData({
-    email: "",
-    password: "",
-  });
+    } catch (error) {
+      console.error(error);
+      alert("Error de conexión");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Manejador de cambios exacto
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     
-    // Limpiar error al empezar a escribir
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -76,21 +75,16 @@ export default function Login() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-[#09090b] to-[#0f170d]/90 overflow-hidden font-sans">
-      {/* Luces de fondo de neón (ambiente detrás del vidrio) */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-600/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purpple-500/60 rounded-full blur-[120px] pointer-events-none" />
 
-      {/* Contenedor principal */}
       <div className="relative z-10 w-full max-w-md p-4">
-        {/* Logo flotante */}
         <div className="absolute top-[-30px] left-4 text-white font-semibold text-sm tracking-wider opacity-60">
           Logo
         </div>
 
-        {/* Tarjeta Glassmorphism */}
         <div className="w-full bg-white/[0.001] backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_32px_0_rgba(0,0,0,0.7)] rounded-3xl p-8 sm:p-10 transition-all duration-300">
           
-          {/* Cabecera */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-extrabold text-white tracking-tight">
               Iniciar sesión
@@ -100,10 +94,8 @@ export default function Login() {
             </p>
           </div>
 
-          {/* Formulario */}
           <form onSubmit={handleSubmit} className="space-y-5">
             
-            {/* Campo: Correo electrónico */}
             <div>
               <label className="block text-gray-300 text-xs font-semibold uppercase tracking-wider mb-2">
                 Correo electrónico
@@ -126,7 +118,6 @@ export default function Login() {
               )}
             </div>
 
-            {/* Campo: Contraseña */}
             <div>
               <label className="block text-gray-300 text-xs font-semibold uppercase tracking-wider mb-2">
                 Contraseña
@@ -167,7 +158,6 @@ export default function Login() {
               )}
             </div>
             
-            {/* Botón de Entrar */}
              <button
         type="submit"
         disabled={isLoading}
