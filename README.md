@@ -84,11 +84,9 @@ La aplicación permite a los usuarios encontrar soluciones personalizadas para e
 | *Búsqueda con Mapa Interactivo* | *Reserva de Paseos* |
 
 ## 👨‍💻 Proyecto grupal
-**Lainneker Contreras**
-**Valeria Carballo**
-**Israel**
-**Jeison Rendón**
-
-
+**Lainneker Contreras**  
+**Valeria Carballo**  
+**Israel**  
+**Jeison Rendón**  
 * Desarrollador Full-Stack | Valladolid, España.
 * [GitHub Profile](https://github.com/lainneker-kairos)
